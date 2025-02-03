@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "conc"
+  site-url: "https://polsci.github.io/conc"
+  description: "A Python library for efficient corpus analysis, enabling corpus linguistic analysis in Jupyter notebooks."
+  repo-branch: main
+  repo-url: "https://github.com/polsci/conc"
