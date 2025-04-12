@@ -2,6 +2,7 @@ _docs/
 _proc/
 test-corpora/
 pending/
+conc-build-process/
 
 *.bak
 .gitattributes
