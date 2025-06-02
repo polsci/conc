@@ -7,6 +7,7 @@ from __future__ import annotations
 from fastcore.basics import patch
 import numpy as np
 from IPython.display import display, HTML
+import polars as pl
 
 # %% auto 0
 __all__ = ['Text']
@@ -16,11 +17,12 @@ class Text:
 	""" Class to represent text documents """
 	def __init__(self,
 			  tokens:np.ndarray, # list of token strs
-			  has_spaces: np.ndarray # whether token strs followed by space
+			  has_spaces: np.ndarray, # whether token strs followed by space
+			  metadata: dict = {} # metadata for doc as a dict
 			  ): 
 		self.tokens = tokens
 		self.has_spaces = has_spaces
-
+		self.metadata = metadata
 
 # %% ../nbs/55_text.ipynb 7
 @patch
@@ -73,9 +75,21 @@ def tokens_count(self:Text):
 
 # %% ../nbs/55_text.ipynb 13
 @patch
+def display_metadata(self:Text,
+                ):
+    """ Output the metadata for a text """
+
+    Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
+
+
+# %% ../nbs/55_text.ipynb 14
+@patch
 def display(self:Text,
+            show_metadata: bool = True # whether to display Metadata for the text
                 ):
     """ Output a text """
     style = '<style>.conc-text {white-space: pre-wrap;}</style>\n'
+    if show_metadata:
+        self.display_metadata()
     display(HTML(style + self._div(self.as_string(), class_str = 'conc-text')))
 

@@ -264,16 +264,17 @@ def _complete_build_process(self: Corpus,
 
 	vocab_df.collect().write_parquet(f'{self.corpus_path}/vocab.parquet') #, maintain_order = True 
 	logger.memory_usage('wrote vocab to disk')
+	del vocab_df
 	tokens_df.collect().write_parquet(f'{self.corpus_path}/tokens.parquet') # , maintain_order = True
 	logger.memory_usage('wrote tokens to disk')
+	del tokens_df
 
-	self.document_count = tokens_df.select(pl.col('token2doc_index').filter(pl.col('token2doc_index') != NOT_DOC_TOKEN).unique().count()).collect(engine='streaming').item()
+	#self.document_count = tokens_df.select(pl.col('token2doc_index').filter(pl.col('token2doc_index') != NOT_DOC_TOKEN).unique().count()).collect(engine='streaming').item()
+	self.document_count = pl.scan_parquet(f'{self.corpus_path}/tokens.parquet').select(pl.col('token2doc_index')).max().collect().item()
 	logger.memory_usage(f'got doc count {self.document_count}')
 	# adjusting for text breaks and headers at start and end of index
 	self.token_count = input_length - self.document_count - INDEX_HEADER_LENGTH - INDEX_HEADER_LENGTH 
 	logger.memory_usage('got token count')
-
-	del tokens_df
 
 	self.punct_token_count = pl.scan_parquet(f'{self.corpus_path}/puncts.parquet').select(pl.len()).collect(engine='streaming').item() # TODO - may be more efficient to do this prior to disk write
 	logger.memory_usage('got punct token count')
@@ -452,7 +453,7 @@ def build(self: Corpus,
 
 	store_pos = 0
 
-	doc_order = 0
+	doc_order = 1
 	for doc in self._nlp.pipe(iterator, batch_size = spacy_batch_size): # was previously using self._nlp.tokenizer.pipe(iterator, batch_size=batch_size): but this is faster, test other options at some point
 		orth_index.append(doc.to_array(ORTH))
 		orth_index.append(eof_arr)
@@ -926,15 +927,15 @@ def tokenize(self: Corpus,
 # %% ../nbs/50_corpus.ipynb 81
 @patch
 def _get_text(self:Corpus,
-        doc_id: int # the id of the document
+        doc_id: int, # the id of the document
         ):
-    """ Get tokens and space definition for a text in the corpus """
+    """ Get tokens, space definitions and metadata for a text in the corpus """
 
     doc_tokens = self.tokens.filter(pl.col('token2doc_index') == doc_id).select(['orth_index', 'has_spaces']).collect()
     tokens = self.token_ids_to_tokens(doc_tokens.select(pl.col('orth_index')).to_numpy().flatten())
     has_spaces = doc_tokens.select(pl.col('has_spaces')).to_numpy().flatten()
-
-    return tokens, has_spaces
+    metadata = self.metadata.with_row_index(offset = 1, name = 'document_id').filter(pl.col('document_id') == doc_id).collect()
+    return tokens, has_spaces, metadata
 
 # %% ../nbs/50_corpus.ipynb 82
 @patch

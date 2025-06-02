@@ -91,4 +91,5 @@ d = { 'settings': { 'branch': 'main',
                            'conc.text.Text.as_string': ('text.html#text.as_string', 'conc/text.py'),
                            'conc.text.Text.as_tokens': ('text.html#text.as_tokens', 'conc/text.py'),
                            'conc.text.Text.display': ('text.html#text.display', 'conc/text.py'),
+                           'conc.text.Text.display_metadata': ('text.html#text.display_metadata', 'conc/text.py'),
                            'conc.text.Text.tokens_count': ('text.html#text.tokens_count', 'conc/text.py')}}}
