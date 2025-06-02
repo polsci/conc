@@ -15,7 +15,7 @@ from great_tables import GT
 import os
 import glob
 import spacy
-from spacy.attrs import ORTH, LOWER # TODO - add ENT_TYPE, ENT_IOB? from spacy.attrs import SPACY, POS, TAG, SENT_START, LEMMA
+from spacy.attrs import ORTH, LOWER, SPACY # TODO - add ENT_TYPE, ENT_IOB? from spacy.attrs import SPACY, POS, TAG, SENT_START, LEMMA
 import sys
 import string
 from fastcore.basics import patch
@@ -31,6 +31,7 @@ __all__ = ['NOT_DOC_TOKEN', 'INDEX_HEADER_LENGTH', 'README_TEMPLATE', 'Corpus']
 from . import __version__
 from .core import logger, set_logger_state, spacy_attribute_name, CorpusMetadata, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR, REPOSITORY_URL, DOCUMENTATION_URL, CITATION_STR, PYPI_URL
 from .result import Result
+from .text import Text
 
 # %% ../nbs/50_corpus.ipynb 7
 polars_conf = pl.Config.set_tbl_hide_column_data_types(True)
@@ -173,11 +174,12 @@ def _update_build_process(self: Corpus,
                            orth_index: list[np.ndarray], # orthographic token ids
                            lower_index: list[np.ndarray], # lower case token ids
                            token2doc_index: list[np.ndarray], # token to document mapping
+                           has_spaces: list[np.ndarray], # arrays of whether token has space
                            store_pos: int # current store pos
                            ) -> int: # next store pos
     """ Write in-progress build data to Parquet disk store. """
 
-    pl.DataFrame([np.concatenate(orth_index), np.concatenate(lower_index), np.concatenate(token2doc_index)], schema = [('orth_index', pl.UInt64), ('lower_index', pl.UInt64), ('token2doc_index', pl.Int32)] ).write_parquet(f'{self.corpus_path}/build_{store_pos}.parquet')
+    pl.DataFrame([np.concatenate(orth_index), np.concatenate(lower_index), np.concatenate(token2doc_index), np.concatenate(has_spaces)], schema = [('orth_index', pl.UInt64), ('lower_index', pl.UInt64), ('token2doc_index', pl.Int32), ('has_spaces', pl.Boolean)] ).write_parquet(f'{self.corpus_path}/build_{store_pos}.parquet')
     return store_pos + 1
 
 # %% ../nbs/50_corpus.ipynb 24
@@ -213,7 +215,9 @@ def _complete_build_process(self: Corpus,
 	tokens_df = pl.concat(
 									[combined_df.select(pl.col('index').alias('orth_index')).slice(0, input_length), 
 									combined_df.select(pl.col('index').alias('lower_index')).slice(input_length),
-									input_df.select(pl.col('token2doc_index'))], how='horizontal'
+									input_df.select(pl.col('token2doc_index')),
+									input_df.select(pl.col('has_spaces'))
+									], how='horizontal'
 							)
 	
 	del combined_df
@@ -436,10 +440,12 @@ def build(self: Corpus,
 	eof_arr = np.array([self.SPACY_EOF_TOKEN], dtype=np.uint64)
 	not_doc_arr = np.array([NOT_DOC_TOKEN], dtype=np.int16)
 	index_header_arr = np.array([self.SPACY_EOF_TOKEN] * INDEX_HEADER_LENGTH, dtype=np.uint64) # this is added to start and end of index to prevent out of bound issues on searches
+	has_spaces_eof_arr = np.array([False], dtype=np.bool)
 
 	orth_index = [index_header_arr]
 	lower_index = [index_header_arr]
 	token2doc_index = [np.array([NOT_DOC_TOKEN] * len(index_header_arr), dtype=np.int32)]
+	has_spaces = [np.array([0] * len(index_header_arr), dtype=np.bool)]
 
 	offset = INDEX_HEADER_LENGTH
 	# self.offsets = [] # TODO - check that this is being used  - consider removing
@@ -458,25 +464,29 @@ def build(self: Corpus,
 		token2doc_index.append(np.array([doc_order] * len(lower_index_tmp), dtype=np.int32))
 		token2doc_index.append(not_doc_arr)
 
+		has_spaces.append(doc.to_array(SPACY))
+		has_spaces.append(has_spaces_eof_arr)
 		# self.offsets.append(offset) 
-		offset = offset + len(lower_index_tmp) + 1
+		# offset = offset + len(lower_index_tmp) + 1
 		doc_order += 1
 
 		# update store every build_process_batch_size docs
 		if doc_order % build_process_batch_size == 0:
 			#was based on condition build_process_path is not None before disk-based build process
-			store_pos = self._update_build_process(orth_index, lower_index, token2doc_index, store_pos)
-			lower_index, orth_index, token2doc_index = [], [], []
+			store_pos = self._update_build_process(orth_index, lower_index, token2doc_index, has_spaces, store_pos)
+			lower_index, orth_index, token2doc_index, has_spaces = [], [], [], []
 			logger.memory_usage(f'processed {doc_order} documents')
 			
 	del iterator
 	orth_index.append(index_header_arr)
 	lower_index.append(index_header_arr)
 	token2doc_index.append(np.array([NOT_DOC_TOKEN] * len(index_header_arr), dtype=np.int32))
+	has_spaces.append(np.array([0] * len(index_header_arr), dtype=np.bool))
 
 	logger.memory_usage(f'Completing build process')
 	if save_path is not None:
-		store_pos = self._update_build_process(orth_index, lower_index, token2doc_index, store_pos)
+		store_pos = self._update_build_process(orth_index, lower_index, token2doc_index, has_spaces, store_pos)
+		lower_index, orth_index, token2doc_index, has_spaces = [], [], [], []
 		self._complete_build_process(build_process_cleanup = build_process_cleanup)
 	else:
 		# depreciated - leaving for now
@@ -492,6 +502,7 @@ def build(self: Corpus,
 	del orth_index
 	del lower_index
 	del token2doc_index
+	del has_spaces
 	
 	logger.memory_usage(f'Completed build process')
 
@@ -914,6 +925,28 @@ def tokenize(self: Corpus,
 
 # %% ../nbs/50_corpus.ipynb 81
 @patch
+def _get_text(self:Corpus,
+        doc_id: int # the id of the document
+        ):
+    """ Get tokens and space definition for a text in the corpus """
+
+    doc_tokens = self.tokens.filter(pl.col('token2doc_index') == doc_id).select(['orth_index', 'has_spaces']).collect()
+    tokens = self.token_ids_to_tokens(doc_tokens.select(pl.col('orth_index')).to_numpy().flatten())
+    has_spaces = doc_tokens.select(pl.col('has_spaces')).to_numpy().flatten()
+
+    return tokens, has_spaces
+
+# %% ../nbs/50_corpus.ipynb 82
+@patch
+def text(self:Corpus,
+        doc_id: int # the id of the document
+        ):
+    """ Get a text document """
+
+    return Text(*self._get_text(doc_id))
+
+# %% ../nbs/50_corpus.ipynb 85
+@patch
 def get_tokens_by_index(self: Corpus, 
 			   index: str = 'orth_index', # index to get tokens from i.e. 'orth_index' 'lower_index' 'token2doc_index'
 				) -> np.ndarray:
@@ -927,7 +960,7 @@ def get_tokens_by_index(self: Corpus,
 
 	return self.results_cache[index]
 
-# %% ../nbs/50_corpus.ipynb 83
+# %% ../nbs/50_corpus.ipynb 87
 @patch
 def get_ngrams_by_index(self: Corpus, 
 				ngram_length:int, # length of ngrams to get
@@ -946,7 +979,7 @@ def get_ngrams_by_index(self: Corpus,
 
 	return self.ngram_index[(index, ngram_length)]
 
-# %% ../nbs/50_corpus.ipynb 86
+# %% ../nbs/50_corpus.ipynb 90
 @patch
 def get_token_positions(self: Corpus, 
 					token_sequence: list[np.ndarray], # token sequence to get index for 
@@ -979,7 +1012,7 @@ def get_token_positions(self: Corpus,
 	logger.info(f'Token indexing ({len(results[0])}) time: {(time.time() - start_time):.5f} seconds')
 	return results
 
-# %% ../nbs/50_corpus.ipynb 90
+# %% ../nbs/50_corpus.ipynb 94
 @patch
 def _index_name(self: Corpus, index):
 	"""Get name of index from spacy."""
@@ -988,7 +1021,7 @@ def _index_name(self: Corpus, index):
 
 	return list(spacy.attrs.IDS.keys())[list(spacy.attrs.IDS.values()).index(index)]
 
-# %% ../nbs/50_corpus.ipynb 91
+# %% ../nbs/50_corpus.ipynb 95
 @patch
 def _init_frequency_table(self: Corpus):
 	""" (Depreciated) Prepare the frequency table for the corpus. """
@@ -1005,7 +1038,7 @@ def _init_frequency_table(self: Corpus):
 		self.frequency_table = self.frequency_table.with_row_index(name='rank', offset=1)
 		logger.info(f'Frequency table created in {(time.time() - start_time):.3f} seconds')
 
-# %% ../nbs/50_corpus.ipynb 92
+# %% ../nbs/50_corpus.ipynb 96
 @patch
 def _init_tokens_sort_order(self: Corpus):
 	""" Prepare the tokens sort order for the corpus. """
@@ -1018,7 +1051,7 @@ def _init_tokens_sort_order(self: Corpus):
 		tokens_array_lower = np.strings.lower(self.results_cache['tokens_array'])
 		self.results_cache['tokens_sort_order'] = np.argsort(np.argsort(tokens_array_lower))
 
-# %% ../nbs/50_corpus.ipynb 93
+# %% ../nbs/50_corpus.ipynb 97
 @patch
 def _mask_from_positions(self: Corpus, 
 						 positions # positions to create mask from
@@ -1031,7 +1064,7 @@ def _mask_from_positions(self: Corpus,
 	mask_from_positions[positions] = True
 	return mask_from_positions
 
-# %% ../nbs/50_corpus.ipynb 95
+# %% ../nbs/50_corpus.ipynb 99
 @patch
 def frequency_of(self: Corpus, 
 				 token:str|int # token id or string to get frequency for

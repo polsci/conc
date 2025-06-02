@@ -10,7 +10,6 @@ from __future__ import annotations
 import re
 import os
 import logging
-import polars as pl
 from great_tables import GT
 import polars as pl
 import msgspec

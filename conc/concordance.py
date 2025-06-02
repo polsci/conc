@@ -95,7 +95,7 @@ def concordance(self: Concordance,
 
 		if len(token_positions[0]) == 0:
 			logger.info('No tokens found')
-			return None, {}, []
+			return Result(type = 'concordance', df=pl.DataFrame(), title=f'Concordance for "{token_str}"', description=f'No matches', summary_data={}, formatted_data=[])
 
 		if order == '1L2L3L':
 			sort_columns = [-1,-2,-3]

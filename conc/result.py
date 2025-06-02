@@ -37,15 +37,17 @@ def display(self: Result
 			   ):
 	""" Print analysis result output from conc in a nice table format using the great_tables library """
 	
-	self.df.columns = [col.replace('_', ' ').title() for col in self.df.columns]
-
 	columns_with_integers = []
 	columns_with_decimals = []
-	for col in self.df.columns:
-		if self.df[col].dtype in [pl.Float64, pl.Float32]:
-			columns_with_decimals.append(col)
-		elif col != 'Token Id' and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
-			columns_with_integers.append(col)
+	if self.df.select(pl.len()).item() > 0:
+
+		self.df.columns = [col.replace('_', ' ').title() for col in self.df.columns]
+
+		for col in self.df.columns:
+			if self.df[col].dtype in [pl.Float64, pl.Float32]:
+				columns_with_decimals.append(col)
+			elif col != 'Token Id' and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
+				columns_with_integers.append(col)
 
 	gt = GT(self.df).tab_options(table_margin_left = 0)
 	if self.title != '' or self.description != '':
