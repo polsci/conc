@@ -256,6 +256,9 @@ def _complete_build_process(self: Corpus,
 	self.unique_tokens = frequency_lower.select(pl.len()).collect(engine='streaming').item() # was len(frequency_lower) before used polars streaming # TODO - validate correct - make sure that EOF_TOKEN not included
 	logger.memory_usage(f'got unique tokens {self.document_count}')
 
+	del frequency_lower
+	del frequency_orth
+
 	# add column for is_punct and is_space based on punct_tokens and space_tokens and token_id
 	vocab_df = vocab_df.with_columns((pl.col("token_id").is_in(self.punct_tokens)).alias("is_punct"))
 	vocab_df = vocab_df.with_columns((pl.col("token_id").is_in(self.space_tokens)).alias("is_space"))
@@ -930,6 +933,9 @@ def _get_text(self:Corpus,
         doc_id: int, # the id of the document
         ):
     """ Get tokens, space definitions and metadata for a text in the corpus """
+    
+    if doc_id < 1 or doc_id > self.document_count:
+        raise ValueError(f"Document ID {doc_id} is out of range. Document ID should be between 1 and the count of documents ({self.document_count}).")
 
     doc_tokens = self.tokens.filter(pl.col('token2doc_index') == doc_id).select(['orth_index', 'has_spaces']).collect()
     tokens = self.token_ids_to_tokens(doc_tokens.select(pl.col('orth_index')).to_numpy().flatten())

@@ -34,7 +34,7 @@ class Report:
 
 
 
-# %% ../nbs/57_report.ipynb 9
+# %% ../nbs/57_report.ipynb 10
 @patch
 def frequencies(self: Report,
 				normalize_by:int=1000000, # normalize frequencies by a number (e.g. 10000)
@@ -47,7 +47,7 @@ def frequencies(self: Report,
 	""" Report frequent tokens. """
 	return self.frequency_.frequencies(normalize_by=normalize_by, page_size=page_size, page_current=page_current, show_token_id=show_token_id, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
 
-# %% ../nbs/57_report.ipynb 11
+# %% ../nbs/57_report.ipynb 12
 @patch
 def ngrams(self: Report, 
 		   token_str: str, # token string to get ngrams for 
@@ -61,7 +61,7 @@ def ngrams(self: Report,
 	""" Report ngrams for a token string. """
 	return self.ngrams_.ngrams(token_str, ngram_length=ngram_length, ngram_word_position=ngram_word_position, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
 
-# %% ../nbs/57_report.ipynb 13
+# %% ../nbs/57_report.ipynb 14
 @patch
 def concordance(self: Report, 
 				token_str: str, # token string to get concordance for 

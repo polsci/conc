@@ -18,7 +18,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/74_collocates.ipynb 5
+# %% ../nbs/74_collocates.ipynb 7
 class Collocates:
 	""" Class for collocation analysis reporting. """
 	def __init__(self,

@@ -12,7 +12,10 @@ import polars as pl
 # %% auto 0
 __all__ = ['Text']
 
-# %% ../nbs/55_text.ipynb 6
+# %% ../nbs/55_text.ipynb 5
+from .result import Result
+
+# %% ../nbs/55_text.ipynb 7
 class Text:
 	""" Class to represent text documents """
 	def __init__(self,
@@ -24,7 +27,7 @@ class Text:
 		self.has_spaces = has_spaces
 		self.metadata = metadata
 
-# %% ../nbs/55_text.ipynb 7
+# %% ../nbs/55_text.ipynb 8
 @patch
 def _nl2br(self:Text,
            text:str # document text
@@ -32,7 +35,7 @@ def _nl2br(self:Text,
     text = text.replace('\r\n', '\n').replace('\r', '\n')
     return text.replace('\n', '<br>\n')
 
-# %% ../nbs/55_text.ipynb 8
+# %% ../nbs/55_text.ipynb 9
 @patch
 def _div(self:Text,
          text:str, # document text
@@ -43,7 +46,7 @@ def _div(self:Text,
         class_str = f' class="{class_str}"'
     return f'<div{class_str}>{text}</div>'
 
-# %% ../nbs/55_text.ipynb 9
+# %% ../nbs/55_text.ipynb 10
 @patch
 def as_string(self:Text,
         ):
@@ -55,7 +58,7 @@ def as_string(self:Text,
 
     return ''.join(list(interleaved))
 
-# %% ../nbs/55_text.ipynb 10
+# %% ../nbs/55_text.ipynb 11
 @patch
 def as_tokens(self:Text,
         ):
@@ -63,17 +66,17 @@ def as_tokens(self:Text,
 
     return list(self.tokens)
 
-# %% ../nbs/55_text.ipynb 11
+# %% ../nbs/55_text.ipynb 12
 @patch
 def __str__(self:Text):
     return self.as_string()
 
-# %% ../nbs/55_text.ipynb 12
+# %% ../nbs/55_text.ipynb 13
 @patch
 def tokens_count(self:Text):
     return len(self.tokens)
 
-# %% ../nbs/55_text.ipynb 13
+# %% ../nbs/55_text.ipynb 14
 @patch
 def display_metadata(self:Text,
                 ):
@@ -82,7 +85,7 @@ def display_metadata(self:Text,
     Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
 
 
-# %% ../nbs/55_text.ipynb 14
+# %% ../nbs/55_text.ipynb 15
 @patch
 def display(self:Text,
             show_metadata: bool = True # whether to display Metadata for the text

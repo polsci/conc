@@ -16,7 +16,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE, set_logger_state
 
-# %% ../nbs/70_frequency.ipynb 6
+# %% ../nbs/70_frequency.ipynb 7
 class Frequency:
 	""" Class for frequency analysis reporting """
 	def __init__(self,
@@ -25,14 +25,15 @@ class Frequency:
 		self.corpus = corpus
 
 
-# %% ../nbs/70_frequency.ipynb 8
+# %% ../nbs/70_frequency.ipynb 9
 @patch
 def frequencies(self: Frequency,
 				case_insensitive:bool=True, # frequencies for tokens lowercased or with case preserved
-				normalize_by:int=1000000, # normalize frequencies by a number (e.g. 10000)
+				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 				page_size:int=PAGE_SIZE, # number of rows to return
 				page_current:int=1, # current page
 				show_token_id:bool=False, # show token_id in output
+				show_document_frequency:bool=False, # show document frequency in output
 				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
@@ -49,12 +50,12 @@ def frequencies(self: Frequency,
 
 	if case_insensitive:
 		frequency_column = 'frequency_lower'
+		document_count_column = 'lower_index'
 	else:
 		frequency_column = 'frequency_orth'
+		document_count_column = 'orth_index'
 
-	columns = ['rank', 'token', 'frequency']
-	if show_token_id == True:
-		columns = ['rank', 'token_id', 'token', 'frequency']
+	columns = ['rank', 'token_id', 'token', 'frequency']
 
 	count_tokens = self.corpus.token_count
 	tokens_descriptor = 'all tokens'
@@ -103,11 +104,17 @@ def frequencies(self: Frequency,
 
 	df = df.slice((page_current-1)*page_size, page_current*page_size).rename({frequency_column: "frequency"}).select(*columns)
 
-	# if a number is passed then normalize by that number
+	if show_document_frequency:
+		document_counts = self.corpus.tokens.select(pl.col(document_count_column).alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency'))
+		df = df.join(document_counts, on='token_id', how='left', maintain_order='left')
+
 	df = df.with_columns(((pl.col("frequency") / count_tokens) * normalize_by).alias('normalized_frequency'))
 	columns.append('normalized_frequency')
 
 	df = df.drop('rank').with_row_index(name='rank', offset=(page_current-1)*page_size+1)
+
+	if show_token_id == False:
+		df = df.drop('token_id')
 
 	if normalize_by is not None:
 		formatted_data.append(f'Normalized Frequency is per {normalize_by:,.0f} tokens')

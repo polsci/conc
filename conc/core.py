@@ -21,8 +21,8 @@ from memory_profiler import _get_memory
 # %% auto 0
 __all__ = ['PAGE_SIZE', 'EOF_TOKEN_STR', 'ERR_TOKEN_STR', 'DOCUMENTATION_URL', 'REPOSITORY_URL', 'PYPI_URL', 'CITATION_STR',
            'logger', 'set_logger_state', 'spacy_attribute_name', 'CorpusMetadata', 'list_corpora', 'get_stop_words',
-           'create_toy_corpus_sources', 'get_nltk_corpus_sources', 'get_garden_party', 'get_large_dataset',
-           'create_large_dataset_sizes']
+           'create_toy_corpus_sources', 'show_toy_corpus', 'get_nltk_corpus_sources', 'get_garden_party',
+           'get_large_dataset', 'create_large_dataset_sizes']
 
 # %% ../nbs/80_core.ipynb 4
 PAGE_SIZE = 20
@@ -128,7 +128,7 @@ def list_corpora(
 		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
 	""" Scan a directory for available corpora """
 	
-	available_corpora = {'path': path, 'corpus': [], 'name': [], 'date_created': [], 'document_count': [], 'token_count': []}
+	available_corpora = {'corpus': [], 'name': [], 'date_created': [], 'document_count': [], 'token_count': []}
 	for dir in os.listdir(path):
 		if os.path.isdir(os.path.join(path, dir)) and os.path.isfile( os.path.join(path, dir, 'corpus.json')):
 			with open(os.path.join(path, dir, 'corpus.json'), 'rb') as f:
@@ -181,8 +181,6 @@ toy_data.append(['4.txt', 'The dog is barking.', 'canine', 'dog'])
 toy_data.append(['5.txt', 'The cat is climbing a tree.', 'feline', 'cat'])
 toy_data.append(['6.txt', 'The dog is digging a hole.', 'canine', 'dog'])
 
-source_path = '../test-corpora/source'
-
 # %% ../nbs/80_core.ipynb 26
 def create_toy_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
@@ -199,7 +197,16 @@ def create_toy_corpus_sources(source_path:str # path to location of sources for 
 	df.write_csv(os.path.join(source_path, 'toy.csv.gz'))
 
 
-# %% ../nbs/80_core.ipynb 29
+# %% ../nbs/80_core.ipynb 28
+def show_toy_corpus(
+        csv_path:str # path to location of csv for building corpora
+        ) -> GT: 
+    """ Show toy corpus in a table. """
+    
+    toy_corpus_df = pl.read_csv(csv_path)
+    GT(toy_corpus_df).tab_options(table_margin_left = 0).show()
+
+# %% ../nbs/80_core.ipynb 30
 def get_nltk_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
 	""" Get nltk corpora as sources for testing. """
@@ -246,7 +253,7 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 	df.write_csv(reuters_path)
 
 
-# %% ../nbs/80_core.ipynb 32
+# %% ../nbs/80_core.ipynb 33
 def get_garden_party(source_path: str #path to location of sources for building corpora
 					):
     """ Get corpus of The Garden Party by Katherine Mansfield for testing. """
@@ -267,7 +274,7 @@ def get_garden_party(source_path: str #path to location of sources for building 
     shutil.rmtree(f'{source_path}/garden-party-corpus')
     
 
-# %% ../nbs/80_core.ipynb 35
+# %% ../nbs/80_core.ipynb 36
 def get_large_dataset(source_path: str #path to location of sources for building corpora
                     ):
     """ Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -276,7 +283,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
     del df
 
 
-# %% ../nbs/80_core.ipynb 38
+# %% ../nbs/80_core.ipynb 39
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
