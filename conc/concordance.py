@@ -19,7 +19,7 @@ __all__ = ['Concordance']
 # %% ../nbs/72_concordance.ipynb 4
 from .corpus import Corpus
 from .result import Result
-from .core import logger, PAGE_SIZE, EOF_TOKEN_STR, set_logger_state
+from .core import logger, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR, set_logger_state
 
 
 # %% ../nbs/72_concordance.ipynb 5
@@ -204,6 +204,7 @@ def concordance_plot(self: Concordance,
 	# Tokenize and get positions
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 	token_positions = self.corpus.get_token_positions(token_sequence, index_id)
+	sequence_len = len(token_sequence[0])
 
 	if len(token_positions[0]) == 0:
 		print("No matches found.")
@@ -299,7 +300,8 @@ def concordance_plot(self: Concordance,
 					positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
 					if len(positions) > 0 and positions[-1] > 5:
 						tokens_for_example = tokens_for_example[:positions[-1]]
-			examples[doc_index].append(' '.join(self.corpus.token_ids_to_tokens(tokens_for_example)))
+			tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
+			examples[doc_index].append(' '.join(tokens_for_example))
 
 			# yref = "y" if i == 0 else f"y{i + 1} domain"
 
