@@ -37,15 +37,32 @@ class Report:
 # %% ../nbs/57_report.ipynb 10
 @patch
 def frequencies(self: Report,
-				normalize_by:int=1000000, # normalize frequencies by a number (e.g. 10000)
+				case_insensitive:bool=True, # frequencies for tokens lowercased or with case preserved
+				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 				page_size:int=PAGE_SIZE, # number of rows to return
 				page_current:int=1, # current page
 				show_token_id:bool=False, # show token_id in output
+				show_document_frequency:bool=False, # show document frequency in output
+				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
+				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
+				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
+				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
 				exclude_punctuation:bool=True, # exclude punctuation tokens
 				exclude_spaces:bool=True # exclude space tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent tokens. """
-	return self.frequency_.frequencies(normalize_by=normalize_by, page_size=page_size, page_current=page_current, show_token_id=show_token_id, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	return self.frequency_.frequencies(case_insensitive=case_insensitive,
+										normalize_by=normalize_by,
+										page_size=page_size,
+										page_current=page_current,
+										show_token_id=show_token_id,
+										show_document_frequency=show_document_frequency,
+										exclude_tokens=exclude_tokens,
+										exclude_tokens_text=exclude_tokens_text,
+										restrict_tokens=restrict_tokens,
+										restrict_tokens_text=restrict_tokens_text,
+										exclude_punctuation=exclude_punctuation,
+										exclude_spaces=exclude_spaces)
 
 # %% ../nbs/57_report.ipynb 12
 @patch
@@ -68,10 +85,9 @@ def concordance(self: Report,
 				context_words:int = 5, # number of words to show on left and right of token string
 				order:str='1R2R3R', # order of sort columns
 				page_size:int=PAGE_SIZE, # number of results to display per results page
-				page_current:int=0, # current page of results
+				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
 				use_cache:bool = True # retrieve the results from cache if available
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 	return self.concordance_.concordance(token_str, context_words=context_words, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
-

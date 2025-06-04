@@ -102,7 +102,7 @@ def frequencies(self: Frequency,
 
 	unique_tokens = df.select(pl.len()).collect(engine='streaming').item()
 
-	df = df.slice((page_current-1)*page_size, page_current*page_size).rename({frequency_column: "frequency"}).select(*columns)
+	df = df.slice((page_current-1)*page_size, page_size).rename({frequency_column: "frequency"}).select(*columns)
 
 	if show_document_frequency:
 		document_counts = self.corpus.tokens.select(pl.col(document_count_column).alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency'))
@@ -128,5 +128,5 @@ def frequencies(self: Frequency,
 
 	logger.info(f'Frequencies report time: {(time.time() - start_time):.5f} seconds')
 
-	return Result(type = 'frequencies', df=df.collect(engine='streaming'), title='Frequencies', description='Frequencies of tokens in the corpus', summary_data={}, formatted_data=formatted_data)
+	return Result(type = 'frequencies', df=df.collect(engine='streaming'), title='Frequencies', description=f'Frequencies of {tokens_descriptor}, {self.corpus.name}', summary_data={}, formatted_data=formatted_data)
 

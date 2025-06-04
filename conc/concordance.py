@@ -186,7 +186,7 @@ def concordance(self: Concordance,
 	
 	logger.info(f'Concordance report time: {(time.time() - start_time):.5f} seconds')
 
-	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'Context tokens: {context_words}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
+	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_words}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
 # %% ../nbs/72_concordance.ipynb 20
@@ -248,6 +248,7 @@ def concordance_plot(self: Concordance,
 		width=600,
 		showlegend=False,
 		title_text=f'Concordance Plot for "{token_str}"',
+		title_x=0.5,
 		margin=dict(t=40, b=20, l=80, r=20),
 		font=dict(family=font_family, size=12),
 	)
@@ -256,7 +257,7 @@ def concordance_plot(self: Concordance,
 	page_slider = widgets.IntSlider(value=1, min=1, max=num_pages, step=1, description='Page', layout=widgets.Layout(width='600px', margin='10px 0 10px 0'))
 
 	footer = widgets.HTML(
-		value=f"<div style='text-align: left; font-size: 12px; color: black; margin-left: 80px;margin-bottom:10px;line-height:1.7;'>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}</div>"
+		value=f"<div style='text-align: left; font-size: 12px; color: black; margin-left: 80px;margin-bottom:10px;line-height:1.7;'>{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}</div>"
 	)
 
 	def update(change):
