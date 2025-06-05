@@ -9,6 +9,7 @@ import time
 import polars as pl
 from fastcore.basics import patch
 import math
+from scipy.stats import chi2
 
 # %% auto 0
 __all__ = ['Keyness']
@@ -16,13 +17,249 @@ __all__ = ['Keyness']
 # %% ../nbs/73_keyness.ipynb 4
 from .corpus import Corpus
 from .result import Result
+from .frequency import Frequency
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/73_keyness.ipynb 5
+# %% ../nbs/73_keyness.ipynb 8
 class Keyness:
 	""" Class for keyness analysis reporting. """
 	def __init__(self,
-			  corpus:Corpus # Corpus instance
+			  corpus:Corpus, # Corpus instance
+			  reference_corpus:Corpus # Corpus for comparison
 			  ): 
 		self.corpus = corpus
+		self.reference_corpus = reference_corpus	
+
+
+# %% ../nbs/73_keyness.ipynb 9
+@patch
+def keywords(self: Keyness,
+				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported and anything else is ignored
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported and anything else is ignored
+				order:str = 'log_ratio', # column to order the results by: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference
+				order_descending:bool = True, # order is descending or ascending
+				statistical_significance_cut: float = 0.0, # statistical significance cut-off, e.g. 0.05 or 0.01 or 0.001
+				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
+				min_document_frequency: int = 0, # minimum document frequency in target for token to be included in the report
+				min_document_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
+				min_frequency: int = 0, # minimum frequency in target for token to be included in the report
+				min_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
+				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
+				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
+				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
+				page_current:int=1, # current page, ignored if page_size is 0
+				show_document_frequency:bool=False, # show document frequency in output
+				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
+				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
+				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
+				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
+				exclude_punctuation:bool=True, # exclude punctuation tokens
+				exclude_spaces:bool=True # exclude space tokens
+				) -> Result: # return a Result object with the frequency table
+	""" Get keywords for the corpus. """
+
+	if type(normalize_by) != int:
+		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
+	
+	if order not in ['log_ratio', 'log_likelihood', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference']:
+		raise ValueError(f'The order parameter must be one of: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference.')
+	
+	if not show_document_frequency and order in ['document_frequency', 'document_frequency_reference']:
+		raise ValueError('The show_document_frequency parameter bust be set True if you want to order by document_frequency or document_frequency_reference.')
+
+	start_time = time.time()
+
+	debug = False
+
+	freq_target = Frequency(self.corpus)
+	freq_reference = Frequency(self.reference_corpus)
+
+	debug_columns = []
+
+	target_count_tokens = self.corpus.token_count
+	reference_count_tokens = self.reference_corpus.token_count
+	tokens_descriptor = 'all tokens'
+	total_descriptor = 'Total tokens'
+	if exclude_punctuation and exclude_spaces:
+		target_count_tokens = self.corpus.word_token_count
+		reference_count_tokens = self.reference_corpus.word_token_count
+		tokens_descriptor = 'word tokens'
+		total_descriptor = 'Total word tokens'
+	elif exclude_punctuation:
+		space_tokens_count = self.corpus.spaces.select(pl.len()).collect(engine='streaming').item()
+		target_count_tokens = self.corpus.word_token_count + space_tokens_count
+		space_tokens_count_reference = self.reference_corpus.spaces.select(pl.len()).collect(engine='streaming').item()
+		reference_count_tokens = self.reference_corpus.word_token_count + space_tokens_count_reference
+		tokens_descriptor = 'word and space tokens'
+		total_descriptor = 'Total word and space tokens'
+	elif exclude_spaces:
+		punct_tokens_count = self.corpus.puncts.select(pl.len()).collect(engine='streaming').item()
+		target_count_tokens = self.corpus.word_token_count + punct_tokens_count
+		punct_tokens_count_reference = self.reference_corpus.puncts.select(pl.len()).collect(engine='streaming').item()
+		reference_count_tokens = self.reference_corpus.word_token_count + punct_tokens_count_reference
+		tokens_descriptor = 'word and punctuation tokens'
+		total_descriptor = 'Total word and punctuation tokens'
+
+	formatted_data = []
+	formatted_data.append(f'Report based on {tokens_descriptor}')
+
+	if exclude_tokens:
+		excluded_tokens_count = df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
+		df = df.filter(~pl.col('token').is_in(exclude_tokens))
+		if exclude_tokens_text == '':
+			formatted_data.append(f'Tokens excluded from report: {excluded_tokens_count}')
+		else:
+			formatted_data.append(f'{exclude_tokens_text}')
+	if restrict_tokens:
+		df = df.filter(pl.col('token').is_in(restrict_tokens))
+		if restrict_tokens_text == '':
+			formatted_data.append(f'')
+		else:
+			formatted_data.append(f'{restrict_tokens_text}')
+
+	target_min_freq = (0.05 * normalize_by) / target_count_tokens
+	reference_min_freq = (0.05 * normalize_by) / reference_count_tokens
+	
+	target_df = freq_target.frequencies(case_sensitive=case_sensitive,
+										normalize_by=normalize_by,
+										page_size=0,
+										page_current=1,
+										show_token_id=False,
+										show_document_frequency=True, # applying to final report not import
+										exclude_tokens=exclude_tokens,
+										exclude_tokens_text=exclude_tokens_text,
+										restrict_tokens=restrict_tokens,
+										restrict_tokens_text=restrict_tokens_text,
+										exclude_punctuation=exclude_punctuation,
+										exclude_spaces=exclude_spaces).to_frame()
+
+	reference_df = freq_reference.frequencies(case_sensitive=case_sensitive,
+										normalize_by=normalize_by,
+										page_size=0,
+										page_current=1,
+										show_token_id=False,
+										show_document_frequency=True, # applying to final report not import
+										exclude_tokens=exclude_tokens,
+										exclude_tokens_text=exclude_tokens_text,
+										restrict_tokens=restrict_tokens,
+										restrict_tokens_text=restrict_tokens_text,
+										exclude_punctuation=exclude_punctuation,
+										exclude_spaces=exclude_spaces).to_frame()
+
+	keyness_df = target_df.join(reference_df, on='token', how='left', suffix = '_reference').drop('rank', 'rank_reference')
+
+	keyness_df = keyness_df.with_columns(pl.col('frequency_reference')).fill_null(0)
+	keyness_df = keyness_df.with_columns(pl.col('document_frequency_reference')).fill_null(0)
+
+	if effect_size_measure in ['log_ratio', 'relative_risk']:
+		debug_columns.extend(['token_count', 'token_count_reference', 'calc_normalized_frequency', 'calc_normalized_frequency_reference'])
+		
+		keyness_df = keyness_df.with_columns(pl.lit(target_count_tokens).alias('token_count')).with_columns(pl.lit(reference_count_tokens).alias('token_count_reference'))
+	
+		# copying for calculation - will retain original values for display
+		keyness_df = keyness_df.with_columns(pl.col('normalized_frequency').alias('calc_normalized_frequency'))
+		keyness_df = keyness_df.with_columns(pl.col('normalized_frequency_reference').alias('calc_normalized_frequency_reference'))
+
+		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency').fill_null(target_min_freq))
+		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency_reference').fill_null(reference_min_freq))
+
+		keyness_df = keyness_df.with_columns((pl.col('calc_normalized_frequency')/pl.col('calc_normalized_frequency_reference')).alias('relative_risk'))
+		keyness_df = keyness_df.with_columns((pl.col('calc_normalized_frequency').log(2) - pl.col('calc_normalized_frequency_reference').log(2)).alias('log_ratio'))
+
+	if statistical_significance_measure in ['log_likelihood']:
+		debug_columns.extend(['expected_frequency', 'expected_frequency_reference', 'term1', 'term2'])
+
+		# calculating using approach here: https://ucrel.lancs.ac.uk/llwizard.html
+		# a = frequency in target , b = frequency in reference 
+		# c = total tokens in target , d = total tokens in reference 
+		# E1 = c*(a+b) / (c+d) 
+		# E2 = d*(a+b) / (c+d)
+		keyness_df = keyness_df.with_columns(
+			((pl.col('token_count') * (pl.col('frequency') + pl.col('frequency_reference'))) / (pl.col('token_count') + pl.col('token_count_reference'))).alias('expected_frequency'),
+			((pl.col('token_count_reference') * (pl.col('frequency') + pl.col('frequency_reference'))) / (pl.col('token_count') + pl.col('token_count_reference'))).alias('expected_frequency_reference'), # 0 if no reference frequency
+		)
+
+		# (a*ln (a/E1))
+		# (b*ln (b/E2))
+		keyness_df = keyness_df.with_columns([
+			pl.when(pl.col('frequency') > 0)
+			.then(pl.col('frequency') * (pl.col('frequency') / pl.col('expected_frequency')).log())
+			.otherwise(0)
+			.alias('term1'),
+			pl.when(pl.col('frequency_reference') > 0)
+			.then(pl.col('frequency_reference') * (pl.col('frequency_reference') / pl.col('expected_frequency_reference')).log())
+			.otherwise(0)
+			.alias('term2') # 0 if no reference frequency
+		])
+
+		# G2 = 2*((a*ln (a/E1)) + (b*ln (b/E2))) 
+		keyness_df = keyness_df.with_columns(
+			(2 * (pl.col('term1') + pl.col('term2'))).alias('log_likelihood')
+		)
+
+		# not needed - as use cutoff instead
+		# combined_frequency_table = combined_frequency_table.collect()
+		# combined_frequency_table = combined_frequency_table.with_columns(
+		#     pl.Series("p_value", chi2.sf(combined_frequency_table["log_likelihood"].to_numpy(), 1)).alias("p_value")
+		# )
+
+	# filtering - must be done before bonferroni or similar correction ...
+	filtering_descriptors = []
+	if min_frequency > 0:
+		keyness_df = keyness_df.filter(pl.col('frequency') >= min_frequency)
+		filtering_descriptors.append(f'minimum frequency in target corpus ({min_frequency:,.0f})')
+	if min_frequency_reference > 0:
+		keyness_df = keyness_df.filter(pl.col('frequency_reference') >= min_frequency_reference)
+		filtering_descriptors.append(f'minimum frequency in reference corpus ({min_frequency_reference:,.0f})')
+	if min_document_frequency > 0:
+		keyness_df = keyness_df.filter(pl.col('document_frequency') >= min_document_frequency)
+		filtering_descriptors.append(f'minimum document frequency in target corpus ({min_document_frequency:,.0f})')
+	if min_document_frequency_reference > 0:
+		keyness_df = keyness_df.filter(pl.col('document_frequency_reference') >= min_document_frequency_reference)
+		filtering_descriptors.append(f'minimum document frequency in reference corpus ({min_document_frequency_reference:,.0f})')
+	
+	if len(filtering_descriptors) > 0:
+		formatted_data.append(f'Filtered tokens by {(", ".join(filtering_descriptors))}')
+
+	unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
+
+	if debug == False:
+		keyness_df = keyness_df.drop(debug_columns)
+
+	if statistical_significance_cut > 0.0:
+		p = statistical_significance_cut
+		# bonferroni correction
+		if apply_bonferroni:
+			p_value_descriptor = f'Keywords filtered based on p-value {p} with Bonferroni correction (based on {unique_tokens} tests)'
+			p = p / unique_tokens # adjust by criteria
+		else:
+			p_value_descriptor = f'Keywords filtered based on p-value: {p}'
+		cut = chi2.ppf(1 - p, df=1)		
+		keyness_df = keyness_df.filter(pl.col('log_likelihood') > cut)
+		formatted_data.append(p_value_descriptor)
+		unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
+	
+	keyness_df = keyness_df.sort(order, descending=order_descending)
+	keyness_df = keyness_df.slice((page_current-1)*page_size, page_size)
+
+	if not show_document_frequency:
+		keyness_df = keyness_df.drop('document_frequency', 'document_frequency_reference')
+
+	rank_offset = (page_current-1) * page_size + 1
+	keyness_df = keyness_df.with_row_index(name='rank', offset=rank_offset)
+
+	if normalize_by is not None:
+		formatted_data.append(f'Normalized Frequency is per {normalize_by:,.0f} tokens')
+
+	formatted_data.append(f'{total_descriptor} in target corpus: {target_count_tokens:,.0f}')
+	formatted_data.append(f'{total_descriptor} in reference corpus: {reference_count_tokens:,.0f}')
+
+	formatted_data.append(f'Keywords: {unique_tokens:,.0f}')
+	if page_size != 0 and unique_tokens > page_size:
+		formatted_data.append(f'Showing {page_size} rows')
+		formatted_data.append(f'Page {page_current} of {unique_tokens // page_size + 1}')
+
+	logger.info(f'Keywords report time: {(time.time() - start_time):.5f} seconds')
+
+	return Result(type = 'keywords', df=keyness_df, title='Keywords', description=f'Target corpus: {self.corpus.name}, Reference corpus: {self.reference_corpus.name}', summary_data={}, formatted_data=formatted_data)
 

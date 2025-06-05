@@ -15,7 +15,7 @@ __all__ = ['Result']
 class Result:
 	def __init__(self,
 			  type: str, # report type
-			  df: pl.DataFrame, # Polars dataframe with the results
+			  df: pl.DataFrame|pl.LazyFrame, # Polars dataframe or lazyframe with the results
 			  title: str, # title of the report
 			  description: str, # description
 			  summary_data: dict, # summary data (ignored)
@@ -39,6 +39,9 @@ def display(self: Result
 	
 	columns_with_integers = []
 	columns_with_decimals = []
+	if type(self.df) == pl.LazyFrame:
+		self.df = self.df.collect()
+
 	if self.df.select(pl.len()).item() > 0:
 
 		self.df.columns = [col.replace('_', ' ').title() for col in self.df.columns]
@@ -73,6 +76,8 @@ def display(self: Result
 
 # %% ../nbs/60_result.ipynb 6
 @patch
-def to_frame(self: Result):
+def to_frame(self: Result,
+			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning
+			 ):
 	""" Return result output from conc as a dataframe """
 	return self.df

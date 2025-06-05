@@ -17,7 +17,7 @@ from .corpus import Corpus
 from .frequency import Frequency
 from .ngrams import Ngrams
 from .concordance import Concordance
-
+from .keyness import Keyness
 
 # %% ../nbs/57_report.ipynb 5
 class Report:
@@ -31,16 +31,16 @@ class Report:
 		self.frequency_ = Frequency(corpus)
 		self.ngrams_ = Ngrams(corpus)
 		self.concordance_ = Concordance(corpus)
-
+		self.keyness_ = None
 
 
 # %% ../nbs/57_report.ipynb 10
 @patch
 def frequencies(self: Report,
-				case_insensitive:bool=True, # frequencies for tokens lowercased or with case preserved
+				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
 				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
-				page_size:int=PAGE_SIZE, # number of rows to return
-				page_current:int=1, # current page
+				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
+				page_current:int=1, # current page, ignored if page_size is 0
 				show_token_id:bool=False, # show token_id in output
 				show_document_frequency:bool=False, # show document frequency in output
 				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
@@ -51,7 +51,7 @@ def frequencies(self: Report,
 				exclude_spaces:bool=True # exclude space tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent tokens. """
-	return self.frequency_.frequencies(case_insensitive=case_insensitive,
+	return self.frequency_.frequencies(case_sensitive=case_sensitive,
 										normalize_by=normalize_by,
 										page_size=page_size,
 										page_current=page_current,
@@ -91,3 +91,61 @@ def concordance(self: Report,
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 	return self.concordance_.concordance(token_str, context_words=context_words, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
+
+# %% ../nbs/57_report.ipynb 16
+@patch
+def set_reference_corpus(self: Report, 
+                    corpus: Corpus  # Reference corpus
+                    ) -> None:
+    """ Set a reference corpus for keyness analysis. """
+    self.keyness_ = Keyness(self.corpus, corpus)
+
+# %% ../nbs/57_report.ipynb 18
+@patch
+def keywords(self: Report,
+				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported and anything else is ignored
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported and anything else is ignored
+				order:str = 'log_ratio', # column to order the results by: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference
+				order_descending:bool = True, # order is descending or ascending
+				statistical_significance_cut: float = 0.0, # statistical significance cut-off, e.g. 0.05 or 0.01 or 0.001
+				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
+				min_document_frequency: int = 0, # minimum document frequency in target for token to be included in the report
+				min_document_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
+				min_frequency: int = 0, # minimum frequency in target for token to be included in the report
+				min_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
+				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
+				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
+				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
+				page_current:int=1, # current page, ignored if page_size is 0
+				show_document_frequency:bool=False, # show document frequency in output
+				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
+				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
+				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
+				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
+				exclude_punctuation:bool=True, # exclude punctuation tokens
+				exclude_spaces:bool=True # exclude space tokens
+				) -> Result: # return a Result object with the frequency table
+	""" Get keywords for the corpus. """
+	if self.keyness_ is None:
+		raise ValueError("Reference corpus is not set. Use 'set_reference_corpus' to set the reference corpus.")
+	return self.keyness_.keywords(effect_size_measure=effect_size_measure,
+									statistical_significance_measure=statistical_significance_measure,
+									order=order,
+									order_descending=order_descending,
+									statistical_significance_cut=statistical_significance_cut,
+									apply_bonferroni=apply_bonferroni,
+									min_document_frequency=min_document_frequency,
+									min_document_frequency_reference=min_document_frequency_reference,
+									min_frequency=min_frequency,
+									min_frequency_reference=min_frequency_reference,
+									case_sensitive=case_sensitive,
+									normalize_by=normalize_by,
+									page_size=page_size,
+									page_current=page_current,
+									show_document_frequency=show_document_frequency,
+									exclude_tokens=exclude_tokens,
+									exclude_tokens_text=exclude_tokens_text,
+									restrict_tokens=restrict_tokens,
+									restrict_tokens_text=restrict_tokens_text,
+									exclude_punctuation=exclude_punctuation,
+									exclude_spaces=exclude_spaces)

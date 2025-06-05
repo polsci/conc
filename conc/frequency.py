@@ -28,10 +28,10 @@ class Frequency:
 # %% ../nbs/70_frequency.ipynb 9
 @patch
 def frequencies(self: Frequency,
-				case_insensitive:bool=True, # frequencies for tokens lowercased or with case preserved
+				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
 				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
-				page_size:int=PAGE_SIZE, # number of rows to return
-				page_current:int=1, # current page
+				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
+				page_current:int=1, # current page, ignored if page_size is 0
 				show_token_id:bool=False, # show token_id in output
 				show_document_frequency:bool=False, # show document frequency in output
 				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
@@ -48,12 +48,15 @@ def frequencies(self: Frequency,
 
 	start_time = time.time()
 
-	if case_insensitive:
-		frequency_column = 'frequency_lower'
-		document_count_column = 'lower_index'
-	else:
+	if case_sensitive:
 		frequency_column = 'frequency_orth'
 		document_count_column = 'orth_index'
+	else:
+		frequency_column = 'frequency_lower'
+		document_count_column = 'lower_index'
+
+	if page_size == 0:
+		page_current = 1 # if returning all, then only interested in first page
 
 	columns = ['rank', 'token_id', 'token', 'frequency']
 
@@ -102,7 +105,12 @@ def frequencies(self: Frequency,
 
 	unique_tokens = df.select(pl.len()).collect(engine='streaming').item()
 
-	df = df.slice((page_current-1)*page_size, page_size).rename({frequency_column: "frequency"}).select(*columns)
+	if page_size == 0:
+		df = df.rename({frequency_column: "frequency"}).select(*columns)
+		rank_offset = 1 # not really needed, but just in case future changes
+	else:
+		df = df.slice((page_current-1)*page_size, page_size).rename({frequency_column: "frequency"}).select(*columns)
+		rank_offset = (page_current-1) * page_size+1
 
 	if show_document_frequency:
 		document_counts = self.corpus.tokens.select(pl.col(document_count_column).alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency'))
@@ -111,7 +119,7 @@ def frequencies(self: Frequency,
 	df = df.with_columns(((pl.col("frequency") / count_tokens) * normalize_by).alias('normalized_frequency'))
 	columns.append('normalized_frequency')
 
-	df = df.drop('rank').with_row_index(name='rank', offset=(page_current-1)*page_size+1)
+	df = df.drop('rank').with_row_index(name='rank', offset=rank_offset)
 
 	if show_token_id == False:
 		df = df.drop('token_id')
@@ -122,11 +130,11 @@ def frequencies(self: Frequency,
 	formatted_data.append(f'{total_descriptor}: {count_tokens:,.0f}')
 
 	formatted_data.append(f'Unique tokens: {unique_tokens:,.0f}')
-	if unique_tokens > page_size:
+	if page_size != 0 and unique_tokens > page_size:
 		formatted_data.append(f'Showing {page_size} rows')
 		formatted_data.append(f'Page {page_current} of {unique_tokens // page_size + 1}')
 
 	logger.info(f'Frequencies report time: {(time.time() - start_time):.5f} seconds')
 
-	return Result(type = 'frequencies', df=df.collect(engine='streaming'), title='Frequencies', description=f'Frequencies of {tokens_descriptor}, {self.corpus.name}', summary_data={}, formatted_data=formatted_data)
+	return Result(type = 'frequencies', df=df, title='Frequencies', description=f'Frequencies of {tokens_descriptor}, {self.corpus.name}', summary_data={}, formatted_data=formatted_data)
 
