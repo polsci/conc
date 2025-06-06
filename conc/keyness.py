@@ -75,6 +75,7 @@ def keywords(self: Keyness,
 	freq_reference = Frequency(self.reference_corpus)
 
 	debug_columns = []
+	columns = ['rank', 'token', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', 'normalized_frequency', 'normalized_frequency_reference', 'relative_risk', 'log_ratio', 'log_likelihood']
 
 	target_count_tokens = self.corpus.token_count
 	reference_count_tokens = self.reference_corpus.token_count
@@ -174,13 +175,15 @@ def keywords(self: Keyness,
 		# c = total tokens in target , d = total tokens in reference 
 		# E1 = c*(a+b) / (c+d) 
 		# E2 = d*(a+b) / (c+d)
+		# G2 = 2*((a*ln (a/E1)) + (b*ln (b/E2))) 
+		
+		# E1 and E2
 		keyness_df = keyness_df.with_columns(
 			((pl.col('token_count') * (pl.col('frequency') + pl.col('frequency_reference'))) / (pl.col('token_count') + pl.col('token_count_reference'))).alias('expected_frequency'),
 			((pl.col('token_count_reference') * (pl.col('frequency') + pl.col('frequency_reference'))) / (pl.col('token_count') + pl.col('token_count_reference'))).alias('expected_frequency_reference'), # 0 if no reference frequency
 		)
 
-		# (a*ln (a/E1))
-		# (b*ln (b/E2))
+		# components of G2 as term1 and term 2 - (a*ln (a/E1)) (b*ln (b/E2))
 		keyness_df = keyness_df.with_columns([
 			pl.when(pl.col('frequency') > 0)
 			.then(pl.col('frequency') * (pl.col('frequency') / pl.col('expected_frequency')).log())
@@ -192,7 +195,7 @@ def keywords(self: Keyness,
 			.alias('term2') # 0 if no reference frequency
 		])
 
-		# G2 = 2*((a*ln (a/E1)) + (b*ln (b/E2))) 
+		#G2
 		keyness_df = keyness_df.with_columns(
 			(2 * (pl.col('term1') + pl.col('term2'))).alias('log_likelihood')
 		)
@@ -244,6 +247,8 @@ def keywords(self: Keyness,
 
 	if not show_document_frequency:
 		keyness_df = keyness_df.drop('document_frequency', 'document_frequency_reference')
+		columns.remove('document_frequency')
+		columns.remove('document_frequency_reference')
 
 	rank_offset = (page_current-1) * page_size + 1
 	keyness_df = keyness_df.with_row_index(name='rank', offset=rank_offset)
@@ -261,5 +266,5 @@ def keywords(self: Keyness,
 
 	logger.info(f'Keywords report time: {(time.time() - start_time):.5f} seconds')
 
-	return Result(type = 'keywords', df=keyness_df, title='Keywords', description=f'Target corpus: {self.corpus.name}, Reference corpus: {self.reference_corpus.name}', summary_data={}, formatted_data=formatted_data)
+	return Result(type = 'keywords', df=keyness_df.select(columns), title='Keywords', description=f'Target corpus: {self.corpus.name}, Reference corpus: {self.reference_corpus.name}', summary_data={}, formatted_data=formatted_data)
 
