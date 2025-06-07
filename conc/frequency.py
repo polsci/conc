@@ -60,23 +60,7 @@ def frequencies(self: Frequency,
 
 	columns = ['rank', 'token_id', 'token', 'frequency']
 
-	count_tokens = self.corpus.token_count
-	tokens_descriptor = 'all tokens'
-	total_descriptor = 'Total tokens'
-	if exclude_punctuation and exclude_spaces:
-		count_tokens = self.corpus.word_token_count
-		tokens_descriptor = 'word tokens'
-		total_descriptor = 'Total word tokens'
-	elif exclude_punctuation:
-		space_tokens_count = self.corpus.spaces.select(pl.len()).collect(engine='streaming').item()
-		count_tokens = self.corpus.word_token_count + space_tokens_count
-		tokens_descriptor = 'word and space tokens'
-		total_descriptor = 'Total word and space tokens'
-	elif exclude_spaces:
-		punct_tokens_count = self.corpus.puncts.select(pl.len()).collect(engine='streaming').item()
-		count_tokens = self.corpus.word_token_count + punct_tokens_count
-		tokens_descriptor = 'word and punctuation tokens'
-		total_descriptor = 'Total word and punctuation tokens'
+	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation, exclude_spaces)
 
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')

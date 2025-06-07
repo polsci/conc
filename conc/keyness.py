@@ -72,6 +72,9 @@ def keywords(self: Keyness,
 	if not show_document_frequency and order in ['document_frequency', 'document_frequency_reference']:
 		raise ValueError('The show_document_frequency parameter bust be set True if you want to order by document_frequency or document_frequency_reference.')
 
+	if type(normalize_by) != int:
+		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
+
 	start_time = time.time()
 
 	debug = False
@@ -81,29 +84,8 @@ def keywords(self: Keyness,
 
 	columns = ['rank', 'token', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', 'normalized_frequency', 'normalized_frequency_reference']
 
-	target_count_tokens = self.corpus.token_count
-	reference_count_tokens = self.reference_corpus.token_count
-	tokens_descriptor = 'all tokens'
-	total_descriptor = 'Total tokens'
-	if exclude_punctuation and exclude_spaces:
-		target_count_tokens = self.corpus.word_token_count
-		reference_count_tokens = self.reference_corpus.word_token_count
-		tokens_descriptor = 'word tokens'
-		total_descriptor = 'Total word tokens'
-	elif exclude_punctuation:
-		space_tokens_count = self.corpus.spaces.select(pl.len()).collect(engine='streaming').item()
-		target_count_tokens = self.corpus.word_token_count + space_tokens_count
-		space_tokens_count_reference = self.reference_corpus.spaces.select(pl.len()).collect(engine='streaming').item()
-		reference_count_tokens = self.reference_corpus.word_token_count + space_tokens_count_reference
-		tokens_descriptor = 'word and space tokens'
-		total_descriptor = 'Total word and space tokens'
-	elif exclude_spaces:
-		punct_tokens_count = self.corpus.puncts.select(pl.len()).collect(engine='streaming').item()
-		target_count_tokens = self.corpus.word_token_count + punct_tokens_count
-		punct_tokens_count_reference = self.reference_corpus.puncts.select(pl.len()).collect(engine='streaming').item()
-		reference_count_tokens = self.reference_corpus.word_token_count + punct_tokens_count_reference
-		tokens_descriptor = 'word and punctuation tokens'
-		total_descriptor = 'Total word and punctuation tokens'
+	target_count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	reference_count_tokens, _, _ = self.reference_corpus.get_token_count_text(exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
 
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')

@@ -53,7 +53,7 @@ def _get_concordance_sort(self:Concordance,
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
 				context_length:int = 5, # number of words to show on left and right of token string
-				order:str='1R2R3R', # order of sort columns
+				order:str='1R2R3R', # order of sort columns - one of 1L2L3L, 3L2L1L, 2L1L1R, 1L1R2R, 1R2R3R, LEFT, RIGHT
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
@@ -61,18 +61,17 @@ def concordance(self: Concordance,
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 
-	# handled output from get concordance that returns columnar format rather than rowwise
-	# shifted to polars dataframes 
-	# make sure clean out Corpus.EOF_TOKEN from left and right
-	# removed x*y iteration (is very slow) for getting tokens - apply vectorized method
-	# TODO: improve ordering so not fixed options e.g. include 3R1R2R
-	# TODO add in ordering by metadata columns or doc
 	# DONE - reducing data retrieved to just the sort columns and then doing the concordance display separately here
-	# DONE - could speed up the sort so that does a partial sort (e.g. just one or two columns) to get position of the slice - then handle ordering with smaller slice of data
-	# e.g. if concordancing 'the' find what sort0 word is before start of that page and what word after - then return that slice and sort that slice only  
+	# DONE - speed up the sort so that does a partial sort (e.g. just one or two columns) to get position of the slice - then handle ordering with smaller slice of data
 	# IDEA: potentially get sort columns until small enough result
-	# TODO: look at retrieval of document_ids - use token2doc_index
-	# TODO avoid any duplication related to retrieval of concordance vectors
+	
+	if order not in ['1L2L3L', '3L2L1L', '2L1L1R', '1L1R2R', '1R2R3R', 'LEFT', 'RIGHT']:
+		raise ValueError(f'Invalid order: order must be one of: 1L2L3L, 3L2L1L, 2L1L1R, 1L1R2R, 1R2R3R, LEFT, RIGHT')
+	
+	if order == 'LEFT':
+		order = '1L2L3L'
+	elif order == 'RIGHT':
+		order = '1R2R3R'
 
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 

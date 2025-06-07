@@ -80,4 +80,6 @@ def to_frame(self: Result,
 			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning
 			 ):
 	""" Return result output from conc as a dataframe """
+	if collect_if_lazy and type(self.df) == pl.LazyFrame:
+		self.df = self.df.collect()
 	return self.df
