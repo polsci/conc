@@ -8,7 +8,6 @@ import numpy as np
 import time
 import polars as pl
 from fastcore.basics import patch
-import math
 from scipy.stats import chi2
 
 # %% auto 0
@@ -34,11 +33,11 @@ class Keyness:
 # %% ../nbs/73_keyness.ipynb 9
 @patch
 def keywords(self: Keyness,
-				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported and anything else is ignored
-				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported and anything else is ignored
-				order:str = 'log_ratio', # column to order the results by: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference
+				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported
+				order:str|None = None, # default of None orders by effect size measure, results can also be ordered by: frequency, frequency_reference, document_frequency, document_frequency_reference, log_likelihood
 				order_descending:bool = True, # order is descending or ascending
-				statistical_significance_cut: float = 0.0, # statistical significance cut-off, e.g. 0.05 or 0.01 or 0.001
+				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
 				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
 				min_document_frequency: int = 0, # minimum document frequency in target for token to be included in the report
 				min_document_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
@@ -49,9 +48,9 @@ def keywords(self: Keyness,
 				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
 				page_current:int=1, # current page, ignored if page_size is 0
 				show_document_frequency:bool=False, # show document frequency in output
-				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
+				exclude_tokens:list[str]=[], # exclude specific tokens from report results
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
-				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
+				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
 				exclude_punctuation:bool=True, # exclude punctuation tokens
 				exclude_spaces:bool=True # exclude space tokens
@@ -60,9 +59,15 @@ def keywords(self: Keyness,
 
 	if type(normalize_by) != int:
 		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
+
+	if effect_size_measure not in ['log_ratio']:
+		raise ValueError('Currently only log_ratio is supported as an effect size measures.')
 	
-	if order not in ['log_ratio', 'log_likelihood', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference']:
-		raise ValueError(f'The order parameter must be one of: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference.')
+	if statistical_significance_measure not in ['log_likelihood']:
+		raise ValueError('Currently only log_likelihood is supported as a statistical significance measure.')
+
+	if order not in [None, effect_size_measure, 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', statistical_significance_measure]:
+		raise ValueError(f'The order parameter must None (default) or one of: {effect_size_measure}, frequency, frequency_reference, document_frequency, document_frequency_reference, {statistical_significance_measure}.')
 	
 	if not show_document_frequency and order in ['document_frequency', 'document_frequency_reference']:
 		raise ValueError('The show_document_frequency parameter bust be set True if you want to order by document_frequency or document_frequency_reference.')
@@ -74,8 +79,7 @@ def keywords(self: Keyness,
 	freq_target = Frequency(self.corpus)
 	freq_reference = Frequency(self.reference_corpus)
 
-	debug_columns = []
-	columns = ['rank', 'token', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', 'normalized_frequency', 'normalized_frequency_reference', 'relative_risk', 'log_ratio', 'log_likelihood']
+	columns = ['rank', 'token', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', 'normalized_frequency', 'normalized_frequency_reference']
 
 	target_count_tokens = self.corpus.token_count
 	reference_count_tokens = self.reference_corpus.token_count
@@ -152,8 +156,8 @@ def keywords(self: Keyness,
 	keyness_df = keyness_df.with_columns(pl.col('frequency_reference')).fill_null(0)
 	keyness_df = keyness_df.with_columns(pl.col('document_frequency_reference')).fill_null(0)
 
-	if effect_size_measure in ['log_ratio', 'relative_risk']:
-		debug_columns.extend(['token_count', 'token_count_reference', 'calc_normalized_frequency', 'calc_normalized_frequency_reference'])
+	if effect_size_measure in ['log_ratio']:
+		columns.extend(['relative_risk', 'log_ratio'])
 		
 		keyness_df = keyness_df.with_columns(pl.lit(target_count_tokens).alias('token_count')).with_columns(pl.lit(reference_count_tokens).alias('token_count_reference'))
 	
@@ -168,7 +172,7 @@ def keywords(self: Keyness,
 		keyness_df = keyness_df.with_columns((pl.col('calc_normalized_frequency').log(2) - pl.col('calc_normalized_frequency_reference').log(2)).alias('log_ratio'))
 
 	if statistical_significance_measure in ['log_likelihood']:
-		debug_columns.extend(['expected_frequency', 'expected_frequency_reference', 'term1', 'term2'])
+		columns.extend(['log_likelihood'])
 
 		# calculating using approach here: https://ucrel.lancs.ac.uk/llwizard.html
 		# a = frequency in target , b = frequency in reference 
@@ -226,10 +230,7 @@ def keywords(self: Keyness,
 
 	unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
 
-	if debug == False:
-		keyness_df = keyness_df.drop(debug_columns)
-
-	if statistical_significance_cut > 0.0:
+	if statistical_significance_cut is not None and statistical_significance_cut > 0:
 		p = statistical_significance_cut
 		# bonferroni correction
 		if apply_bonferroni:
@@ -238,10 +239,12 @@ def keywords(self: Keyness,
 		else:
 			p_value_descriptor = f'Keywords filtered based on p-value: {p}'
 		cut = chi2.ppf(1 - p, df=1)		
-		keyness_df = keyness_df.filter(pl.col('log_likelihood') > cut)
+		keyness_df = keyness_df.filter(pl.col(statistical_significance_measure) > cut)
 		formatted_data.append(p_value_descriptor)
 		unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
 	
+	if order is None:
+		order = effect_size_measure
 	keyness_df = keyness_df.sort(order, descending=order_descending)
 	keyness_df = keyness_df.slice((page_current-1)*page_size, page_size)
 
@@ -265,6 +268,9 @@ def keywords(self: Keyness,
 		formatted_data.append(f'Page {page_current} of {unique_tokens // page_size + 1}')
 
 	logger.info(f'Keywords report time: {(time.time() - start_time):.5f} seconds')
+
+	if debug:
+		columns = keyness_df.columns
 
 	return Result(type = 'keywords', df=keyness_df.select(columns), title='Keywords', description=f'Target corpus: {self.corpus.name}, Reference corpus: {self.reference_corpus.name}', summary_data={}, formatted_data=formatted_data)
 

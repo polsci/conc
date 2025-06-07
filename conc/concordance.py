@@ -52,7 +52,7 @@ def _get_concordance_sort(self:Concordance,
 @patch
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
-				context_words:int = 5, # number of words to show on left and right of token string
+				context_length:int = 5, # number of words to show on left and right of token string
 				order:str='1R2R3R', # order of sort columns
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
@@ -78,7 +78,7 @@ def concordance(self: Concordance,
 
 	start_time = time.time()
 	sequence_len = len(token_sequence[0])
-	concordance_range = range(-1 * context_words, context_words + sequence_len)
+	concordance_range = range(-1 * context_length, context_length + sequence_len)
 	positional_columns = [str(x) for x in concordance_range]
 
 	index = 'orth_index'
@@ -186,7 +186,7 @@ def concordance(self: Concordance,
 	
 	logger.info(f'Concordance report time: {(time.time() - start_time):.5f} seconds')
 
-	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_words}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
+	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
 # %% ../nbs/72_concordance.ipynb 20

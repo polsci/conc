@@ -8,7 +8,7 @@ import numpy as np
 import time
 import polars as pl
 from fastcore.basics import patch
-import math
+from scipy.stats import chi2
 
 # %% auto 0
 __all__ = ['Collocates']
@@ -59,11 +59,13 @@ def _zero_after_value(self:Collocates,
 
 # %% ../nbs/74_collocates.ipynb 13
 @patch
-def _get_collocates_in_context(self:Collocates,
+def _get_tokens_in_context(self:Collocates,
 							   token_positions:np.ndarray, # Numpy array of token positions in the corpus
 							   index:str, # Index to use - lower_index, orth_index
 							   context_length:int = 5, # Number of context words to consider on each side of the token
-							   position_offset:int = 1 # offset to start retrieving context words - -1 for left, positive for right (may be adjusted by sequence_len)
+							   position_offset:int = 1, # offset to start retrieving context words - -1 for left, positive for right (may be adjusted by sequence_len)
+							   exclude_punctuation:bool = True, # exclude punctuation from collocate retrieval
+							   exclude_spaces:bool = True
 							   ) -> Result:
 	""" Get collocates in context for a given token index, operates one side at a time. """
 
@@ -78,15 +80,23 @@ def _get_collocates_in_context(self:Collocates,
 	else:
 		position_offset_step = 1
 	
+	tokens_for_removal = []
+	if exclude_punctuation:
+		tokens_for_removal += self.corpus.punct_tokens
+	if exclude_spaces:
+		tokens_for_removal += self.corpus.space_tokens
+	len_tokens_for_removal = len(tokens_for_removal)
+
 	collected = False
 	context_tokens_arr = []
 	while collected == False:
 		new_positions = np.array(token_positions[0] + position_offset, dtype = token_positions[0].dtype)
 		context_tokens_arr.append(self.corpus.get_tokens_by_index(index)[new_positions])
 		position_offset += position_offset_step
-		if len(context_tokens_arr) >= context_length: # cleaning spaces and punctuation and check if need more iterations
+		if len(context_tokens_arr) >= context_length: 
 			context_tokens = np.array(context_tokens_arr, dtype = token_positions[0].dtype)
-			context_tokens = np.where(np.isin(context_tokens, self.corpus.punct_tokens + self.corpus.space_tokens), 0, context_tokens)
+			if len_tokens_for_removal > 0: # cleaning spaces and punctuation and check if need more iterations
+				context_tokens = np.where(np.isin(context_tokens, self.corpus.punct_tokens + self.corpus.space_tokens), 0, context_tokens)
 			counts = np.count_nonzero(context_tokens, axis=0)
 			if np.min(counts) < context_length:
 				pass
@@ -107,7 +117,12 @@ def _get_collocates_in_context(self:Collocates,
 @patch
 def collocates(self:Collocates, 
 				token_str:str, # Token to search for
-				collocation_measure:str = 'logdice', # statistical measure to use for collocation calculation: logdice, mutual_information
+				effect_size_measure:str = 'logdice', # statistical measure to use for collocation calculation: logdice, mutual_information
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported
+				order:str|None = None, # default of None orders by collocation measure, results can also be ordered by: collocate_frequency, frequency, log_likelihood
+				order_descending:bool = True, # order is descending or ascending
+				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
+				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
 				context_length:int|None=5, # Window size per side in tokens - use this for setting context lengths on left and right to same value
 				context_left:int|None=None, # If context_left or context_right > 0 sets context lengths independently
 				context_right:int|None=None, # see context_left
@@ -119,20 +134,30 @@ def collocates(self:Collocates,
 				) -> Result:
 	""" Report collocates for a given token string. """
 
+	if effect_size_measure not in ['logdice', 'mutual_information']:
+		raise ValueError(f'Collocation measure must be one of "logdice" or "mutual_information".')
+	
+	if statistical_significance_measure not in ['log_likelihood']:
+		raise ValueError(f'Statistical significance measure must be "log_likelihood".')
+
+	if order not in [None, effect_size_measure, 'collocate_frequency', 'frequency', statistical_significance_measure]:
+		raise ValueError(f'The order parameter must be None (default) or one of: {effect_size_measure}, collocate_frequency, frequency, {statistical_significance_measure}')
+
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 
 	index_column = 'lower_index'
 	frequency_column = 'frequency_lower'
 	columns = ['rank', 'token', 'collocate_frequency', 'frequency']
 
-	if collocation_measure not in ['logdice', 'mutual_information']:
-		raise ValueError(f'Collocation measure must be one of "logdice" or "mutual_information"')
-
 	start_time = time.time()
 	debug = False
 
 	sequence_len = len(token_sequence[0])
 	token_positions = self.corpus.get_token_positions(token_sequence, index_id)
+
+	if token_positions is None or token_positions[0].shape[0] == 0:
+		logger.warning(f'Token "{token_str}" not found in the corpus.')
+		return Result(type='collocates', df=pl.DataFrame(), title=f'No matches for "{token_str}"', description=f'{self.corpus.name}', summary_data={}, formatted_data=[])
 
 	count_tokens = self.corpus.token_count
 	tokens_descriptor = 'all tokens'
@@ -172,20 +197,31 @@ def collocates(self:Collocates,
 	formatted_data.append(f'Context tokens left: {context_left}, context tokens right: {context_right}')
 
 	# getting context tokens
-	left_tokens = self._get_collocates_in_context(token_positions=token_positions, index=index_column, context_length=context_left, position_offset=-1)
-	right_tokens = self._get_collocates_in_context(token_positions=token_positions, index=index_column, context_length=context_right, position_offset=sequence_len)
+	left_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_left, position_offset=-1, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	right_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_right, position_offset=sequence_len, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
 	combined_tokens = np.concatenate([left_tokens.flatten(), right_tokens.flatten()])
+	del left_tokens, right_tokens
 	combined_tokens = combined_tokens[combined_tokens != 0] # removes punctuation and space placeholder
-	token_count_in_context_window = combined_tokens.shape[0]
-
 	# getting frequencies of collocates
 	unique_token_ids, counts = np.unique(combined_tokens, return_counts=True)
-	#unique_token_ids = unique_token_ids.astype(np.int32)
+	token_count_in_context_window = combined_tokens.shape[0]
+
+	node_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=sequence_len, position_offset=0, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	unique_node_token_ids, node_counts = np.unique(node_tokens, return_counts=True)
 
 	df = pl.DataFrame({
 		'token_id': unique_token_ids,
 		'collocate_frequency': counts
 	})
+
+	# for log liklihood calculation - need to have counts of node tokens to adjust collocate_frequency_outside_context
+	node_frequency = np.zeros_like(unique_token_ids, dtype=np.int32)
+	# use where to set node_frequency for node tokens
+	for i, token_id in enumerate(unique_node_token_ids):
+		node_frequency[unique_token_ids == token_id] = node_counts[i]
+	df = df.with_columns(
+		pl.lit(node_frequency).alias('node_frequency')
+	)
 
 	# adding frequency of collocates in corpus
 	df = df.join(self.corpus.vocab.collect().select(['token_id', 'token', frequency_column]), on='token_id', how='left', maintain_order='left')
@@ -198,7 +234,7 @@ def collocates(self:Collocates,
 	if len(filtering_descriptors) > 0:
 		formatted_data.append(f'Filtered tokens by {(", ".join(filtering_descriptors))}')
 
-	if collocation_measure == 'logdice':
+	if effect_size_measure == 'logdice':
 		# calculating collocation measure
 		# from old code: logdice = 14 + math.log2((2 * collocate_count) / (node_frequency + loaded_corpora[corpus_name]['frequency_lookup'][collocate]))
 		df = df.with_columns(
@@ -206,8 +242,7 @@ def collocates(self:Collocates,
 			.alias('logdice')
 		)
 		columns.append('logdice')
-
-	if collocation_measure == 'mutual_information':
+	elif effect_size_measure == 'mutual_information':
 		# from old code: mi = math.log2((loaded_corpora[corpus_name]['token_count'] * collocate_count) / (node_frequency * loaded_corpora[corpus_name]['frequency_lookup'][collocate]))
 		df = df.with_columns(
 			(pl.lit(count_tokens) * pl.col('collocate_frequency') / (pl.lit(token_positions[0].shape[0]) * pl.col('frequency'))).log(2)
@@ -215,50 +250,67 @@ def collocates(self:Collocates,
 		)
 		columns.append('mutual_information')
 
+	if statistical_significance_measure == 'log_likelihood':
+		# based on calculation for keyness: https://ucrel.lancs.ac.uk/llwizard.html
+		# a = collocate frequency in context, is collocate_frequency
+		# b = collocate frequency outside context ...
+		# reminder: for individual tokens constituting the node, collocate_frequency_outside_context should exclude frequency of tokens in node
+		df = df.with_columns(
+			pl.max_horizontal([(pl.col('frequency') - pl.col('collocate_frequency') - pl.col('node_frequency')), pl.lit(0)]).alias('collocate_frequency_outside_context')
+		)
 
-	# based on calculation for keyness: https://ucrel.lancs.ac.uk/llwizard.html
-	# a = collocate frequency in context, is collocate_frequency
-	# b = collocate frequency outside context ...
-	# TODO - add when syntax to handle case for individual tokens constituting the node, adjust collocate_frequency_outside_context by token_positions[0].shape[0]
-	df = df.with_columns(
-		(pl.col('frequency') - pl.col('collocate_frequency')).alias('collocate_frequency_outside_context')
-	)
+		# c = total tokens in context windows, is token_count_in_context_window calculated above
+		# d = total tokens outside context windows
+		total_tokens_outside_context_window = count_tokens - token_count_in_context_window - (token_positions[0].shape[0] * sequence_len)
 
-	# c = total tokens in context windows, is token_count_in_context_window calculated above
-	# d = total tokens outside context windows
-	total_tokens_outside_context_window = count_tokens - token_count_in_context_window - (token_positions[0].shape[0] * sequence_len)
+		# E1 = c*(a+b) / (c+d) 
+		# E2 = d*(a+b) / (c+d)
+		# E1 and E2
+		df = df.with_columns(
+			((pl.lit(token_count_in_context_window) * (pl.col('collocate_frequency') + pl.col('collocate_frequency_outside_context'))) / (pl.lit(token_count_in_context_window) + pl.lit(total_tokens_outside_context_window))).alias('expected_frequency1'),
+			((pl.lit(total_tokens_outside_context_window) * (pl.col('collocate_frequency') + pl.col('collocate_frequency_outside_context'))) / (pl.lit(token_count_in_context_window) + pl.lit(total_tokens_outside_context_window))).alias('expected_frequency2'), 
+		)
 
-	# E1 = c*(a+b) / (c+d) 
-	# E2 = d*(a+b) / (c+d)
-	# E1 and E2
-	df = df.with_columns(
-		((pl.lit(token_count_in_context_window) * (pl.col('collocate_frequency') + pl.col('collocate_frequency_outside_context'))) / (pl.lit(token_count_in_context_window) + pl.lit(total_tokens_outside_context_window))).alias('expected_frequency1'),
-		((pl.lit(total_tokens_outside_context_window) * (pl.col('collocate_frequency') + pl.col('collocate_frequency_outside_context'))) / (pl.lit(token_count_in_context_window) + pl.lit(total_tokens_outside_context_window))).alias('expected_frequency2'), 
-	)
+		# G2 = 2*((a*ln (a/E1)) + (b*ln (b/E2))) 
+		# components of G2 as term1 and term 2 - (a*ln (a/E1)) (b*ln (b/E2))
+		df = df.with_columns([
+			pl.when(pl.col('collocate_frequency') > 0)
+			.then(pl.col('collocate_frequency') * (pl.col('collocate_frequency') / pl.col('expected_frequency1')).log())
+			.otherwise(0)
+			.alias('term1'),
+			pl.when(pl.col('collocate_frequency_outside_context') > 0)
+			.then(pl.col('collocate_frequency_outside_context') * (pl.col('collocate_frequency_outside_context') / pl.col('expected_frequency2')).log())
+			.otherwise(0)
+			.alias('term2') # 0 if no reference frequency
+		])
 
-	# G2 = 2*((a*ln (a/E1)) + (b*ln (b/E2))) 
-	# components of G2 as term1 and term 2 - (a*ln (a/E1)) (b*ln (b/E2))
-	df = df.with_columns([
-		pl.when(pl.col('collocate_frequency') > 0)
-		.then(pl.col('collocate_frequency') * (pl.col('collocate_frequency') / pl.col('expected_frequency1')).log())
-		.otherwise(0)
-		.alias('term1'),
-		pl.when(pl.col('collocate_frequency_outside_context') > 0)
-		.then(pl.col('collocate_frequency_outside_context') * (pl.col('collocate_frequency_outside_context') / pl.col('expected_frequency2')).log())
-		.otherwise(0)
-		.alias('term2') # 0 if no reference frequency
-	])
+		# G2
+		df = df.with_columns(
+			(2 * (pl.col('term1') + pl.col('term2'))).alias('log_likelihood')
+		)
+		columns.append('log_likelihood')
 
-	# G2
-	df = df.with_columns(
-		(2 * (pl.col('term1') + pl.col('term2'))).alias('log_likelihood')
-	)
-	columns.append('log_likelihood')
+	unique_collocates = df.select(pl.len()).item()
+
+	if statistical_significance_cut is not None and statistical_significance_cut > 0:
+		p = statistical_significance_cut
+		# bonferroni correction
+		if apply_bonferroni:
+			p_value_descriptor = f'Keywords filtered based on p-value {p} with Bonferroni correction (based on {unique_collocates} tests)'
+			p = p / unique_collocates # adjust by criteria
+		else:
+			p_value_descriptor = f'Keywords filtered based on p-value: {p}'
+		cut = chi2.ppf(1 - p, df=1)		
+		df = df.filter(pl.col('log_likelihood') > cut)
+		formatted_data.append(p_value_descriptor)
+		unique_collocates = df.select(pl.len()).item()
+
+	formatted_data.append(f'Unique collocates: {unique_collocates:,.0f}')
 
 	# prepare report information and paging ...
-	df = df.sort(collocation_measure, descending = True).with_row_index('rank', offset=1)
-	unique_collocates = df.select(pl.len()).item()
-	formatted_data.append(f'Unique collocates: {unique_collocates:,.0f}')
+	if order is None:
+		order = effect_size_measure
+	df = df.sort(order, descending = order_descending).with_row_index('rank', offset=1)
 
 	if page_size > 0:
 		start = (page_current - 1) * page_size
@@ -269,6 +321,8 @@ def collocates(self:Collocates,
 		formatted_data.append(f'Page {page_current} of {unique_collocates // page_size + 1}')
 
 	#formatted_data.append(f'{total_descriptor}: {count_tokens:,.0f}')
+	if debug:
+		columns = df.columns
 
 	logger.info(f"Collocates calculated in {time.time() - start_time:.2f} seconds.")
 

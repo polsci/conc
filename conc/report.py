@@ -18,10 +18,11 @@ from .frequency import Frequency
 from .ngrams import Ngrams
 from .concordance import Concordance
 from .keyness import Keyness
+from .collocates import Collocates
 
 # %% ../nbs/57_report.ipynb 5
 class Report:
-	"""Represention of a text data, with methods to load and save a corpus and to do corpus linguistic analysis of the texts."""
+	"""Unified interface to Conc reporting for analysis of frequency, ngrams, concordances, keyness, and collocates."""
 	
 	def __init__(self, 
 				corpus # Corpus instance
@@ -32,7 +33,7 @@ class Report:
 		self.ngrams_ = Ngrams(corpus)
 		self.concordance_ = Concordance(corpus)
 		self.keyness_ = None
-
+		self.collocates_ = Collocates(corpus)
 
 # %% ../nbs/57_report.ipynb 10
 @patch
@@ -82,7 +83,7 @@ def ngrams(self: Report,
 @patch
 def concordance(self: Report, 
 				token_str: str, # token string to get concordance for 
-				context_words:int = 5, # number of words to show on left and right of token string
+				context_length:int = 5, # number of words to show on left and right of token string
 				order:str='1R2R3R', # order of sort columns
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
@@ -90,7 +91,7 @@ def concordance(self: Report,
 				use_cache:bool = True # retrieve the results from cache if available
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
-	return self.concordance_.concordance(token_str, context_words=context_words, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
+	return self.concordance_.concordance(token_str, context_length=context_length, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
 
 # %% ../nbs/57_report.ipynb 16
 @patch
@@ -103,11 +104,11 @@ def set_reference_corpus(self: Report,
 # %% ../nbs/57_report.ipynb 18
 @patch
 def keywords(self: Report,
-				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported and anything else is ignored
-				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported and anything else is ignored
-				order:str = 'log_ratio', # column to order the results by: log_ratio, log_likelihood, frequency, frequency_reference, document_frequency, document_frequency_reference
+				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported
+				order:str|None = None, # default of None orders by effect size measure, results can also be ordered by: frequency, frequency_reference, document_frequency, document_frequency_reference, log_likelihood
 				order_descending:bool = True, # order is descending or ascending
-				statistical_significance_cut: float = 0.0, # statistical significance cut-off, e.g. 0.05 or 0.01 or 0.001
+				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
 				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
 				min_document_frequency: int = 0, # minimum document frequency in target for token to be included in the report
 				min_document_frequency_reference: int = 0, # minimum document frequency in reference for token to be included in the report
@@ -118,9 +119,9 @@ def keywords(self: Report,
 				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
 				page_current:int=1, # current page, ignored if page_size is 0
 				show_document_frequency:bool=False, # show document frequency in output
-				exclude_tokens:list[str]=[], # exclude specific tokens from frequency report, can be used to remove stopwords
+				exclude_tokens:list[str]=[], # exclude specific tokens from report results
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
-				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
+				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
 				exclude_punctuation:bool=True, # exclude punctuation tokens
 				exclude_spaces:bool=True # exclude space tokens
@@ -149,3 +150,41 @@ def keywords(self: Report,
 									restrict_tokens_text=restrict_tokens_text,
 									exclude_punctuation=exclude_punctuation,
 									exclude_spaces=exclude_spaces)
+
+# %% ../nbs/57_report.ipynb 20
+@patch
+def collocates(self: Report, 
+				token_str:str, # Token to search for
+				effect_size_measure:str = 'logdice', # statistical measure to use for collocation calculation: logdice, mutual_information
+				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported
+				order:str|None = None, # default of None orders by collocation_measure, results can also be ordered by: collocate_frequency, frequency, log_likelihood
+				order_descending:bool = True, # order is descending or ascending
+				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
+				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
+				context_length:int|None=5, # Window size per side in tokens - use this for setting context lengths on left and right to same value
+				context_left:int|None=None, # If context_left or context_right > 0 sets context lengths independently
+				context_right:int|None=None, # see context_left
+				min_collocate_frequency:int=5, # Minimum count of collocates
+				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
+				page_current:int=1, # current page, ignored if page_size is 0
+				exclude_punctuation:bool=True, # exclude punctuation tokens
+				exclude_spaces:bool=True # exclude space tokens
+				) -> Result:
+
+	""" Report collocates for a given token string. """
+
+	return self.collocates_.collocates(token_str, 
+										effect_size_measure=effect_size_measure, 
+										statistical_significance_measure=statistical_significance_measure, 
+										order=order, 
+										order_descending=order_descending, 
+										statistical_significance_cut=statistical_significance_cut, 
+										apply_bonferroni=apply_bonferroni, 
+										context_length=context_length, 
+										context_left=context_left, 
+										context_right=context_right, 
+										min_collocate_frequency=min_collocate_frequency, 
+										page_size=page_size, 
+										page_current=page_current,
+										exclude_punctuation=exclude_punctuation,
+										exclude_spaces=exclude_spaces)
