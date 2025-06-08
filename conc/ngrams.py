@@ -19,7 +19,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE, set_logger_state
 
-# %% ../nbs/71_ngrams.ipynb 7
+# %% ../nbs/71_ngrams.ipynb 8
 class Ngrams:
 	""" Class for n-gram analysis reporting. """
 	def __init__(self,
@@ -28,7 +28,7 @@ class Ngrams:
 		self.corpus = corpus
 
 
-# %% ../nbs/71_ngrams.ipynb 9
+# %% ../nbs/71_ngrams.ipynb 10
 @patch
 def _get_ngrams(self:Ngrams, 
 			   token_sequence: list[np.ndarray], # token sequence to get index for 
@@ -36,8 +36,8 @@ def _get_ngrams(self:Ngrams,
 			   token_positions: list[np.ndarray], # positions of token sequence, returned by get_token_positions 
 			   ngram_length: int = 2, # length of ngram
 			   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT, RIGHT, or MIDDLE of ngrams
-			   exclude_punctuation:bool=True, # exclude punctuation tokens
-			   exclude_spaces:bool=True # exclude space tokens
+			   exclude_punctuation:bool=False, # exclude punctuation tokens
+			   exclude_spaces:bool=False # exclude space tokens
 			   ) -> np.ndarray: # array of ngrams results
 
 	""" Get ngram data for a token sequence. """
@@ -74,11 +74,15 @@ def _get_ngrams(self:Ngrams,
 	positions = (np.array(ngram_range)[:, None] != np.arange(sequence_len)).all(axis=1)
 	ngrams = np.delete(ngrams, np.where(ngrams[positions] == self.corpus.EOF_TOKEN)[1], axis=1)
 
+	if exclude_punctuation:
+		punctuation_tokens = self.corpus.punct_tokens
+		ngrams = np.delete(ngrams, np.where(np.isin(ngrams, punctuation_tokens))[1], axis=1)
+
 	logger.info(f'Ngrams ({ngrams.shape[1]}) retrieval time: {(time.time() - start_time):.5f} seconds')
 	return ngrams
 
 
-# %% ../nbs/71_ngrams.ipynb 14
+# %% ../nbs/71_ngrams.ipynb 16
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
@@ -158,7 +162,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/71_ngrams.ipynb 17
+# %% ../nbs/71_ngrams.ipynb 19
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram

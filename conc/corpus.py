@@ -21,28 +21,28 @@ import msgspec # tested against orjson - with validation was faster, without aro
 # %% auto 0
 __all__ = ['NOT_DOC_TOKEN', 'INDEX_HEADER_LENGTH', 'README_TEMPLATE', 'Corpus']
 
-# %% ../nbs/50_corpus.ipynb 6
+# %% ../nbs/50_corpus.ipynb 5
 from . import __version__
 from .core import logger, set_logger_state, spacy_attribute_name, CorpusMetadata, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR, REPOSITORY_URL, DOCUMENTATION_URL, CITATION_STR, PYPI_URL
 from .result import Result
 from .text import Text
 
-# %% ../nbs/50_corpus.ipynb 7
+# %% ../nbs/50_corpus.ipynb 6
 polars_conf = pl.Config.set_tbl_hide_column_data_types(True)
 polars_conf = pl.Config.set_tbl_hide_dataframe_shape(True)
 polars_conf = pl.Config.set_tbl_rows(50)
 polars_conf = pl.Config.set_tbl_width_chars(300)
 polars_conf = pl.Config.set_fmt_str_lengths(300)
 
-# %% ../nbs/50_corpus.ipynb 8
+# %% ../nbs/50_corpus.ipynb 7
 _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
 _RE_PUNCT = re.compile(r"^[^\s^\w^\d]$")
 
-# %% ../nbs/50_corpus.ipynb 9
+# %% ../nbs/50_corpus.ipynb 8
 NOT_DOC_TOKEN = -1
 INDEX_HEADER_LENGTH = 100
 
-# %% ../nbs/50_corpus.ipynb 12
+# %% ../nbs/50_corpus.ipynb 11
 class Corpus:
 	"""Represention of text corpus, with methods to build, load and save a corpus from a variety of formats and to work with the corpus data."""
 	
@@ -121,7 +121,7 @@ class Corpus:
 		self.results_cache = {}
 
 
-# %% ../nbs/50_corpus.ipynb 14
+# %% ../nbs/50_corpus.ipynb 13
 @patch
 def _init_spacy_model(self: Corpus,
                 model: str = 'en_core_web_sm', # spacy model to use for tokenization
@@ -139,7 +139,7 @@ def _init_spacy_model(self: Corpus,
 		if self._nlp.meta['version'] != version:
 			logger.warning(f'Spacy model version mismatch: expecting {version}, got {self._nlp.meta["version"]}. This may cause issues with tokenization.')
 
-# %% ../nbs/50_corpus.ipynb 15
+# %% ../nbs/50_corpus.ipynb 14
 @patch
 def _process_punct_positions(self: Corpus):
 	""" Process punctuation positions in token data and populates punct_tokens and punct_positions. """
@@ -148,7 +148,7 @@ def _process_punct_positions(self: Corpus):
 	punct_mask = np.isin(self.lower_index, self.punct_tokens) # faster to retrieve with isin than where
 	self.punct_positions = np.nonzero(punct_mask)[0] # storing this as smaller
 
-# %% ../nbs/50_corpus.ipynb 21
+# %% ../nbs/50_corpus.ipynb 20
 @patch
 def _init_build_process(self:Corpus,
 						save_path: str, # path to save corpus data 
@@ -162,7 +162,7 @@ def _init_build_process(self:Corpus,
 	if not os.path.isdir(self.corpus_path):
 		os.makedirs(self.corpus_path)
 
-# %% ../nbs/50_corpus.ipynb 22
+# %% ../nbs/50_corpus.ipynb 21
 @patch
 def _update_build_process(self: Corpus, 
                            orth_index: list[np.ndarray], # orthographic token ids
@@ -176,7 +176,7 @@ def _update_build_process(self: Corpus,
     pl.DataFrame([np.concatenate(orth_index), np.concatenate(lower_index), np.concatenate(token2doc_index), np.concatenate(has_spaces)], schema = [('orth_index', pl.UInt64), ('lower_index', pl.UInt64), ('token2doc_index', pl.Int32), ('has_spaces', pl.Boolean)] ).write_parquet(f'{self.corpus_path}/build_{store_pos}.parquet')
     return store_pos + 1
 
-# %% ../nbs/50_corpus.ipynb 24
+# %% ../nbs/50_corpus.ipynb 23
 @patch
 def _complete_build_process(self: Corpus, 
 							build_process_cleanup: bool = True # Remove the build files after build is complete, retained for development and testing purposes
@@ -291,7 +291,7 @@ def _complete_build_process(self: Corpus,
 
 
 
-# %% ../nbs/50_corpus.ipynb 25
+# %% ../nbs/50_corpus.ipynb 24
 @patch
 def _create_indices(self: Corpus, 
 				   orth_index: list[np.ndarray], # list of np arrays of orth token ids 
@@ -299,6 +299,8 @@ def _create_indices(self: Corpus,
 				   token2doc_index: list[np.ndarray] # list of np arrays of doc ids
 				   ):
 	""" (Depreciated) Use Numpy to create internal representation of the corpus for faster analysis and efficient representation on disk. Only used when the disk-based build process is not used. """
+
+	raise DeprecationWarning('This method is depreciated, the current build process uses _complete_build_process instead.')
 
 	self.token2doc_index = np.concatenate(token2doc_index)
 	unique_values, inverse = np.unique(np.concatenate(orth_index + lower_index), return_inverse=True)
@@ -328,9 +330,7 @@ def _create_indices(self: Corpus,
 	del self.frequency_lookup[self.EOF_TOKEN]
 	del unique_values
 
-
-
-# %% ../nbs/50_corpus.ipynb 26
+# %% ../nbs/50_corpus.ipynb 25
 @patch
 def _init_corpus_dataframes(self: Corpus):
 	""" Initialize dataframes after build or load """
@@ -341,7 +341,7 @@ def _init_corpus_dataframes(self: Corpus):
 	self.spaces = pl.scan_parquet(f'{self.corpus_path}/spaces.parquet')
 	self.metadata = pl.scan_parquet(f'{self.corpus_path}/metadata.parquet')
 
-# %% ../nbs/50_corpus.ipynb 27
+# %% ../nbs/50_corpus.ipynb 26
 README_TEMPLATE = """# {name}
 
 ## About
@@ -367,7 +367,7 @@ Conc can be installed [via pip]({PYPI_URL}):
 ```
 pip install conc
 ```
-Documentation and tutorials to get you started with Conc are available:
+Documentation to get you started with Conc are available:
 [Conc Documentation]({DOCUMENTATION_URL})
 
 ## Cite Conc
@@ -376,7 +376,7 @@ Documentation and tutorials to get you started with Conc are available:
 
 """
 
-# %% ../nbs/50_corpus.ipynb 28
+# %% ../nbs/50_corpus.ipynb 27
 @patch
 def save_corpus_metadata(self: Corpus, 
 		 ):
@@ -409,14 +409,13 @@ def save_corpus_metadata(self: Corpus,
 		
 	logger.info(f'Saved corpus metadata time: {(time.time() - start_time):.3f} seconds')
 
-# %% ../nbs/50_corpus.ipynb 29
+# %% ../nbs/50_corpus.ipynb 28
 @patch
 def build(self: Corpus, 
 		  save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
 		  iterator: iter, # iterator of texts
 		  model: str='en_core_web_sm', # spacy model to use for tokenisation
 		  spacy_batch_size:int=500, # batch size for spacy tokenizer
-		  #build_process_path:str|None=None, # path to save an in-progress build to disk to reduce memory usage, default of None disables 
 		  build_process_batch_size:int=5000, # save in-progress build to disk every n docs
 		  build_process_cleanup:bool = True # Remove the build files after build is complete, retained for development and testing purposes
 		  ):
@@ -511,7 +510,7 @@ def build(self: Corpus,
 	logger.info(f'Build time: {(time.time() - start_time):.3f} seconds')
 
 
-# %% ../nbs/50_corpus.ipynb 30
+# %% ../nbs/50_corpus.ipynb 29
 @patch
 def _prepare_files(self: Corpus, 
 					source_path: str, # path to folder with text files, path can be a directory, zip or tar/tar.gz file
@@ -559,10 +558,13 @@ def _prepare_files(self: Corpus,
 		if not os.path.isfile(metadata_file):
 			raise FileNotFoundError(f"Metadata file '{metadata_file}' not found")
 		try:
-			metadata_columns = set([metadata_file_column] + metadata_columns)
+			if metadata_file_column not in metadata_columns:
+				metadata_columns.insert(0, metadata_file_column)
 			
-			# ordering metadata based on order of files so token data and metadata aligned
-			metadata = metadata.join(pl.scan_csv(metadata_file).select(metadata_columns), on=metadata_file_column, how='left', maintain_order='left')
+			metadata = pl.scan_csv(metadata_file).select(metadata_columns)
+			# reordering files on metadata so token data and metadata aligned
+			files = metadata.select(pl.col(metadata_file_column)).collect(engine='streaming').to_numpy().flatten().tolist() # get file names from metadata
+			files = [os.path.join(source_path, f) for f in files if os.path.basename(f) in files] 
 		except pl.exceptions.ColumnNotFoundError as e:
 			raise
 	
@@ -584,7 +586,7 @@ def _prepare_files(self: Corpus,
 	
 
 
-# %% ../nbs/50_corpus.ipynb 31
+# %% ../nbs/50_corpus.ipynb 30
 @patch
 def build_from_files(self: Corpus,
 					source_path: str, # path to folder with text files 
@@ -596,7 +598,6 @@ def build_from_files(self: Corpus,
 					encoding:str='utf-8', # encoding of text files
 					model:str='en_core_web_sm', # spacy model to use for tokenisation
 					spacy_batch_size:int=1000, # batch size for spacy tokenizer
-					#build_process_path:str=None, # path to save an in-progress build to disk to reduce memory usage
 					build_process_batch_size:int=5000, # save in-progress build to disk every n docs
 					build_process_cleanup:bool = True # Remove the build files after build is complete, retained for development and testing purposes
 					):
@@ -611,7 +612,7 @@ def build_from_files(self: Corpus,
 	return self
 
 
-# %% ../nbs/50_corpus.ipynb 33
+# %% ../nbs/50_corpus.ipynb 31
 @patch
 def _prepare_csv(self: Corpus, 
 					source_path:str, # path to csv file
@@ -638,7 +639,7 @@ def _prepare_csv(self: Corpus,
 		for row in slice_df.iter_rows():
 			yield row[0]  
 
-# %% ../nbs/50_corpus.ipynb 34
+# %% ../nbs/50_corpus.ipynb 32
 @patch
 def build_from_csv(self: Corpus, 
 				   source_path:str, # path to csv file
@@ -662,8 +663,7 @@ def build_from_csv(self: Corpus,
 
 	return self
 
-
-# %% ../nbs/50_corpus.ipynb 37
+# %% ../nbs/50_corpus.ipynb 36
 @patch
 def load(self: Corpus, 
 		 corpus_path: str # path to load corpus
@@ -697,7 +697,7 @@ def load(self: Corpus,
 
 	return self
 
-# %% ../nbs/50_corpus.ipynb 42
+# %% ../nbs/50_corpus.ipynb 41
 @patch
 def info(self: Corpus, 
 		 include_disk_usage:bool = False, # include information of size on disk in output
@@ -733,7 +733,7 @@ def info(self: Corpus,
 
 
 
-# %% ../nbs/50_corpus.ipynb 43
+# %% ../nbs/50_corpus.ipynb 42
 @patch
 def summary(self: Corpus, 
 			include_memory_usage:bool = False # include memory usage in output
@@ -742,7 +742,7 @@ def summary(self: Corpus,
 	result = Result('summary', self.info(include_memory_usage), 'Corpus Summary', '', {}, [])
 	result.display()
 
-# %% ../nbs/50_corpus.ipynb 44
+# %% ../nbs/50_corpus.ipynb 43
 @patch
 def __str__(self: Corpus):
 	""" Formatted information about the corpus. """
@@ -751,7 +751,7 @@ def __str__(self: Corpus):
 
 
 
-# %% ../nbs/50_corpus.ipynb 54
+# %% ../nbs/50_corpus.ipynb 53
 @patch
 def _init_token_arrays(self: Corpus):
 	""" Prepare the temporary token arrays for the corpus. """
@@ -773,7 +773,7 @@ def _init_token_arrays(self: Corpus):
 		logger.info(f'Created tokens_sort_order in {(time.time() - start_time):.3f} seconds')
 		del tokens_array_lower	
 
-# %% ../nbs/50_corpus.ipynb 56
+# %% ../nbs/50_corpus.ipynb 55
 @patch
 def token_ids_to_tokens(self: Corpus, 
 						token_ids: np.ndarray|list # token ids to return token strings for 
@@ -789,7 +789,7 @@ def token_ids_to_tokens(self: Corpus,
 	
 	return self.results_cache['tokens_array'][token_ids]
 
-# %% ../nbs/50_corpus.ipynb 57
+# %% ../nbs/50_corpus.ipynb 56
 @patch
 def tokens_to_token_ids(self: Corpus, 
 				tokens: list[str]|np.ndarray[str] # list of tokens to get ids for
@@ -803,7 +803,7 @@ def tokens_to_token_ids(self: Corpus,
 	
 	return np.array([self.results_cache['tokens_lookup'].get(token, 0) for token in tokens])
 
-# %% ../nbs/50_corpus.ipynb 58
+# %% ../nbs/50_corpus.ipynb 57
 @patch
 def token_to_id(self: Corpus, 
 				token: str # token to get id for
@@ -813,7 +813,7 @@ def token_to_id(self: Corpus,
 	token_ids = self.tokens_to_token_ids([token])
 	return int(token_ids[0])
 
-# %% ../nbs/50_corpus.ipynb 74
+# %% ../nbs/50_corpus.ipynb 73
 @patch
 def token_ids_to_sort_order(self: Corpus, 
 							token_ids: np.ndarray|list # token ids to return token strings for 
@@ -829,7 +829,7 @@ def token_ids_to_sort_order(self: Corpus,
 	
 	return self.results_cache['tokens_sort_order'][token_ids]
 
-# %% ../nbs/50_corpus.ipynb 76
+# %% ../nbs/50_corpus.ipynb 75
 @patch
 def get_token_count_text(self: Corpus, 
 					exclude_punctuation:bool = False, # exclude punctuation tokens from the count
@@ -857,7 +857,7 @@ def get_token_count_text(self: Corpus,
 
 	return count_tokens, tokens_descriptor, total_descriptor
 
-# %% ../nbs/50_corpus.ipynb 79
+# %% ../nbs/50_corpus.ipynb 78
 @patch
 def tokenize(self: Corpus, 
 			 string:str, # string to tokenize 
@@ -946,7 +946,7 @@ def tokenize(self: Corpus,
 	# else:
 	return token_sequences, index_id
 
-# %% ../nbs/50_corpus.ipynb 82
+# %% ../nbs/50_corpus.ipynb 81
 @patch
 def _get_text(self:Corpus,
         doc_id: int, # the id of the document
@@ -962,7 +962,7 @@ def _get_text(self:Corpus,
     metadata = self.metadata.with_row_index(offset = 1, name = 'document_id').filter(pl.col('document_id') == doc_id).collect()
     return tokens, has_spaces, metadata
 
-# %% ../nbs/50_corpus.ipynb 83
+# %% ../nbs/50_corpus.ipynb 82
 @patch
 def text(self:Corpus,
         doc_id: int # the id of the document
@@ -971,7 +971,7 @@ def text(self:Corpus,
 
     return Text(*self._get_text(doc_id))
 
-# %% ../nbs/50_corpus.ipynb 86
+# %% ../nbs/50_corpus.ipynb 85
 @patch
 def get_tokens_by_index(self: Corpus, 
 			   index: str = 'orth_index', # index to get tokens from i.e. 'orth_index' 'lower_index' 'token2doc_index'
@@ -989,7 +989,7 @@ def get_tokens_by_index(self: Corpus,
 	return self.results_cache[index]
 
 
-# %% ../nbs/50_corpus.ipynb 88
+# %% ../nbs/50_corpus.ipynb 87
 @patch
 def get_ngrams_by_index(self: Corpus, 
 				ngram_length:int, # length of ngrams to get
@@ -1008,7 +1008,7 @@ def get_ngrams_by_index(self: Corpus,
 
 	return self.ngram_index[(index, ngram_length)]
 
-# %% ../nbs/50_corpus.ipynb 91
+# %% ../nbs/50_corpus.ipynb 90
 @patch
 def get_token_positions(self: Corpus, 
 					token_sequence: list[np.ndarray], # token sequence to get index for 
@@ -1039,78 +1039,3 @@ def get_token_positions(self: Corpus,
 
 	logger.info(f'Token indexing ({len(results[0])}) time: {(time.time() - start_time):.5f} seconds')
 	return results
-
-# %% ../nbs/50_corpus.ipynb 95
-@patch
-def _index_name(self: Corpus, index):
-	"""Get name of index from spacy."""
-
-	raise DeprecationWarning('Functionality moved to conc.core spacy_attribute_name')
-
-	return list(spacy.attrs.IDS.keys())[list(spacy.attrs.IDS.values()).index(index)]
-
-# %% ../nbs/50_corpus.ipynb 96
-@patch
-def _init_frequency_table(self: Corpus):
-	""" (Depreciated) Prepare the frequency table for the corpus. """
-
-	raise DeprecationWarning("This method is deprecated and will be removed soon.")
-
-	if self.frequency_table is None:
-		# note: don't sort this - leave in order of token_id - sorts can be done when required
-		start_time = time.time()
-		self.frequency_table = pl.DataFrame({'token_id': list(self.frequency_lookup.keys()), 'frequency': list(self.frequency_lookup.values())})  
-		self.frequency_table = self.frequency_table.join(pl.DataFrame({'token_id': list(self.vocab.keys()), 'token': list(self.vocab.values())}), on='token_id', how='left')
-		self.frequency_table = self.frequency_table.with_columns(self.frequency_table['token_id'].is_in(self.punct_tokens).alias('is_punct')).with_columns(self.frequency_table['token_id'].is_in(self.space_tokens).alias('is_space'))	
-		self.frequency_table = self.frequency_table.with_row_index(name='rank', offset=1)
-		logger.info(f'Frequency table created in {(time.time() - start_time):.3f} seconds')
-
-# %% ../nbs/50_corpus.ipynb 97
-@patch
-def _init_tokens_sort_order(self: Corpus):
-	""" Prepare the tokens sort order for the corpus. """
-	
-	raise DeprecationWarning("This method is deprecated and will be removed soon.")
-
-	if 'tokens_sort_order' not in self.results_cache:
-		self._init_tokens_array()
-		# lowercasing then sorting ...
-		tokens_array_lower = np.strings.lower(self.results_cache['tokens_array'])
-		self.results_cache['tokens_sort_order'] = np.argsort(np.argsort(tokens_array_lower))
-
-# %% ../nbs/50_corpus.ipynb 98
-@patch
-def _mask_from_positions(self: Corpus, 
-						 positions # positions to create mask from
-						 ):
-	""" Convert positions to mask """
-	
-	raise DeprecationWarning("This method is deprecated and will be removed soon.")
-
-	mask_from_positions = np.zeros(self.lower_index.shape, dtype=bool)
-	mask_from_positions[positions] = True
-	return mask_from_positions
-
-# %% ../nbs/50_corpus.ipynb 100
-@patch
-def frequency_of(self: Corpus, 
-				 token:str|int # token id or string to get frequency for
-				 ) -> int|bool: # return frequency of token or False if not found
-	""" Get the frequency of a specific token. """
-
-	raise DeprecationWarning("This method is deprecated. Use conc.frequency instead.")
-
-	start_time = time.time()
-	# self._init_frequency_table() # depreciated
-	
-	if type(token) == str:
-		token = self.token_to_id(token)
-		if token == False:
-			return False
-
-	logger.info(f'Token frequency retrieval time: {(time.time() - start_time):.5f} seconds')
-
-	if token in self.frequency_lookup:
-		return int(self.frequency_lookup[token])
-	else:
-		return False
