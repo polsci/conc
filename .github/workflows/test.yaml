@@ -1,7 +1,17 @@
 name: CI
 on:  [workflow_dispatch, pull_request, push]
-
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps: [uses: fastai/workflows/nbdev-ci@master]
+    steps: 
+      # start changes from default CI
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # hard-coding - but may need to change in future
+      - name: Install dependencies
+        run: pip install spacy
+      - name: Install spaCy English model
+        run: python -m spacy download en_core_web_sm
+      # end changes from default CI
+      - uses: fastai/workflows/nbdev-ci@master
