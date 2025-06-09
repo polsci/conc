@@ -14,9 +14,9 @@ __all__ = ['Frequency']
 # %% ../nbs/70_frequency.ipynb 4
 from .corpus import Corpus
 from .result import Result
-from .core import logger, PAGE_SIZE, set_logger_state
+from .core import logger, PAGE_SIZE
 
-# %% ../nbs/70_frequency.ipynb 7
+# %% ../nbs/70_frequency.ipynb 10
 class Frequency:
 	""" Class for frequency analysis reporting """
 	def __init__(self,
@@ -25,7 +25,7 @@ class Frequency:
 		self.corpus = corpus
 
 
-# %% ../nbs/70_frequency.ipynb 9
+# %% ../nbs/70_frequency.ipynb 12
 @patch
 def frequencies(self: Frequency,
 				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
@@ -38,8 +38,7 @@ def frequencies(self: Frequency,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent tokens. """
 
@@ -60,12 +59,15 @@ def frequencies(self: Frequency,
 
 	columns = ['rank', 'token_id', 'token', 'frequency']
 
-	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation, exclude_spaces)
+	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation)
 
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')
 
 	df = self.corpus.vocab.filter(pl.col(frequency_column).is_not_null())
+	# ALWAYS remove spaces!
+	df = df.filter(pl.col('is_space') == False)
+
 	if exclude_tokens:
 		excluded_tokens_count = df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
 		df = df.filter(~pl.col('token').is_in(exclude_tokens))
@@ -82,8 +84,6 @@ def frequencies(self: Frequency,
 
 	if exclude_punctuation:
 		df = df.filter(pl.col('is_punct') == False)
-	if exclude_spaces:
-		df = df.filter(pl.col('is_space') == False)
 
 	df = df.sort(by = frequency_column, descending=True)
 
@@ -113,7 +113,7 @@ def frequencies(self: Frequency,
 
 	formatted_data.append(f'{total_descriptor}: {count_tokens:,.0f}')
 
-	formatted_data.append(f'Unique tokens: {unique_tokens:,.0f}')
+	formatted_data.append(f'Unique {tokens_descriptor}: {unique_tokens:,.0f}')
 	if page_size != 0 and unique_tokens > page_size:
 		formatted_data.append(f'Showing {page_size} rows')
 		formatted_data.append(f'Page {page_current} of {unique_tokens // page_size + 1}')

@@ -16,9 +16,9 @@ __all__ = ['Collocates']
 # %% ../nbs/74_collocates.ipynb 4
 from .corpus import Corpus
 from .result import Result
-from .core import logger, PAGE_SIZE, set_logger_state
+from .core import logger, PAGE_SIZE
 
-# %% ../nbs/74_collocates.ipynb 9
+# %% ../nbs/74_collocates.ipynb 12
 class Collocates:
 	""" Class for collocation analysis reporting. """
 	def __init__(self,
@@ -26,92 +26,6 @@ class Collocates:
 			  ): 
 		self.corpus = corpus
 
-
-# %% ../nbs/74_collocates.ipynb 10
-@patch
-def _shift_zeroes_to_end(self:Collocates,
-						arr:np.ndarray # Numpy array of collocate frequencies to process
-						):
-	""" Move 0 value positions for punctuation and space removal """
-	result = np.empty_like(arr)
-	for col in range(arr.shape[1]):
-		col_data = arr[:, col]
-		mask = col_data != 0
-		result[:mask.sum(), col] = col_data[mask]
-		result[mask.sum():, col] = 0
-	return result
-
-# %% ../nbs/74_collocates.ipynb 11
-@patch
-def _zero_after_value(self:Collocates,
-					  arr:np.ndarray, # Numpy array of collocate frequencies to process
-					  target: int # Target value to find in the array (e.g., an end-of-file token or a specific collocate frequency)
-					  ):
-	""" Set values from first occurence of target value to 0 in each column (for processing tokens outside text using eof token) """
-	arr = arr.copy()  
-	for col in range(arr.shape[1]):
-		col_data = arr[:, col]
-		idx = np.where(col_data == target)[0]
-		if idx.size > 0:
-			first_idx = idx[0]
-			arr[first_idx:, col] = 0
-	return arr
-
-# %% ../nbs/74_collocates.ipynb 12
-@patch
-def _get_tokens_in_context(self:Collocates,
-							   token_positions:np.ndarray, # Numpy array of token positions in the corpus
-							   index:str, # Index to use - lower_index, orth_index
-							   context_length:int = 5, # Number of context words to consider on each side of the token
-							   position_offset:int = 1, # offset to start retrieving context words - -1 for left, positive for right (may be adjusted by sequence_len)
-							   exclude_punctuation:bool = True, # exclude punctuation from collocate retrieval
-							   exclude_spaces:bool = True
-							   ) -> Result:
-	""" Get collocates in context for a given token index, operates one side at a time. """
-
-	start_time = time.time()
-
-	if context_length < 1:
-		# return empty result
-		return np.zeros((0, 0), dtype=np.int32)
-
-	if position_offset < 0:
-		position_offset_step = -1
-	else:
-		position_offset_step = 1
-	
-	tokens_for_removal = []
-	if exclude_punctuation:
-		tokens_for_removal += self.corpus.punct_tokens
-	if exclude_spaces:
-		tokens_for_removal += self.corpus.space_tokens
-	len_tokens_for_removal = len(tokens_for_removal)
-
-	collected = False
-	context_tokens_arr = []
-	while collected == False:
-		new_positions = np.array(token_positions[0] + position_offset, dtype = token_positions[0].dtype)
-		context_tokens_arr.append(self.corpus.get_tokens_by_index(index)[new_positions])
-		position_offset += position_offset_step
-		if len(context_tokens_arr) >= context_length: 
-			context_tokens = np.array(context_tokens_arr, dtype = token_positions[0].dtype)
-			if len_tokens_for_removal > 0: # cleaning spaces and punctuation and check if need more iterations
-				context_tokens = np.where(np.isin(context_tokens, self.corpus.punct_tokens + self.corpus.space_tokens), 0, context_tokens)
-			counts = np.count_nonzero(context_tokens, axis=0)
-			if np.min(counts) < context_length:
-				pass
-			else:
-				collected = True
-
-	context_tokens = self._shift_zeroes_to_end(context_tokens)
-	context_tokens = context_tokens[:context_length, :]
-
-	if self.corpus.EOF_TOKEN in context_tokens:
-		context_tokens = self._zero_after_value(context_tokens, self.corpus.EOF_TOKEN)
-
-	logger.info(f"Collocates retrieved in {time.time() - start_time:.2f} seconds.")
-
-	return context_tokens
 
 # %% ../nbs/74_collocates.ipynb 13
 @patch
@@ -123,14 +37,11 @@ def collocates(self:Collocates,
 				order_descending:bool = True, # order is descending or ascending
 				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
 				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
-				context_length:int|None=5, # Window size per side in tokens - use this for setting context lengths on left and right to same value
-				context_left:int|None=None, # If context_left or context_right > 0 sets context lengths independently
-				context_right:int|None=None, # see context_left
+				context_length:int|tuple[int, int]=5, # Window size per side in tokens - if an int (e.g. 5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right) (e.g. (0, 5)) 
 				min_collocate_frequency:int=5, # Minimum count of collocates
 				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
 				page_current:int=1, # current page, ignored if page_size is 0
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens
 				) -> Result:
 	""" Report collocates for a given token string. """
 
@@ -159,30 +70,32 @@ def collocates(self:Collocates,
 		logger.warning(f'Token "{token_str}" not found in the corpus.')
 		return Result(type='collocates', df=pl.DataFrame(), title=f'No matches for "{token_str}"', description=f'{self.corpus.name}', summary_data={}, formatted_data=[])
 
-	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation, exclude_spaces)
+	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation)
 
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')
 
 	# if any of context_length, context_left, context_right are None - set them to 0
-	if context_length is None:
-		context_length = 0
-	if context_left is None:
-		context_left = 0
-	if context_right is None:
-		context_right = 0
-
-	if context_left == 0 and context_right == 0:
+	if type(context_length) == int:
+		if context_length < 1:
+			raise ValueError('Context length must be greater than 0')
 		context_left = context_length
 		context_right = context_length
-	elif (context_left > 0 or context_right > 0) and context_length > 0:
-		logger.warning('Context length is ignored if either context_left or context_right is set to a value greater than 0. To remove this warning, set context_length to None or 0.')
+	elif type(context_length) == tuple:
+		if len(context_length) != 2:
+			raise ValueError('Context_length must be an int or a tuple of two ints (context_left, context_right).')
+		elif type(context_length[0]) != int or type(context_length[1]) != int:
+			raise ValueError('Context_length must be an int or a tuple of two ints (context_left, context_right).')
+		elif context_length[0] < 1 and context_length[1] < 1:
+			raise ValueError('If setting context lengths independently, at least one context length must be greater than 0')
+		else:
+			context_left, context_right = context_length
 
 	formatted_data.append(f'Context tokens left: {context_left}, context tokens right: {context_right}')
 
 	# getting context tokens
-	left_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_left, position_offset=-1, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
-	right_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_right, position_offset=sequence_len, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	left_tokens = self.corpus.get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_left, position_offset=-1, position_offset_step = -1, exclude_punctuation=exclude_punctuation, convert_eof = True)
+	right_tokens = self.corpus.get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=context_right, position_offset=sequence_len, position_offset_step = 1, exclude_punctuation=exclude_punctuation, convert_eof = True)
 	combined_tokens = np.concatenate([left_tokens.flatten(), right_tokens.flatten()])
 	del left_tokens, right_tokens
 	combined_tokens = combined_tokens[combined_tokens != 0] # removes punctuation and space placeholder
@@ -190,7 +103,7 @@ def collocates(self:Collocates,
 	unique_token_ids, counts = np.unique(combined_tokens, return_counts=True)
 	token_count_in_context_window = combined_tokens.shape[0]
 
-	node_tokens = self._get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=sequence_len, position_offset=0, exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	node_tokens = self.corpus.get_tokens_in_context(token_positions=token_positions, index=index_column, context_length=sequence_len, position_offset=0,  position_offset_step = 1, exclude_punctuation=exclude_punctuation, convert_eof = True)
 	unique_node_token_ids, node_counts = np.unique(node_tokens, return_counts=True)
 
 	df = pl.DataFrame({

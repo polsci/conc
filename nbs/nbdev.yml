@@ -3,7 +3,7 @@ project:
 
 website:
   title: "conc"
-  site-url: "https://polsci.github.io/conc"
+  site-url: "https://geoffford.nz/conc"
   description: "A Python library for efficient corpus analysis, enabling corpus linguistic analysis in Jupyter notebooks."
   repo-branch: main
   repo-url: "https://github.com/polsci/conc"

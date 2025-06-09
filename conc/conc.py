@@ -12,7 +12,7 @@ __all__ = ['Conc']
 
 # %% ../nbs/57_conc.ipynb 4
 from .result import Result
-from .core import PAGE_SIZE
+from .core import PAGE_SIZE, logger
 from .corpus import Corpus
 from .frequency import Frequency
 from .ngrams import Ngrams
@@ -20,7 +20,7 @@ from .concordance import Concordance
 from .keyness import Keyness
 from .collocates import Collocates
 
-# %% ../nbs/57_conc.ipynb 5
+# %% ../nbs/57_conc.ipynb 10
 class Conc:
 	"""Unified interface to Conc reporting for analysis of frequency, ngrams, concordances, keyness, and collocates."""
 	
@@ -35,7 +35,7 @@ class Conc:
 		self.keyness_ = None
 		self.collocates_ = Collocates(corpus)
 
-# %% ../nbs/57_conc.ipynb 10
+# %% ../nbs/57_conc.ipynb 14
 @patch
 def frequencies(self: Conc,
 				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
@@ -48,8 +48,7 @@ def frequencies(self: Conc,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict frequency report to return frequencies for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent tokens. """
 	return self.frequency_.frequencies(case_sensitive=case_sensitive,
@@ -62,23 +61,23 @@ def frequencies(self: Conc,
 										exclude_tokens_text=exclude_tokens_text,
 										restrict_tokens=restrict_tokens,
 										restrict_tokens_text=restrict_tokens_text,
-										exclude_punctuation=exclude_punctuation,
-										exclude_spaces=exclude_spaces)
+										exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 12
+# %% ../nbs/57_conc.ipynb 17
 @patch
 def ngrams(self: Conc, 
 		   token_str: str, # token string to get ngrams for 
 		   ngram_length:int = 2, # length of ngram
-		   ngram_token_position:str = 'LEFT', # specify if token sequence is on LEFT, RIGHT, or MIDDLE of ngrams
+		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
 		   normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 		   page_size:int = PAGE_SIZE, # number of results to display per results page 
 		   page_current:int = 1, # current page of results
 		   show_all_columns:bool = False, # return raw df with all columns or just ngram and frequency
+		   exclude_punctuation:bool=True, # do not return ngrams with punctuation tokens
 		   use_cache:bool = True # retrieve the results from cache if available
 		   ) -> Result: # return a Result object with ngram data
-	""" Report ngrams for a token string. """
-	
+	""" Report ngram frequencies containing a token string. """
+
 	return self.ngrams_.ngrams(token_str, 
 							ngram_length=ngram_length, 
 							ngram_token_position=ngram_token_position, 
@@ -86,9 +85,28 @@ def ngrams(self: Conc,
 							page_size=page_size, 
 							page_current=page_current, 
 							show_all_columns=show_all_columns, 
+							exclude_punctuation=exclude_punctuation,
 							use_cache=use_cache)
 
-# %% ../nbs/57_conc.ipynb 14
+# %% ../nbs/57_conc.ipynb 20
+@patch
+def ngram_frequencies(self: Conc, 
+                ngram_length:int=2, # length of ngram
+                case_sensitive:bool=False, # frequencies for tokens lowercased or with case preserved
+				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
+				page_size:int=PAGE_SIZE, # number of rows to return
+				page_current:int=1, # current page
+				exclude_punctuation:bool=True # exclude ngrams containing punctuation tokens
+				) -> Result: # return a Result object with the frequency table
+    """ Report frequent ngrams. """
+    return self.ngrams_.ngram_frequencies(ngram_length=ngram_length,
+                                    case_sensitive=case_sensitive,
+                                    normalize_by=normalize_by,
+                                    page_size=page_size,
+                                    page_current=page_current,
+                                    exclude_punctuation=exclude_punctuation)
+
+# %% ../nbs/57_conc.ipynb 23
 @patch
 def concordance(self: Conc, 
 				token_str: str, # token string to get concordance for 
@@ -102,7 +120,7 @@ def concordance(self: Conc,
 	""" Report concordance for a token string. """
 	return self.concordance_.concordance(token_str, context_length=context_length, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
 
-# %% ../nbs/57_conc.ipynb 16
+# %% ../nbs/57_conc.ipynb 26
 @patch
 def set_reference_corpus(self: Conc, 
                     corpus: Corpus  # Reference corpus
@@ -110,7 +128,7 @@ def set_reference_corpus(self: Conc,
     """ Set a reference corpus for keyness analysis. """
     self.keyness_ = Keyness(self.corpus, corpus)
 
-# %% ../nbs/57_conc.ipynb 18
+# %% ../nbs/57_conc.ipynb 28
 @patch
 def keywords(self: Conc,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
@@ -132,8 +150,7 @@ def keywords(self: Conc,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Get keywords for the corpus. """
 	if self.keyness_ is None:
@@ -157,10 +174,9 @@ def keywords(self: Conc,
 									exclude_tokens_text=exclude_tokens_text,
 									restrict_tokens=restrict_tokens,
 									restrict_tokens_text=restrict_tokens_text,
-									exclude_punctuation=exclude_punctuation,
-									exclude_spaces=exclude_spaces)
+									exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 20
+# %% ../nbs/57_conc.ipynb 31
 @patch
 def collocates(self: Conc, 
 				token_str:str, # Token to search for
@@ -170,14 +186,11 @@ def collocates(self: Conc,
 				order_descending:bool = True, # order is descending or ascending
 				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
 				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
-				context_length:int|None=5, # Window size per side in tokens - use this for setting context lengths on left and right to same value
-				context_left:int|None=None, # If context_left or context_right > 0 sets context lengths independently
-				context_right:int|None=None, # see context_left
+				context_length:int|tuple[int, int]=5, # Window size per side in tokens - if an int (e.g. 5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right) (e.g. (0, 5)) 
 				min_collocate_frequency:int=5, # Minimum count of collocates
 				page_size:int=PAGE_SIZE, # number of rows to return, if 0 returns all
 				page_current:int=1, # current page, ignored if page_size is 0
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens				
 				) -> Result:
 
 	""" Report collocates for a given token string. """
@@ -190,10 +203,7 @@ def collocates(self: Conc,
 										statistical_significance_cut=statistical_significance_cut, 
 										apply_bonferroni=apply_bonferroni, 
 										context_length=context_length, 
-										context_left=context_left, 
-										context_right=context_right, 
 										min_collocate_frequency=min_collocate_frequency, 
 										page_size=page_size, 
 										page_current=page_current,
-										exclude_punctuation=exclude_punctuation,
-										exclude_spaces=exclude_spaces)
+										exclude_punctuation=exclude_punctuation)

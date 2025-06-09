@@ -19,7 +19,7 @@ from .result import Result
 from .frequency import Frequency
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/73_keyness.ipynb 8
+# %% ../nbs/73_keyness.ipynb 11
 class Keyness:
 	""" Class for keyness analysis reporting. """
 	def __init__(self,
@@ -30,7 +30,7 @@ class Keyness:
 		self.reference_corpus = reference_corpus	
 
 
-# %% ../nbs/73_keyness.ipynb 9
+# %% ../nbs/73_keyness.ipynb 12
 @patch
 def keywords(self: Keyness,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
@@ -52,8 +52,7 @@ def keywords(self: Keyness,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Get keywords for the corpus. """
 
@@ -84,25 +83,11 @@ def keywords(self: Keyness,
 
 	columns = ['rank', 'token', 'frequency', 'frequency_reference', 'document_frequency', 'document_frequency_reference', 'normalized_frequency', 'normalized_frequency_reference']
 
-	target_count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
-	reference_count_tokens, _, _ = self.reference_corpus.get_token_count_text(exclude_punctuation=exclude_punctuation, exclude_spaces=exclude_spaces)
+	target_count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation=exclude_punctuation)
+	reference_count_tokens, _, _ = self.reference_corpus.get_token_count_text(exclude_punctuation=exclude_punctuation)
 
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')
-
-	if exclude_tokens:
-		excluded_tokens_count = df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
-		df = df.filter(~pl.col('token').is_in(exclude_tokens))
-		if exclude_tokens_text == '':
-			formatted_data.append(f'Tokens excluded from report: {excluded_tokens_count}')
-		else:
-			formatted_data.append(f'{exclude_tokens_text}')
-	if restrict_tokens:
-		df = df.filter(pl.col('token').is_in(restrict_tokens))
-		if restrict_tokens_text == '':
-			formatted_data.append(f'')
-		else:
-			formatted_data.append(f'{restrict_tokens_text}')
 
 	target_min_freq = (0.05 * normalize_by) / target_count_tokens
 	reference_min_freq = (0.05 * normalize_by) / reference_count_tokens
@@ -117,8 +102,7 @@ def keywords(self: Keyness,
 										exclude_tokens_text=exclude_tokens_text,
 										restrict_tokens=restrict_tokens,
 										restrict_tokens_text=restrict_tokens_text,
-										exclude_punctuation=exclude_punctuation,
-										exclude_spaces=exclude_spaces).to_frame()
+										exclude_punctuation=exclude_punctuation).to_frame()
 
 	reference_df = freq_reference.frequencies(case_sensitive=case_sensitive,
 										normalize_by=normalize_by,
@@ -130,10 +114,23 @@ def keywords(self: Keyness,
 										exclude_tokens_text=exclude_tokens_text,
 										restrict_tokens=restrict_tokens,
 										restrict_tokens_text=restrict_tokens_text,
-										exclude_punctuation=exclude_punctuation,
-										exclude_spaces=exclude_spaces).to_frame()
+										exclude_punctuation=exclude_punctuation).to_frame()
 
 	keyness_df = target_df.join(reference_df, on='token', how='left', suffix = '_reference').drop('rank', 'rank_reference')
+
+	if exclude_tokens:
+		excluded_tokens_count = keyness_df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
+		keyness_df = keyness_df.filter(~pl.col('token').is_in(exclude_tokens))
+		if exclude_tokens_text == '':
+			formatted_data.append(f'Tokens excluded from report: {excluded_tokens_count}')
+		else:
+			formatted_data.append(f'{exclude_tokens_text}')
+	if restrict_tokens:
+		keyness_df = keyness_df.filter(pl.col('token').is_in(restrict_tokens))
+		if restrict_tokens_text == '':
+			formatted_data.append(f'')
+		else:
+			formatted_data.append(f'{restrict_tokens_text}')
 
 	keyness_df = keyness_df.with_columns(pl.col('frequency_reference')).fill_null(0)
 	keyness_df = keyness_df.with_columns(pl.col('document_frequency_reference')).fill_null(0)
@@ -210,7 +207,7 @@ def keywords(self: Keyness,
 	if len(filtering_descriptors) > 0:
 		formatted_data.append(f'Filtered tokens by {(", ".join(filtering_descriptors))}')
 
-	unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
+	unique_tokens = keyness_df.select(pl.len()).item()
 
 	if statistical_significance_cut is not None and statistical_significance_cut > 0:
 		p = statistical_significance_cut
@@ -223,7 +220,7 @@ def keywords(self: Keyness,
 		cut = chi2.ppf(1 - p, df=1)		
 		keyness_df = keyness_df.filter(pl.col(statistical_significance_measure) > cut)
 		formatted_data.append(p_value_descriptor)
-		unique_tokens = keyness_df.select(pl.len()).collect(engine='streaming').item()
+		unique_tokens = keyness_df.select(pl.len()).item()
 	
 	if order is None:
 		order = effect_size_measure

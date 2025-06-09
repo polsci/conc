@@ -15,7 +15,7 @@ __all__ = ['Text']
 # %% ../nbs/55_text.ipynb 5
 from .result import Result
 
-# %% ../nbs/55_text.ipynb 7
+# %% ../nbs/55_text.ipynb 9
 class Text:
 	""" Class to represent text documents """
 	def __init__(self,
@@ -27,7 +27,7 @@ class Text:
 		self.has_spaces = has_spaces
 		self.metadata = metadata
 
-# %% ../nbs/55_text.ipynb 8
+# %% ../nbs/55_text.ipynb 10
 @patch
 def _nl2br(self:Text,
            text:str # document text
@@ -35,7 +35,7 @@ def _nl2br(self:Text,
     text = text.replace('\r\n', '\n').replace('\r', '\n')
     return text.replace('\n', '<br>\n')
 
-# %% ../nbs/55_text.ipynb 9
+# %% ../nbs/55_text.ipynb 11
 @patch
 def _div(self:Text,
          text:str, # document text
@@ -46,9 +46,10 @@ def _div(self:Text,
         class_str = f' class="{class_str}"'
     return f'<div{class_str}>{text}</div>'
 
-# %% ../nbs/55_text.ipynb 10
+# %% ../nbs/55_text.ipynb 12
 @patch
 def as_string(self:Text,
+              max_tokens: int|None = None # maximum length of text to display in tokens, if None, display all
         ):
     """ Return the text as a string """
 
@@ -56,9 +57,13 @@ def as_string(self:Text,
     interleaved[0::2] = self.tokens
     interleaved[1::2] = np.where(self.has_spaces, ' ', '')
 
+    if max_tokens is not None and self.tokens.size > max_tokens:
+        interleaved = interleaved[:max_tokens * 2]
+        interleaved[-1] = ''
+
     return ''.join(list(interleaved))
 
-# %% ../nbs/55_text.ipynb 11
+# %% ../nbs/55_text.ipynb 13
 @patch
 def as_tokens(self:Text,
         ):
@@ -66,17 +71,17 @@ def as_tokens(self:Text,
 
     return list(self.tokens)
 
-# %% ../nbs/55_text.ipynb 12
+# %% ../nbs/55_text.ipynb 14
 @patch
 def __str__(self:Text):
     return self.as_string()
 
-# %% ../nbs/55_text.ipynb 13
+# %% ../nbs/55_text.ipynb 15
 @patch
 def tokens_count(self:Text):
     return len(self.tokens)
 
-# %% ../nbs/55_text.ipynb 14
+# %% ../nbs/55_text.ipynb 16
 @patch
 def display_metadata(self:Text,
                 ):
@@ -85,14 +90,21 @@ def display_metadata(self:Text,
     Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
 
 
-# %% ../nbs/55_text.ipynb 15
+# %% ../nbs/55_text.ipynb 17
 @patch
 def display(self:Text,
-            show_metadata: bool = True # whether to display Metadata for the text
-                ):
-    """ Output a text """
-    style = '<style>.conc-text {white-space: pre-wrap;}</style>\n'
-    if show_metadata:
-        self.display_metadata()
-    display(HTML(style + self._div(self.as_string(), class_str = 'conc-text')))
+			show_metadata: bool = True, # whether to display Metadata for the text
+			max_tokens: int|None = None # maximum length of text to display in tokens, if None, display all
+				):
+	""" Output a text """
+	style = '<style>.conc-text {white-space: pre-wrap;}</style>\n'
+	if show_metadata:
+		self.display_metadata()
+
+	text_string = self.as_string(max_tokens = max_tokens)
+
+	if max_tokens is not None and self.tokens.size > max_tokens:
+		text_string += f'… [{max_tokens} of {self.tokens.size} tokens]'
+
+	display(HTML(style + self._div(text_string, class_str = 'conc-text')))
 

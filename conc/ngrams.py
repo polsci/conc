@@ -17,9 +17,9 @@ __all__ = ['Ngrams']
 # %% ../nbs/71_ngrams.ipynb 4
 from .corpus import Corpus
 from .result import Result
-from .core import logger, PAGE_SIZE, set_logger_state
+from .core import logger, PAGE_SIZE
 
-# %% ../nbs/71_ngrams.ipynb 8
+# %% ../nbs/71_ngrams.ipynb 10
 class Ngrams:
 	""" Class for n-gram analysis reporting. """
 	def __init__(self,
@@ -28,16 +28,15 @@ class Ngrams:
 		self.corpus = corpus
 
 
-# %% ../nbs/71_ngrams.ipynb 10
+# %% ../nbs/71_ngrams.ipynb 13
 @patch
 def _get_ngrams(self:Ngrams, 
 			   token_sequence: list[np.ndarray], # token sequence to get index for 
 			   index_id: int, # index to search (i.e. ORTH, LOWER)
 			   token_positions: list[np.ndarray], # positions of token sequence, returned by get_token_positions 
 			   ngram_length: int = 2, # length of ngram
-			   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT, RIGHT, or MIDDLE of ngrams
-			   exclude_punctuation:bool=False, # exclude punctuation tokens
-			   exclude_spaces:bool=False # exclude space tokens
+			   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
+			   exclude_punctuation:bool=False # exclude ngrams with tokens
 			   ) -> np.ndarray: # array of ngrams results
 
 	""" Get ngram data for a token sequence. """
@@ -53,28 +52,34 @@ def _get_ngrams(self:Ngrams,
 		index = 'lower_index'
 
 	if ngram_token_position == 'RIGHT':
-		ngram_range = range(-1 * ngram_length + sequence_len, sequence_len)
-	elif ngram_token_position == 'MIDDLE':
-		ngram_range = range(-1 * ngram_length + sequence_len + 1, sequence_len + 1)
+		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = -1, exclude_punctuation = False, convert_eof = False)
+		ngrams = ngrams[::-1, :] # reversing order as retrieved right to left
+	# elif ngram_token_position == 'MIDDLE': # further development needed - in roadmap
+	# 	ngram_range = range(-1 * ngram_length + sequence_len + 1, sequence_len + 1)
 	else:
-		ngram_range = range(0, ngram_length)
+		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = 1, exclude_punctuation = False, convert_eof = False)
 
-	ngrams = []
+	# old retrieval method - aligning with collocates context retrieval
+	# ngrams = []
 	
-	for pos in ngram_range:
-		if variants_len == 1 and pos > -1 and pos < sequence_len:
-			ngrams.append(np.full(token_index_len, token_sequence[0][pos]))
-		else:
-			seq = token_positions[0] + pos
-			ngrams.append(self.corpus.get_tokens_by_index(index)[seq])
+	# for pos in ngram_range:
+	# 	if variants_len == 1 and pos > -1 and pos < sequence_len:
+	# 		ngrams.append(np.full(token_index_len, token_sequence[0][pos]))
+	# 	else:
+	# 		seq = token_positions[0] + pos
+	# 		ngrams.append(self.corpus.get_tokens_by_index(index)[seq])
 
-	ngrams = np.stack(ngrams)
+	# ngrams = np.stack(ngrams)
+	# logger.info(f'Ngrams ({ngrams.shape}) retrieval time: {(time.time() - start_time):.5f} seconds')
 
 	# getting positions to search for EOF_TOKEN and filter out ngrams crossing doc boundaries
-	positions = (np.array(ngram_range)[:, None] != np.arange(sequence_len)).all(axis=1)
-	ngrams = np.delete(ngrams, np.where(ngrams[positions] == self.corpus.EOF_TOKEN)[1], axis=1)
+	#positions = (np.array(ngram_range)[:, None] != np.arange(sequence_len)).all(axis=1)
+	# ngrams = np.delete(ngrams, np.where(ngrams[positions] == self.corpus.EOF_TOKEN)[1], axis=1)
+	logger.debug(f'Ngrams shape prior to EOF removal {ngrams.shape}')
+	ngrams = np.delete(ngrams, np.where(ngrams == self.corpus.EOF_TOKEN)[1], axis=1)
+	logger.debug(f'Ngrams shape after EOF removal {ngrams.shape}')
 
-	if exclude_punctuation:
+	if exclude_punctuation: # see above - ngrams returned with punctuation tokens - and then cleaned if exclude_punctuation is True
 		punctuation_tokens = self.corpus.punct_tokens
 		ngrams = np.delete(ngrams, np.where(np.isin(ngrams, punctuation_tokens))[1], axis=1)
 
@@ -82,21 +87,20 @@ def _get_ngrams(self:Ngrams,
 	return ngrams
 
 
-# %% ../nbs/71_ngrams.ipynb 16
+# %% ../nbs/71_ngrams.ipynb 18
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
 		   ngram_length:int = 2, # length of ngram
-		   ngram_token_position:str = 'LEFT', # specify if token sequence is on LEFT, RIGHT, or MIDDLE of ngrams
+		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
 		   normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 		   page_size:int = PAGE_SIZE, # number of results to display per results page 
 		   page_current:int = 1, # current page of results
 		   show_all_columns:bool = False, # return raw df with all columns or just ngram and frequency
-		   exclude_punctuation:bool=True, # exclude punctuation tokens
-		   exclude_spaces:bool=True, # exclude space tokens
-		   use_cache:bool = True # retrieve the results from cache if available
+		   exclude_punctuation:bool=True, # do not return ngrams with punctuation tokens
+		   use_cache:bool = True # retrieve the results from cache if available (currently ignored)
 		   ) -> Result: # return a Result object with ngram data
-	""" Report ngrams for a token string. """
+	""" Report ngram frequencies containing a token string. """
 
 	if type(normalize_by) != int:
 		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
@@ -104,7 +108,8 @@ def ngrams(self: Ngrams,
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 
 	start_time = time.time()
-	cache_id = tuple(['ngram'] + list(token_sequence) + [ngram_length, ngram_token_position])
+	use_cache = False
+	cache_id = tuple(['ngram'] + list(token_sequence) + [ngram_length, ngram_token_position]) # before reenabling will need to make sure the cache_id matches options above (e.g. could get differences based on exclude punctuation etc but cache first currently)
 
 	if use_cache == True and cache_id in self.corpus.results_cache:
 		logger.info('Using cached ngrams results')
@@ -119,7 +124,7 @@ def ngrams(self: Ngrams,
 			return Result(type = 'ngrams', df=pl.DataFrame(), title=f'Ngrams for "{token_str}"', description=f'No matches', summary_data={}, formatted_data=[])
 
 		logger.info('Generating ngrams results')
-		ngrams = self._get_ngrams(token_sequence, index_id, token_positions, ngram_length = ngram_length, ngram_token_position = ngram_token_position)
+		ngrams = self._get_ngrams(token_sequence, index_id, token_positions, ngram_length = ngram_length, ngram_token_position = ngram_token_position, exclude_punctuation=exclude_punctuation)
 		total_count = ngrams.shape[1]
 		schema = [f'token_{i+1}' for i in range(ngram_length)]
 		ngrams_report = pl.DataFrame(ngrams.T, schema=schema).to_struct(name = 'ngram_token_ids').value_counts(sort=True).rename({"count": "frequency"})
@@ -127,7 +132,7 @@ def ngrams(self: Ngrams,
 		total_unique = len(ngrams_report)
 		self.corpus.results_cache[cache_id] = (ngrams_report, total_unique, total_count)
 	
-	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation, exclude_spaces)
+	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation)
 
 	resultset_start = page_size*(page_current-1)
 
@@ -146,6 +151,9 @@ def ngrams(self: Ngrams,
 	summary_data = {'ngram_length': ngram_length, 'ngram_token_position': ngram_token_position, 'total_unique': total_unique, 'total_count': total_count, 'page_current': page_current, 'total_pages': total_pages}
 	formatted_data = [f'Report based on {tokens_descriptor}', f'Ngram length: {ngram_length}, Token position: {ngram_token_position.lower()}']
 
+	if exclude_punctuation:
+		formatted_data.append(f'Ngrams containing punctuation tokens excluded')
+
 	if normalize_by is not None:
 		formatted_data.append(f'Normalized Frequency is per {normalize_by:,.0f} tokens')
 
@@ -162,7 +170,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/71_ngrams.ipynb 19
+# %% ../nbs/71_ngrams.ipynb 23
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
@@ -170,8 +178,7 @@ def ngram_frequencies(self: Ngrams,
 				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 				page_size:int=PAGE_SIZE, # number of rows to return
 				page_current:int=1, # current page
-				exclude_punctuation:bool=True, # exclude punctuation tokens
-				exclude_spaces:bool=True # exclude space tokens
+				exclude_punctuation:bool=True # exclude ngrams containing punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent ngrams. """
 	
@@ -188,17 +195,21 @@ def ngram_frequencies(self: Ngrams,
 	filter = [self.corpus.EOF_TOKEN]
 	if exclude_punctuation == True:
 		filter += self.corpus.punct_tokens
-	if exclude_spaces == True:
-		filter += self.corpus.space_tokens
 
 	resultset_start = page_size*(page_current-1)
 
-	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation, exclude_spaces)
+	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation)
 	formatted_data = [f'Report based on {tokens_descriptor}']
 	formatted_data.append(f'Ngram length: {ngram_length}')
 
+	if exclude_punctuation:
+		formatted_data.append(f'Ngrams containing punctuation tokens excluded')
+
 	# ngrams = self.corpus.get_ngrams_by_index(ngram_length = ngram_length, index = index).T
-	ngrams_report = self.corpus.tokens.with_columns([pl.col(index).shift(-i).alias(f'token_{i+1}') for i in range(ngram_length)])
+
+	ngrams_report = self.corpus.tokens.select(pl.col(index).alias('token_1')).with_row_index('position')
+
+	ngrams_report = ngrams_report.with_columns([pl.col('token_1').shift(-i).alias(f'token_{i+1}') for i in range(1, ngram_length)])
 
 	schema = [f'token_{i+1}' for i in range(ngram_length)]
 
@@ -207,6 +218,9 @@ def ngram_frequencies(self: Ngrams,
 
 	for i in range(ngram_length):
 		ngrams_report = ngrams_report.filter(~pl.col(f'token_{i+1}').is_in(filter))
+
+	total_unique = ngrams_report.select(pl.len()).collect().item()
+	total_count = ngrams_report.select(pl.col('frequency').sum()).collect().item()
 
 	ngrams_report_page = ngrams_report.slice(resultset_start, page_size).collect(engine = 'streaming')
 	logger.info(f'collected report page: {(time.time() - start_time):.5f} seconds')
@@ -219,12 +233,12 @@ def ngram_frequencies(self: Ngrams,
 	ngrams_report_page = ngrams_report_page.with_columns(((pl.col("frequency") / pl.lit(count_tokens)) * normalize_by).alias('normalized_frequency'))
 	formatted_data.append(f'Normalized Frequency is per {normalize_by:,.0f} tokens')
 
-	# formatted_data.extend([f'Total unique ngrams: {total_unique:,}', f'Total ngrams: {total_count:,}'])
+	formatted_data.extend([f'Total unique ngrams: {total_unique:,}', f'Total ngrams: {total_count:,}'])
 
-	# total_pages = math.ceil(total_unique/page_size)
-	# if page_size != 0 and total_count > page_size:
-	# 	formatted_data.extend([f'Showing {min(page_size, total_count)} rows', f'Page {page_current} of {total_pages}']) 
+	total_pages = math.ceil(total_unique/page_size)
+	if page_size != 0 and total_count > page_size:
+		formatted_data.extend([f'Showing {min(page_size, total_count)} rows', f'Page {page_current} of {total_pages}']) 
 
 	ngrams_report_page = ngrams_report_page[['rank', 'ngram', 'frequency', 'normalized_frequency']]
 
-	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngram Frequencies', description=f'{self.corpus.name}', summary_data = {}, formatted_data = formatted_data)
+	return Result(type = 'ngram_frequencies', df=ngrams_report_page, title=f'Ngram Frequencies', description=f'{self.corpus.name}', summary_data = {}, formatted_data = formatted_data)

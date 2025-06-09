@@ -57,7 +57,7 @@ class ConcLogger(logging.Logger):
 		if state == 'quiet':
 			level = logging.WARNING
 		elif state == 'verbose':
-			level = logging.INFO
+			level = logging.DEBUG
 		else:
 			raise ValueError(f"Invalid state: {state}")
 		
@@ -88,13 +88,13 @@ def set_logger_state(state:str # 'quiet' or 'verbose'
 	""" Set the state of the conc logger to either 'quiet' or 'verbose' """
 	logger.set_state(state)
 
-# %% ../nbs/80_core.ipynb 13
+# %% ../nbs/80_core.ipynb 14
 def spacy_attribute_name(index):
 	"""Get name of index from spacy."""
 
 	return list(spacy.attrs.IDS.keys())[list(spacy.attrs.IDS.values()).index(index)]
 
-# %% ../nbs/80_core.ipynb 15
+# %% ../nbs/80_core.ipynb 16
 class CorpusMetadata(msgspec.Struct): 
     """ JSON validation schema for corpus metadata """
     name: str
@@ -119,7 +119,7 @@ class CorpusMetadata(msgspec.Struct):
 
 
 
-# %% ../nbs/80_core.ipynb 18
+# %% ../nbs/80_core.ipynb 19
 def list_corpora(
 		path: str # path to load corpus
 		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
@@ -140,7 +140,7 @@ def list_corpora(
 
 	return pl.DataFrame(available_corpora)
 
-# %% ../nbs/80_core.ipynb 21
+# %% ../nbs/80_core.ipynb 22
 def get_stop_words(save_path:str, # directory to save stop words to, file name will be created based on spaCy model name
 				   spacy_model:str = 'en_core_web_sm' # model to get stop words for
 					):
@@ -169,7 +169,7 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 
 	return stop_words
 
-# %% ../nbs/80_core.ipynb 24
+# %% ../nbs/80_core.ipynb 25
 toy_data = []
 toy_data.append(['1.txt', 'The cat sat on the mat.', 'feline', 'cat'])
 toy_data.append(['2.txt', 'The dog sat on the mat.', 'canine', 'dog'])
@@ -178,7 +178,7 @@ toy_data.append(['4.txt', 'The dog is barking.', 'canine', 'dog'])
 toy_data.append(['5.txt', 'The cat is climbing a tree.', 'feline', 'cat'])
 toy_data.append(['6.txt', 'The dog is digging a hole.', 'canine', 'dog'])
 
-# %% ../nbs/80_core.ipynb 26
+# %% ../nbs/80_core.ipynb 27
 def create_toy_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
 	""" Create txt files and csv to test build of toy corpus. """
@@ -194,7 +194,7 @@ def create_toy_corpus_sources(source_path:str # path to location of sources for 
 	df.write_csv(os.path.join(source_path, 'toy.csv.gz'))
 
 
-# %% ../nbs/80_core.ipynb 28
+# %% ../nbs/80_core.ipynb 29
 def show_toy_corpus(
         csv_path:str # path to location of csv for building corpora
         ) -> GT: 
@@ -203,7 +203,7 @@ def show_toy_corpus(
     toy_corpus_df = pl.read_csv(csv_path)
     GT(toy_corpus_df).tab_options(table_margin_left = 0).show()
 
-# %% ../nbs/80_core.ipynb 30
+# %% ../nbs/80_core.ipynb 31
 def get_nltk_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
 	""" Get NLTK corpora as sources for development or testing Conc functionality. """
@@ -255,10 +255,10 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 	df.write_csv(reuters_path)
 
 
-# %% ../nbs/80_core.ipynb 33
+# %% ../nbs/80_core.ipynb 34
 def get_garden_party(source_path: str #path to location of sources for building corpora
 					):
-	""" Get corpus of The Garden Party by Katherine Mansfield for development or testing Conc functionality. """
+	""" Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
 
 	path = 'https://github.com/ucdh/scraping-garden-party/raw/master/garden-party-corpus.zip'
 
@@ -283,7 +283,7 @@ def get_garden_party(source_path: str #path to location of sources for building 
 	shutil.rmtree(f'{source_path}/garden-party-corpus')
 	
 
-# %% ../nbs/80_core.ipynb 36
+# %% ../nbs/80_core.ipynb 38
 def get_large_dataset(source_path: str #path to location of sources for building corpora
                     ):
     """ Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -292,7 +292,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
     del df
 
 
-# %% ../nbs/80_core.ipynb 39
+# %% ../nbs/80_core.ipynb 41
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):

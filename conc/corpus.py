@@ -19,30 +19,30 @@ from slugify import slugify
 import msgspec # tested against orjson - with validation was faster, without around the same
 
 # %% auto 0
-__all__ = ['NOT_DOC_TOKEN', 'INDEX_HEADER_LENGTH', 'README_TEMPLATE', 'Corpus']
+__all__ = ['NOT_DOC_TOKEN', 'INDEX_HEADER_LENGTH', 'README_TEMPLATE', 'Corpus', 'build_test_corpora']
 
 # %% ../nbs/50_corpus.ipynb 5
 from . import __version__
-from .core import logger, set_logger_state, spacy_attribute_name, CorpusMetadata, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR, REPOSITORY_URL, DOCUMENTATION_URL, CITATION_STR, PYPI_URL
+from .core import logger, CorpusMetadata, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR, REPOSITORY_URL, DOCUMENTATION_URL, CITATION_STR, PYPI_URL
 from .result import Result
 from .text import Text
 
-# %% ../nbs/50_corpus.ipynb 6
+# %% ../nbs/50_corpus.ipynb 7
 polars_conf = pl.Config.set_tbl_hide_column_data_types(True)
 polars_conf = pl.Config.set_tbl_hide_dataframe_shape(True)
 polars_conf = pl.Config.set_tbl_rows(50)
 polars_conf = pl.Config.set_tbl_width_chars(300)
 polars_conf = pl.Config.set_fmt_str_lengths(300)
 
-# %% ../nbs/50_corpus.ipynb 7
+# %% ../nbs/50_corpus.ipynb 8
 _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
 _RE_PUNCT = re.compile(r"^[^\s^\w^\d]$")
 
-# %% ../nbs/50_corpus.ipynb 8
+# %% ../nbs/50_corpus.ipynb 9
 NOT_DOC_TOKEN = -1
 INDEX_HEADER_LENGTH = 100
 
-# %% ../nbs/50_corpus.ipynb 11
+# %% ../nbs/50_corpus.ipynb 13
 class Corpus:
 	"""Represention of text corpus, with methods to build, load and save a corpus from a variety of formats and to work with the corpus data."""
 	
@@ -121,7 +121,7 @@ class Corpus:
 		self.results_cache = {}
 
 
-# %% ../nbs/50_corpus.ipynb 13
+# %% ../nbs/50_corpus.ipynb 15
 @patch
 def _init_spacy_model(self: Corpus,
                 model: str = 'en_core_web_sm', # spacy model to use for tokenization
@@ -139,7 +139,7 @@ def _init_spacy_model(self: Corpus,
 		if self._nlp.meta['version'] != version:
 			logger.warning(f'Spacy model version mismatch: expecting {version}, got {self._nlp.meta["version"]}. This may cause issues with tokenization.')
 
-# %% ../nbs/50_corpus.ipynb 14
+# %% ../nbs/50_corpus.ipynb 16
 @patch
 def _process_punct_positions(self: Corpus):
 	""" Process punctuation positions in token data and populates punct_tokens and punct_positions. """
@@ -148,7 +148,7 @@ def _process_punct_positions(self: Corpus):
 	punct_mask = np.isin(self.lower_index, self.punct_tokens) # faster to retrieve with isin than where
 	self.punct_positions = np.nonzero(punct_mask)[0] # storing this as smaller
 
-# %% ../nbs/50_corpus.ipynb 20
+# %% ../nbs/50_corpus.ipynb 22
 @patch
 def _init_build_process(self:Corpus,
 						save_path: str, # path to save corpus data 
@@ -162,7 +162,7 @@ def _init_build_process(self:Corpus,
 	if not os.path.isdir(self.corpus_path):
 		os.makedirs(self.corpus_path)
 
-# %% ../nbs/50_corpus.ipynb 21
+# %% ../nbs/50_corpus.ipynb 23
 @patch
 def _update_build_process(self: Corpus, 
                            orth_index: list[np.ndarray], # orthographic token ids
@@ -176,7 +176,7 @@ def _update_build_process(self: Corpus,
     pl.DataFrame([np.concatenate(orth_index), np.concatenate(lower_index), np.concatenate(token2doc_index), np.concatenate(has_spaces)], schema = [('orth_index', pl.UInt64), ('lower_index', pl.UInt64), ('token2doc_index', pl.Int32), ('has_spaces', pl.Boolean)] ).write_parquet(f'{self.corpus_path}/build_{store_pos}.parquet')
     return store_pos + 1
 
-# %% ../nbs/50_corpus.ipynb 23
+# %% ../nbs/50_corpus.ipynb 25
 @patch
 def _complete_build_process(self: Corpus, 
 							build_process_cleanup: bool = True # Remove the build files after build is complete, retained for development and testing purposes
@@ -184,62 +184,70 @@ def _complete_build_process(self: Corpus,
 	""" Complete the disk-based build to create representation of the corpus. """
 
 	logger.memory_usage('init', init=True)
-	input_df = pl.scan_parquet(f'{self.corpus_path}/build_*.parquet')
-	# combining indexes to reindex
-	combined_df = pl.concat([input_df.select(pl.col('orth_index').alias('index')), input_df.select(pl.col('lower_index').alias('index'))])
-
-	input_length = input_df.select(pl.len()).collect(engine='streaming').item() # tested vs count - len seems to have slight memory overhead, but more correct (i.e. count only counts non-null)
-	logger.memory_usage(f'got input length {input_length}')
+	tokens_df = pl.scan_parquet(f'{self.corpus_path}/build_*.parquet')
 
 	# get unique vocab ids (combining orth and lower) and create new index
-	vocab_df  = combined_df.select(pl.col('index').unique().sort().alias('source_id')).with_row_index('token_id', offset=1) #.collect(engine='streaming')
+	vocab_df = pl.concat([tokens_df.select(pl.col('orth_index').unique().alias('index')), tokens_df.select(pl.col('lower_index').unique().alias('index'))])
+	#vocab_df  = combined_df.select(pl.col('index').unique().sort().alias('source_id')).with_row_index('token_id', offset=1) #.collect(engine='streaming')
+	vocab_df = vocab_df.select(pl.col('index').unique().sort().alias('source_id')).with_row_index('token_id', offset=1) 
 	logger.memory_usage('collected vocab')
 
 	# combined_df = (combined_df.with_columns(pl.col('index').replace(vocab_df.select(pl.col('source_id'))['source_id'], vocab_df.select(pl.col('token_id'))['token_id']).cast(pl.UInt32)))
 	# combined_df = combined_df.with_columns(pl.col('index').cast(pl.UInt32))
 
-	combined_df = (
-		combined_df
-		.join(vocab_df, left_on="index", right_on="source_id", how="left", maintain_order="left")
-		.drop("index")
-		.rename({"token_id": "index"})
-		.with_columns(pl.col("index").cast(pl.UInt32).alias("index"))
+	tokens_df = (
+		tokens_df
+		.join(vocab_df, left_on="orth_index", right_on="source_id", how="left", maintain_order="left")
+		.drop("orth_index")
+		.rename({"token_id": "orth_index"})
+		.with_columns(pl.col("orth_index").cast(pl.UInt32).alias("orth_index"))
 	)
 
-	tokens_df = pl.concat(
-									[combined_df.select(pl.col('index').alias('orth_index')).slice(0, input_length), 
-									combined_df.select(pl.col('index').alias('lower_index')).slice(input_length),
-									input_df.select(pl.col('token2doc_index')),
-									input_df.select(pl.col('has_spaces'))
-									], how='horizontal'
-							)
-	
-	del combined_df
-	del input_df
-	logger.memory_usage('freed up combined_df and input_df')
+	tokens_df = (
+		tokens_df
+		.join(vocab_df, left_on="lower_index", right_on="source_id", how="left", maintain_order="left")
+		.drop("lower_index")
+		.rename({"token_id": "lower_index"})
+		.with_columns(pl.col("lower_index").cast(pl.UInt32).alias("lower_index"))
+	) # should have aligned data for token2doc_index and has_spaces
 
-	vocab_query = vocab_df.select(pl.col('source_id')).collect(engine='streaming').to_numpy().flatten() # get vocab ids as numpy array for faster processing
+	# this is currently the most intensive operation in terms of memory usage - this needs attention - can't use sink_parquet currently or collect(engine='streaming') as it doesn't maintain order (including changing order between two columns)
+	tokens_df.select([pl.col('orth_index'), pl.col('lower_index'), pl.col('token2doc_index'), pl.col('has_spaces')]).collect().write_parquet(f'{self.corpus_path}/tokens.parquet') # if using streaming or sink will need to verify ordering - check for maintain_order parameters
+	logger.memory_usage('wrote pending tokens to disk')
+	tokens_df = pl.scan_parquet(f'{self.corpus_path}/tokens.parquet') # re-read as lazy frame
 
+	# could batch this to reduce memory usage - but leaving for now
+	vocab_query = vocab_df.select(pl.col('source_id')).collect().to_numpy().flatten() # get vocab ids as numpy array for faster processing
 	vocab = {k:self._nlp.vocab[k].text for k in vocab_query} # get vocab strings from spacy vocab
 	token_strs = list(vocab.values())
-	logger.memory_usage('got vocab strings')
 	vocab_df = vocab_df.with_columns(pl.Series(token_strs).alias('token'))
+	del vocab_query
 	logger.memory_usage('added vocab strings')
 
-	self.EOF_TOKEN = vocab_df.filter(pl.col('source_id') == self.SPACY_EOF_TOKEN).select(pl.col('token_id')).collect(engine='streaming').item() # casting to int for storage
+	self.EOF_TOKEN = vocab_df.filter(pl.col('source_id') == self.SPACY_EOF_TOKEN).select(pl.col('token_id')).collect().item() # casting to int for storage
 	
 	self.punct_tokens = [(k + 1) for k, v in enumerate(token_strs) if v.strip(string.punctuation) == '']
 	logger.memory_usage(f'got punct tokens')
 	self.space_tokens = [(k + 1) for k, v in enumerate(token_strs) if v.strip() == '']
 	logger.memory_usage(f'got space tokens')
-
 	del token_strs
 
-	# Create LazyFrames for punct_positions and space_positions
+	# new spaces handling
+	spaces_df = tokens_df.with_row_index('position').filter(pl.col('lower_index').is_in(self.space_tokens))
+	spaces_df = spaces_df.with_row_index('adjust_by').with_columns((pl.col('position') - pl.col('adjust_by')).alias('corrected'))
+	spaces_df = spaces_df.with_columns(pl.col('corrected').alias('position')).drop('adjust_by').drop('corrected')
+	spaces_df.collect().write_parquet(f'{self.corpus_path}/spaces.parquet') 
+	logger.memory_usage('saved space positions')
+
+	# remove spaces from tokens_df
+	tokens_df = tokens_df.filter(~pl.col('lower_index').is_in(self.space_tokens))
+	tokens_df.collect().write_parquet(f'{self.corpus_path}/tokens.parquet') # if using streaming or sink will need to verify ordering - check for maintain_order parameters
+	logger.memory_usage('wrote final tokens to disk')
+	tokens_df = pl.scan_parquet(f'{self.corpus_path}/tokens.parquet') # re-read as lazy frame
+
+	# Create LazyFrames for punct_positions
 	tokens_df.select(pl.col('lower_index')).with_row_index('position').filter(pl.col('lower_index').is_in(self.punct_tokens)).select('position').sink_parquet(f'{self.corpus_path}/puncts.parquet', maintain_order = True) #.collect(engine='streaming').to_numpy().flatten()
 	logger.memory_usage('saved punct positions')
-	tokens_df.select(pl.col('lower_index')).with_row_index('position').filter(pl.col('lower_index').is_in(self.space_tokens)).select('position').sink_parquet(f'{self.corpus_path}/spaces.parquet', maintain_order = True) #.collect(engine='streaming').to_numpy().flatten()
-	logger.memory_usage('saved space positions')
 
 	# get counts from tokens_df
 	frequency_lower = tokens_df.filter(pl.col('lower_index') != self.EOF_TOKEN).select(pl.col('lower_index')).group_by('lower_index').agg(pl.count('lower_index').alias('frequency_lower')) #.collect(engine='streaming')
@@ -248,7 +256,7 @@ def _complete_build_process(self: Corpus,
 	logger.memory_usage('added frequency to vocab')
 
 	self.unique_tokens = frequency_lower.select(pl.len()).collect(engine='streaming').item() # was len(frequency_lower) before used polars streaming
-	logger.memory_usage(f'got unique tokens {self.document_count}')
+	logger.memory_usage(f'got unique tokens {self.unique_tokens}')
 
 	del frequency_lower
 	del frequency_orth
@@ -256,29 +264,31 @@ def _complete_build_process(self: Corpus,
 	# add column for is_punct and is_space based on punct_tokens and space_tokens and token_id
 	vocab_df = vocab_df.with_columns((pl.col("token_id").is_in(self.punct_tokens)).alias("is_punct"))
 	vocab_df = vocab_df.with_columns((pl.col("token_id").is_in(self.space_tokens)).alias("is_space"))
+	vocab_df = vocab_df.sort(by = pl.col('token').str.to_lowercase(), descending = False).with_row_index('tokens_sort_order', offset=1) # leave with no zero for handling of error tokens
 	vocab_df = vocab_df.drop('source_id').sort(by = pl.col('frequency_orth'), descending = True, nulls_last = True).with_row_index(name='rank', offset=1)
 	logger.memory_usage('added is_punct is_space to vocab')
 
 	vocab_df.collect().write_parquet(f'{self.corpus_path}/vocab.parquet') #, maintain_order = True 
-	logger.memory_usage('wrote vocab to disk')
 	del vocab_df
-	tokens_df.collect().write_parquet(f'{self.corpus_path}/tokens.parquet') # , maintain_order = True
-	logger.memory_usage('wrote tokens to disk')
-	del tokens_df
+	logger.memory_usage('wrote vocab to disk')
 
 	#self.document_count = tokens_df.select(pl.col('token2doc_index').filter(pl.col('token2doc_index') != NOT_DOC_TOKEN).unique().count()).collect(engine='streaming').item()
-	self.document_count = pl.scan_parquet(f'{self.corpus_path}/tokens.parquet').select(pl.col('token2doc_index')).max().collect().item()
+	self.document_count = tokens_df.select(pl.col('token2doc_index')).max().collect().item()
 	logger.memory_usage(f'got doc count {self.document_count}')
-	# adjusting for text breaks and headers at start and end of index
+	# reading now excludes spaces
+	input_length = tokens_df.select(pl.len()).collect(engine='streaming').item() # tested vs count - len seems to have slight memory overhead, but more correct (i.e. count only counts non-null)
+	logger.memory_usage(f'got input length {input_length} (with eof headers)')
+
+	# adjusting token count for text breaks and headers at start and end of index
 	self.token_count = input_length - self.document_count - INDEX_HEADER_LENGTH - INDEX_HEADER_LENGTH 
-	logger.memory_usage('got token count')
+	logger.memory_usage(f'got token count {self.token_count}')
 
 	self.punct_token_count = pl.scan_parquet(f'{self.corpus_path}/puncts.parquet').select(pl.len()).collect(engine='streaming').item() # may be more efficient to do this prior to disk write
-	logger.memory_usage('got punct token count')
+	logger.memory_usage(f'got punct token count ({self.punct_token_count})')
 	self.space_token_count = pl.scan_parquet(f'{self.corpus_path}/spaces.parquet').select(pl.len()).collect(engine='streaming').item() # may be more efficient to do this prior to disk write
-	logger.memory_usage('got space token count')
-	self.word_token_count = self.token_count - self.punct_token_count - self.space_token_count
-	self.unique_word_tokens = self.unique_tokens - len(self.punct_tokens) - len(self.space_tokens)
+	logger.memory_usage(f'got space token count ({self.space_token_count})')
+	self.word_token_count = self.token_count - self.punct_token_count
+	self.unique_word_tokens = self.unique_tokens - len(self.punct_tokens)
 	
 	self.date_created = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
@@ -291,7 +301,7 @@ def _complete_build_process(self: Corpus,
 
 
 
-# %% ../nbs/50_corpus.ipynb 24
+# %% ../nbs/50_corpus.ipynb 26
 @patch
 def _create_indices(self: Corpus, 
 				   orth_index: list[np.ndarray], # list of np arrays of orth token ids 
@@ -330,7 +340,7 @@ def _create_indices(self: Corpus,
 	del self.frequency_lookup[self.EOF_TOKEN]
 	del unique_values
 
-# %% ../nbs/50_corpus.ipynb 25
+# %% ../nbs/50_corpus.ipynb 27
 @patch
 def _init_corpus_dataframes(self: Corpus):
 	""" Initialize dataframes after build or load """
@@ -341,7 +351,7 @@ def _init_corpus_dataframes(self: Corpus):
 	self.spaces = pl.scan_parquet(f'{self.corpus_path}/spaces.parquet')
 	self.metadata = pl.scan_parquet(f'{self.corpus_path}/metadata.parquet')
 
-# %% ../nbs/50_corpus.ipynb 26
+# %% ../nbs/50_corpus.ipynb 28
 README_TEMPLATE = """# {name}
 
 ## About
@@ -376,7 +386,7 @@ Documentation to get you started with Conc are available:
 
 """
 
-# %% ../nbs/50_corpus.ipynb 27
+# %% ../nbs/50_corpus.ipynb 29
 @patch
 def save_corpus_metadata(self: Corpus, 
 		 ):
@@ -409,7 +419,7 @@ def save_corpus_metadata(self: Corpus,
 		
 	logger.info(f'Saved corpus metadata time: {(time.time() - start_time):.3f} seconds')
 
-# %% ../nbs/50_corpus.ipynb 28
+# %% ../nbs/50_corpus.ipynb 30
 @patch
 def build(self: Corpus, 
 		  save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
@@ -510,7 +520,7 @@ def build(self: Corpus,
 	logger.info(f'Build time: {(time.time() - start_time):.3f} seconds')
 
 
-# %% ../nbs/50_corpus.ipynb 29
+# %% ../nbs/50_corpus.ipynb 31
 @patch
 def _prepare_files(self: Corpus, 
 					source_path: str, # path to folder with text files, path can be a directory, zip or tar/tar.gz file
@@ -586,7 +596,7 @@ def _prepare_files(self: Corpus,
 	
 
 
-# %% ../nbs/50_corpus.ipynb 30
+# %% ../nbs/50_corpus.ipynb 32
 @patch
 def build_from_files(self: Corpus,
 					source_path: str, # path to folder with text files 
@@ -612,7 +622,7 @@ def build_from_files(self: Corpus,
 	return self
 
 
-# %% ../nbs/50_corpus.ipynb 31
+# %% ../nbs/50_corpus.ipynb 33
 @patch
 def _prepare_csv(self: Corpus, 
 					source_path:str, # path to csv file
@@ -639,7 +649,7 @@ def _prepare_csv(self: Corpus,
 		for row in slice_df.iter_rows():
 			yield row[0]  
 
-# %% ../nbs/50_corpus.ipynb 32
+# %% ../nbs/50_corpus.ipynb 34
 @patch
 def build_from_csv(self: Corpus, 
 				   source_path:str, # path to csv file
@@ -663,7 +673,7 @@ def build_from_csv(self: Corpus,
 
 	return self
 
-# %% ../nbs/50_corpus.ipynb 36
+# %% ../nbs/50_corpus.ipynb 38
 @patch
 def load(self: Corpus, 
 		 corpus_path: str # path to load corpus
@@ -697,7 +707,7 @@ def load(self: Corpus,
 
 	return self
 
-# %% ../nbs/50_corpus.ipynb 41
+# %% ../nbs/50_corpus.ipynb 43
 @patch
 def info(self: Corpus, 
 		 include_disk_usage:bool = False, # include information of size on disk in output
@@ -733,7 +743,7 @@ def info(self: Corpus,
 
 
 
-# %% ../nbs/50_corpus.ipynb 42
+# %% ../nbs/50_corpus.ipynb 44
 @patch
 def summary(self: Corpus, 
 			include_memory_usage:bool = False # include memory usage in output
@@ -742,7 +752,7 @@ def summary(self: Corpus,
 	result = Result('summary', self.info(include_memory_usage), 'Corpus Summary', '', {}, [])
 	result.display()
 
-# %% ../nbs/50_corpus.ipynb 43
+# %% ../nbs/50_corpus.ipynb 45
 @patch
 def __str__(self: Corpus):
 	""" Formatted information about the corpus. """
@@ -751,7 +761,7 @@ def __str__(self: Corpus):
 
 
 
-# %% ../nbs/50_corpus.ipynb 53
+# %% ../nbs/50_corpus.ipynb 55
 @patch
 def _init_token_arrays(self: Corpus):
 	""" Prepare the temporary token arrays for the corpus. """
@@ -766,14 +776,19 @@ def _init_token_arrays(self: Corpus):
 		self.results_cache['tokens_lookup'] = dict(zip(self.results_cache['tokens_array'], range(len(self.results_cache['tokens_array']))))
 		logger.info(f'Created tokens_lookup in {(time.time() - start_time):.3f} seconds')
 		
-		start_time = time.time()  # move tokens sort order to build process - takes > 1 second for large corpora, but not needed for all results
-		# building tokens_sort_order was implemented in _init_tokens_sort_order - depreciating to simplify as makes sense to build all these in one go
-		tokens_array_lower = np.char.lower(self.results_cache['tokens_array'].astype(str))
-		self.results_cache['tokens_sort_order'] = np.argsort(np.argsort(tokens_array_lower)) # lowercasing then sorting	
+		start_time = time.time()
+		self.results_cache['tokens_sort_order'] = self.vocab.sort(by = pl.col('token_id')).select(pl.col('tokens_sort_order')).collect(engine='streaming').to_numpy().flatten()
+		self.results_cache['tokens_sort_order'] = np.insert(self.results_cache['tokens_sort_order'], 0, 0) # adding a dummy value at the 0 index to align token strings with token_ids
 		logger.info(f'Created tokens_sort_order in {(time.time() - start_time):.3f} seconds')
-		del tokens_array_lower	
 
-# %% ../nbs/50_corpus.ipynb 55
+		# start_time = time.time()  # move tokens sort order to build process - takes > 1 second for large corpora, but not needed for all results
+		# # building tokens_sort_order was implemented in _init_tokens_sort_order - depreciating to simplify as makes sense to build all these in one go
+		# tokens_array_lower = np.char.lower(self.results_cache['tokens_array'].astype(str))
+		# self.results_cache['tokens_sort_order'] = np.argsort(np.argsort(tokens_array_lower)) # lowercasing then sorting	
+		# logger.info(f'Created tokens_sort_order in {(time.time() - start_time):.3f} seconds')
+		# del tokens_array_lower	
+
+# %% ../nbs/50_corpus.ipynb 57
 @patch
 def token_ids_to_tokens(self: Corpus, 
 						token_ids: np.ndarray|list # token ids to return token strings for 
@@ -789,7 +804,7 @@ def token_ids_to_tokens(self: Corpus,
 	
 	return self.results_cache['tokens_array'][token_ids]
 
-# %% ../nbs/50_corpus.ipynb 56
+# %% ../nbs/50_corpus.ipynb 58
 @patch
 def tokens_to_token_ids(self: Corpus, 
 				tokens: list[str]|np.ndarray[str] # list of tokens to get ids for
@@ -803,7 +818,7 @@ def tokens_to_token_ids(self: Corpus,
 	
 	return np.array([self.results_cache['tokens_lookup'].get(token, 0) for token in tokens])
 
-# %% ../nbs/50_corpus.ipynb 57
+# %% ../nbs/50_corpus.ipynb 59
 @patch
 def token_to_id(self: Corpus, 
 				token: str # token to get id for
@@ -813,7 +828,7 @@ def token_to_id(self: Corpus,
 	token_ids = self.tokens_to_token_ids([token])
 	return int(token_ids[0])
 
-# %% ../nbs/50_corpus.ipynb 73
+# %% ../nbs/50_corpus.ipynb 75
 @patch
 def token_ids_to_sort_order(self: Corpus, 
 							token_ids: np.ndarray|list # token ids to return token strings for 
@@ -829,35 +844,24 @@ def token_ids_to_sort_order(self: Corpus,
 	
 	return self.results_cache['tokens_sort_order'][token_ids]
 
-# %% ../nbs/50_corpus.ipynb 75
+# %% ../nbs/50_corpus.ipynb 78
 @patch
 def get_token_count_text(self: Corpus, 
-					exclude_punctuation:bool = False, # exclude punctuation tokens from the count
-					exclude_spaces:bool = False # exclude space tokens from the count
+					exclude_punctuation:bool = False # exclude punctuation tokens from the count
 					) -> tuple[int, str, str]: # token count with adjustments based on exclusions, token descriptor, total descriptor
 	""" Get the token count for the corpus with adjustments and text for output """
 
 	count_tokens = self.token_count
-	tokens_descriptor = 'all tokens'
-	total_descriptor = 'Total tokens'
-	if exclude_punctuation and exclude_spaces:
+	tokens_descriptor = 'word and punctuation tokens'
+	total_descriptor = 'Total word and punctuation tokens'
+	if exclude_punctuation:
 		count_tokens = self.word_token_count
 		tokens_descriptor = 'word tokens'
 		total_descriptor = 'Total word tokens'
-	elif exclude_punctuation:
-		space_tokens_count = self.spaces.select(pl.len()).collect(engine='streaming').item()
-		count_tokens = self.word_token_count + space_tokens_count
-		tokens_descriptor = 'word and space tokens'
-		total_descriptor = 'Total word and space tokens'
-	elif exclude_spaces:
-		punct_tokens_count = self.puncts.select(pl.len()).collect(engine='streaming').item()
-		count_tokens = self.word_token_count + punct_tokens_count
-		tokens_descriptor = 'word and punctuation tokens'
-		total_descriptor = 'Total word and punctuation tokens'
 
 	return count_tokens, tokens_descriptor, total_descriptor
 
-# %% ../nbs/50_corpus.ipynb 78
+# %% ../nbs/50_corpus.ipynb 81
 @patch
 def tokenize(self: Corpus, 
 			 string:str, # string to tokenize 
@@ -946,7 +950,7 @@ def tokenize(self: Corpus,
 	# else:
 	return token_sequences, index_id
 
-# %% ../nbs/50_corpus.ipynb 81
+# %% ../nbs/50_corpus.ipynb 84
 @patch
 def _get_text(self:Corpus,
         doc_id: int, # the id of the document
@@ -956,13 +960,17 @@ def _get_text(self:Corpus,
     if doc_id < 1 or doc_id > self.document_count:
         raise ValueError(f"Document ID {doc_id} is out of range. Document ID should be between 1 and the count of documents ({self.document_count}).")
 
-    doc_tokens = self.tokens.filter(pl.col('token2doc_index') == doc_id).select(['orth_index', 'has_spaces']).collect()
+    doc_tokens = self.tokens.with_row_index('position').filter(pl.col('token2doc_index') == doc_id).with_columns(pl.lit(1).alias('not_space'))
+    doc_space_tokens = self.spaces.filter(pl.col('token2doc_index') == doc_id).with_columns(pl.lit(0).alias('not_space'))
+    doc_tokens = pl.concat([doc_tokens, doc_space_tokens]).sort('position', 'not_space').drop('position').drop('not_space')
+
+    doc_tokens = doc_tokens.select(['orth_index', 'has_spaces']).collect()
     tokens = self.token_ids_to_tokens(doc_tokens.select(pl.col('orth_index')).to_numpy().flatten())
     has_spaces = doc_tokens.select(pl.col('has_spaces')).to_numpy().flatten()
     metadata = self.metadata.with_row_index(offset = 1, name = 'document_id').filter(pl.col('document_id') == doc_id).collect()
     return tokens, has_spaces, metadata
 
-# %% ../nbs/50_corpus.ipynb 82
+# %% ../nbs/50_corpus.ipynb 85
 @patch
 def text(self:Corpus,
         doc_id: int # the id of the document
@@ -971,12 +979,11 @@ def text(self:Corpus,
 
     return Text(*self._get_text(doc_id))
 
-# %% ../nbs/50_corpus.ipynb 85
+# %% ../nbs/50_corpus.ipynb 88
 @patch
 def get_tokens_by_index(self: Corpus, 
 			   index: str = 'orth_index', # index to get tokens from i.e. 'orth_index' 'lower_index' 'token2doc_index'
-			   exclude_punctuation: bool = False, # exclude punctuation tokens from the result
-			   exclude_spaces: bool = False # exclude space tokens from the result
+			   exclude_punctuation: bool = False, # exclude punctuation tokens from the result (unused currently)
 				) -> np.ndarray:
 	""" Get tokens for a given index. """
 
@@ -989,7 +996,7 @@ def get_tokens_by_index(self: Corpus,
 	return self.results_cache[index]
 
 
-# %% ../nbs/50_corpus.ipynb 87
+# %% ../nbs/50_corpus.ipynb 90
 @patch
 def get_ngrams_by_index(self: Corpus, 
 				ngram_length:int, # length of ngrams to get
@@ -1008,7 +1015,7 @@ def get_ngrams_by_index(self: Corpus,
 
 	return self.ngram_index[(index, ngram_length)]
 
-# %% ../nbs/50_corpus.ipynb 90
+# %% ../nbs/50_corpus.ipynb 93
 @patch
 def get_token_positions(self: Corpus, 
 					token_sequence: list[np.ndarray], # token sequence to get index for 
@@ -1039,3 +1046,134 @@ def get_token_positions(self: Corpus,
 
 	logger.info(f'Token indexing ({len(results[0])}) time: {(time.time() - start_time):.5f} seconds')
 	return results
+
+# %% ../nbs/50_corpus.ipynb 96
+@patch
+def _shift_zeroes_to_end(self:Corpus,
+						arr:np.ndarray # Numpy array of collocate frequencies to process
+						):
+	""" Move 0 value positions for punctuation and space removal """
+	result = np.empty_like(arr)
+	for col in range(arr.shape[1]):
+		col_data = arr[:, col]
+		mask = col_data != 0
+		result[:mask.sum(), col] = col_data[mask]
+		result[mask.sum():, col] = 0
+	return result
+
+# %% ../nbs/50_corpus.ipynb 97
+@patch
+def _zero_after_value(self:Corpus,
+					  arr:np.ndarray, # Numpy array of collocate frequencies to process
+					  target: int # Target value to find in the array (e.g., an end-of-file token or a specific collocate frequency)
+					  ):
+	""" Set values from first occurence of target value to 0 in each column (for processing tokens outside text using eof token) """
+	arr = arr.copy()  
+	for col in range(arr.shape[1]):
+		col_data = arr[:, col]
+		idx = np.where(col_data == target)[0]
+		if idx.size > 0:
+			first_idx = idx[0]
+			arr[first_idx:, col] = 0
+	return arr
+
+# %% ../nbs/50_corpus.ipynb 98
+@patch
+def get_tokens_in_context(self:Corpus,
+							   token_positions:np.ndarray, # Numpy array of token positions in the corpus
+							   index:str, # Index to use - lower_index, orth_index
+							   context_length:int = 5, # Number of context words to consider on each side of the token
+							   position_offset:int = 1, # offset to start retrieving context words - negatve is left of node, positive for right - may want to adjust if sequence_len > 1
+							   position_offset_step:int = 1, # step to move position offset by, this sets direct, -1 for left, 1 for right
+							   exclude_punctuation:bool = True, # ignore punctuation from context retrieved
+							   convert_eof:bool = True # if True (for collocation functionality), contexts with end of file tokens will have eof token and tokens after set to zero, otherwise EOF retained (e.g. False used for ngrams)
+							   ) -> Result:
+	""" Get tokens in context for given token positions, context length and direction, operates one side at a time. """
+
+	start_time = time.time()
+
+	if context_length < 1:
+		# return empty result
+		return np.zeros((0, 0), dtype=np.int32)
+
+	tokens_for_removal = []
+	if exclude_punctuation:
+		tokens_for_removal += self.punct_tokens
+	len_tokens_for_removal = len(tokens_for_removal)
+
+	collected = False
+	context_tokens_arr = []
+	while collected == False:
+		new_positions = np.array(token_positions[0] + position_offset, dtype = token_positions[0].dtype)
+		context_tokens_arr.append(self.get_tokens_by_index(index)[new_positions])
+		position_offset += position_offset_step
+		if len(context_tokens_arr) >= context_length: 
+			context_tokens = np.array(context_tokens_arr, dtype = token_positions[0].dtype)
+			logger.info(f"Context tokens collected: {context_tokens.shape}")
+			if len_tokens_for_removal > 0: # cleaning punctuation and check if need more iterations
+				context_tokens = np.where(np.isin(context_tokens, tokens_for_removal), 0, context_tokens)
+			counts = np.count_nonzero(context_tokens, axis=0)
+			if np.min(counts) < context_length:
+				pass
+			else:
+				collected = True
+
+	context_tokens = self._shift_zeroes_to_end(context_tokens)
+	context_tokens = context_tokens[:context_length, :]
+
+	if convert_eof: # delete any context that contains self.EOF_TOKEN
+		if self.EOF_TOKEN in context_tokens:
+			context_tokens = self._zero_after_value(context_tokens, self.EOF_TOKEN)
+
+	logger.info(f"Context retrieved in {time.time() - start_time:.2f} seconds.")
+
+	return context_tokens
+
+# %% ../nbs/50_corpus.ipynb 99
+def build_test_corpora(
+		source_path:str, # path to folder with corpora
+		save_path:str, # path to save corpora
+		force_rebuild:bool = False # force rebuild of corpora, useful for development and testing
+		):
+	"""Build all test corpora from source files."""
+
+	corpora = {}
+	corpora['toy'] = {'name': 'Toy Corpus', 'slug': 'toy', 'description': 'Toy corpus is a very small dataset for testing and library development. ', 'extension': '.csv.gz'}
+	corpora['brown'] = {'name': 'Brown Corpus', 'slug': 'brown', 'description': 'A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
+	corpora['reuters'] = {'name': 'Reuters Corpus', 'slug': 'reuters', 'description': 'Reuters corpus (Reuters-21578, Distribution 1.0). "The copyright for the text of newswire articles and Reuters annotations in the Reuters-21578 collection resides with Reuters Ltd. Reuters Ltd. and Carnegie Group, Inc. have agreed to allow the free distribution of this data *for research purposes only*. If you publish results based on this data set, please acknowledge its use, refer to the data set by the name (Reuters-21578, Distribution 1.0), and inform your readers of the current location of the data set." https://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
+	corpora['gutenberg'] = {'name': 'Gutenberg Corpus', 'slug': 'gutenberg', 'description': 'Project Gutenberg Selections NLTK Corpus. Source: https://gutenberg.org/. Public domain. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
+	corpora['garden-party-corpus'] = {'name': 'Garden Party Corpus', 'slug': 'garden-party', 'description': 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party', 'extension': '.zip'}
+
+	for corpus_name, corpus_details in corpora.items():
+		if force_rebuild and os.path.isdir(f'{save_path}{corpus_details["slug"]}.corpus'):
+			import shutil
+			shutil.rmtree(f'{save_path}{corpus_details["slug"]}.corpus', ignore_errors=True)
+
+		try:
+			corpus = Corpus().load(f"{save_path}{corpus_details['slug']}.corpus")
+		except FileNotFoundError:
+
+			if not os.path.exists(source_path):
+				os.makedirs(source_path)
+			if not os.path.exists(save_path):
+				os.makedirs(save_path)
+
+			if corpus_name == 'toy' and not os.path.exists(f'{source_path}toy.csv.gz'):
+				from conc.core import create_toy_corpus_sources
+				create_toy_corpus_sources(source_path)
+
+			if corpus_name == 'garden-party-corpus' and not os.path.exists(f'{source_path}garden-party-corpus.zip'):
+				from conc.core import get_garden_party
+				get_garden_party(source_path)
+
+			if corpus_name == 'brown' and not os.path.exists(f'{source_path}brown.csv.gz'):
+				from conc.core import get_nltk_corpus_sources
+				get_nltk_corpus_sources(source_path)
+
+			if 'csv' in corpus_details['extension']:
+				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_csv(source_path = f'{source_path}{corpus_name}.csv.gz', text_column='text', metadata_columns=['source'], save_path = save_path)
+			else:
+				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_files(source_path = f'{source_path}{corpus_name}{corpus_details["extension"]}', save_path = save_path)
+		except Exception as e:
+			raise e
+		del corpus
