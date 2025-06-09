@@ -11,9 +11,7 @@ from great_tables import GT
 import polars as pl
 import msgspec
 import spacy
-
 from memory_profiler import _get_memory
-
 
 # %% auto 0
 __all__ = ['PAGE_SIZE', 'EOF_TOKEN_STR', 'ERR_TOKEN_STR', 'DOCUMENTATION_URL', 'REPOSITORY_URL', 'PYPI_URL', 'CITATION_STR',
