@@ -168,15 +168,6 @@ The conc.core module implements a number of helpful functions …
 | [`get_stop_words`](https://geoffford.nz/conc/core.html#get_stop_words) | Get a spaCy stop word list list for a specific model |
 | Various - see `Get data sources` | Functions to download source texts to create sample corpora. Primarily intended for development/testing. To minimize requirements not all libraries are installed by default. Functions will raise errors with information on installing required libraries. |
 
-## Final release process …
-
-- [ ] generate README etc
-- [x] ensure local tests work via nbdev_prepare
-- [ ] ensure github CI tests work
-- [ ] check generated documentation
-- [ ] Bump version
-- [ ] Pypi release
-
 ## Roadmap
 
 ### Short-term
