@@ -122,13 +122,22 @@ def concordance(self: Conc,
 
 # %% ../nbs/57_conc.ipynb 26
 @patch
+def concordance_plot(self: Conc,
+					 token_str: str,
+					 page_size: int = 10):
+	"""Display concordance plot."""
+	return self.concordance_.concordance_plot(token_str, 
+										   page_size=page_size)
+
+# %% ../nbs/57_conc.ipynb 28
+@patch
 def set_reference_corpus(self: Conc, 
                     corpus: Corpus  # Reference corpus
                     ) -> None:
     """ Set a reference corpus for keyness analysis. """
     self.keyness_ = Keyness(self.corpus, corpus)
 
-# %% ../nbs/57_conc.ipynb 28
+# %% ../nbs/57_conc.ipynb 30
 @patch
 def keywords(self: Conc,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
@@ -176,7 +185,7 @@ def keywords(self: Conc,
 									restrict_tokens_text=restrict_tokens_text,
 									exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 31
+# %% ../nbs/57_conc.ipynb 33
 @patch
 def collocates(self: Conc, 
 				token_str:str, # Token to search for
