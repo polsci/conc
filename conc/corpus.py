@@ -148,6 +148,16 @@ def _process_punct_positions(self: Corpus):
 	punct_mask = np.isin(self.lower_index, self.punct_tokens) # faster to retrieve with isin than where
 	self.punct_positions = np.nonzero(punct_mask)[0] # storing this as smaller
 
+# %% ../nbs/50_corpus.ipynb 17
+@patch
+def _process_space_positions(self: Corpus):
+	""" Process whitespace positions in token data and populates space_tokens and space_positions. """
+
+	self.space_tokens = np.array(list({k: v for k, v in self.vocab.items() if v.strip() == ''}.keys()))
+	space_mask = np.isin(self.lower_index, self.space_tokens) 	# faster to retrieve with isin than where
+	self.space_positions = np.nonzero(space_mask)[0] # storing this as smaller
+
+
 # %% ../nbs/50_corpus.ipynb 22
 @patch
 def _init_build_process(self:Corpus,
