@@ -16,7 +16,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/70_frequency.ipynb 10
+# %% ../nbs/70_frequency.ipynb 8
 class Frequency:
 	""" Class for frequency analysis reporting """
 	def __init__(self,
@@ -25,7 +25,7 @@ class Frequency:
 		self.corpus = corpus
 
 
-# %% ../nbs/70_frequency.ipynb 12
+# %% ../nbs/70_frequency.ipynb 10
 @patch
 def frequencies(self: Frequency,
 				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 

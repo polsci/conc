@@ -1154,6 +1154,23 @@ def build_test_corpora(
 	corpora['gutenberg'] = {'name': 'Gutenberg Corpus', 'slug': 'gutenberg', 'description': 'Project Gutenberg Selections NLTK Corpus. Source: https://gutenberg.org/. Public domain. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
 	corpora['garden-party-corpus'] = {'name': 'Garden Party Corpus', 'slug': 'garden-party', 'description': 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party', 'extension': '.zip'}
 
+	if not os.path.exists(source_path):
+		os.makedirs(source_path)
+	if not os.path.exists(save_path):
+		os.makedirs(save_path)
+
+	if not os.path.exists(f'{source_path}toy.csv.gz'):
+		from conc.core import create_toy_corpus_sources
+		create_toy_corpus_sources(source_path)
+
+	if not os.path.exists(f'{source_path}garden-party-corpus.zip'):
+		from conc.core import get_garden_party
+		get_garden_party(source_path)
+
+	if not os.path.exists(f'{source_path}brown.csv.gz'):
+		from conc.core import get_nltk_corpus_sources
+		get_nltk_corpus_sources(source_path)
+
 	for corpus_name, corpus_details in corpora.items():
 		if force_rebuild and os.path.isdir(f'{save_path}{corpus_details["slug"]}.corpus'):
 			import shutil
@@ -1162,23 +1179,6 @@ def build_test_corpora(
 		try:
 			corpus = Corpus().load(f"{save_path}{corpus_details['slug']}.corpus")
 		except FileNotFoundError:
-
-			if not os.path.exists(source_path):
-				os.makedirs(source_path)
-			if not os.path.exists(save_path):
-				os.makedirs(save_path)
-
-			if corpus_name == 'toy' and not os.path.exists(f'{source_path}toy.csv.gz'):
-				from conc.core import create_toy_corpus_sources
-				create_toy_corpus_sources(source_path)
-
-			if corpus_name == 'garden-party-corpus' and not os.path.exists(f'{source_path}garden-party-corpus.zip'):
-				from conc.core import get_garden_party
-				get_garden_party(source_path)
-
-			if corpus_name == 'brown' and not os.path.exists(f'{source_path}brown.csv.gz'):
-				from conc.core import get_nltk_corpus_sources
-				get_nltk_corpus_sources(source_path)
 
 			if 'csv' in corpus_details['extension']:
 				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_csv(source_path = f'{source_path}{corpus_name}.csv.gz', text_column='text', metadata_columns=['source'], save_path = save_path)

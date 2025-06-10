@@ -21,7 +21,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR
 
-# %% ../nbs/72_concordance.ipynb 10
+# %% ../nbs/72_concordance.ipynb 8
 class Concordance:
 	""" Class for concordancing. """
 	def __init__(self,
@@ -30,7 +30,7 @@ class Concordance:
 		self.corpus = corpus
 
 
-# %% ../nbs/72_concordance.ipynb 11
+# %% ../nbs/72_concordance.ipynb 9
 @patch
 def _get_concordance_sort(self:Concordance, 
 						 token_positions: list[np.ndarray], # token index to get sort columns for
@@ -47,7 +47,7 @@ def _get_concordance_sort(self:Concordance,
 	return sort_column_ids, sort_column_order
 
 
-# %% ../nbs/72_concordance.ipynb 16
+# %% ../nbs/72_concordance.ipynb 14
 @patch
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
@@ -187,7 +187,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/72_concordance.ipynb 25
+# %% ../nbs/72_concordance.ipynb 23
 @patch
 def concordance_plot(self: Concordance,
 					 token_str: str,

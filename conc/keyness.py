@@ -19,7 +19,7 @@ from .result import Result
 from .frequency import Frequency
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/73_keyness.ipynb 11
+# %% ../nbs/73_keyness.ipynb 9
 class Keyness:
 	""" Class for keyness analysis reporting. """
 	def __init__(self,
@@ -30,7 +30,7 @@ class Keyness:
 		self.reference_corpus = reference_corpus	
 
 
-# %% ../nbs/73_keyness.ipynb 12
+# %% ../nbs/73_keyness.ipynb 10
 @patch
 def keywords(self: Keyness,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported

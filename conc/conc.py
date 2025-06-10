@@ -20,7 +20,7 @@ from .concordance import Concordance
 from .keyness import Keyness
 from .collocates import Collocates
 
-# %% ../nbs/57_conc.ipynb 10
+# %% ../nbs/57_conc.ipynb 8
 class Conc:
 	"""Unified interface to Conc reporting for analysis of frequency, ngrams, concordances, keyness, and collocates."""
 	
@@ -35,7 +35,7 @@ class Conc:
 		self.keyness_ = None
 		self.collocates_ = Collocates(corpus)
 
-# %% ../nbs/57_conc.ipynb 14
+# %% ../nbs/57_conc.ipynb 12
 @patch
 def frequencies(self: Conc,
 				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
@@ -63,7 +63,7 @@ def frequencies(self: Conc,
 										restrict_tokens_text=restrict_tokens_text,
 										exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 17
+# %% ../nbs/57_conc.ipynb 15
 @patch
 def ngrams(self: Conc, 
 		   token_str: str, # token string to get ngrams for 
@@ -88,7 +88,7 @@ def ngrams(self: Conc,
 							exclude_punctuation=exclude_punctuation,
 							use_cache=use_cache)
 
-# %% ../nbs/57_conc.ipynb 20
+# %% ../nbs/57_conc.ipynb 18
 @patch
 def ngram_frequencies(self: Conc, 
                 ngram_length:int=2, # length of ngram
@@ -106,7 +106,7 @@ def ngram_frequencies(self: Conc,
                                     page_current=page_current,
                                     exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 23
+# %% ../nbs/57_conc.ipynb 21
 @patch
 def concordance(self: Conc, 
 				token_str: str, # token string to get concordance for 
@@ -120,7 +120,7 @@ def concordance(self: Conc,
 	""" Report concordance for a token string. """
 	return self.concordance_.concordance(token_str, context_length=context_length, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
 
-# %% ../nbs/57_conc.ipynb 26
+# %% ../nbs/57_conc.ipynb 24
 @patch
 def concordance_plot(self: Conc,
 					 token_str: str,
@@ -129,7 +129,7 @@ def concordance_plot(self: Conc,
 	return self.concordance_.concordance_plot(token_str, 
 										   page_size=page_size)
 
-# %% ../nbs/57_conc.ipynb 28
+# %% ../nbs/57_conc.ipynb 26
 @patch
 def set_reference_corpus(self: Conc, 
                     corpus: Corpus  # Reference corpus
@@ -137,7 +137,7 @@ def set_reference_corpus(self: Conc,
     """ Set a reference corpus for keyness analysis. """
     self.keyness_ = Keyness(self.corpus, corpus)
 
-# %% ../nbs/57_conc.ipynb 30
+# %% ../nbs/57_conc.ipynb 28
 @patch
 def keywords(self: Conc,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
@@ -185,7 +185,7 @@ def keywords(self: Conc,
 									restrict_tokens_text=restrict_tokens_text,
 									exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/57_conc.ipynb 33
+# %% ../nbs/57_conc.ipynb 31
 @patch
 def collocates(self: Conc, 
 				token_str:str, # Token to search for

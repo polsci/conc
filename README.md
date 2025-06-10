@@ -6,45 +6,53 @@
 ## Introduction to Conc
 
 Conc is a Python library that brings corpus linguistic analysis to
-Jupyter notebooks. A staple of data science, Jupyter notebooks are a
-great model for presenting analysis that combines code, reporting and
-discussion in a way that can be reproduced. Conc aims to allow
-researchers to analyse large corpora in efficient ways using standard
-hardware, with the ability to produce clear, publication-ready reports
-and extend analysis where required using standard Python libraries.
+[Jupyter notebooks](https://docs.jupyter.org/en/latest/). A staple of
+data science, [Jupyter notebooks are a great model for presenting
+analysis](https://docs.jupyter.org/en/latest/#what-is-a-notebook)
+through an interactive form that combines code, reporting and discussion
+that allows other researchers to reproduce and interact with your
+analysis. Conc aims to allow researchers to analyse large corpora in
+efficient ways using standard hardware, with the ability to produce
+clear, publication-ready reports and extend analysis where required
+using standard Python libraries.
 
-Conc uses [spaCy](https://spacy.io/) for tokenising texts. More spaCy
-functionality will be supported in future releases.
+Conc uses [spaCy](https://spacy.io/) for tokenising texts. SpaCy
+functionality to annotate texts will be supported soon.
 
 ### Conc Principles
 
-- use standard Python libraries for data analysis (i.e. Numpy, Scipy,
-  Jupyterlab)
+- use standard Python libraries for data processing, analysis and
+  visualisation (i.e. [Numpy](https://numpy.org/),
+  [Scipy](https://scipy.org/), [Polars](https://pola.rs),
+  [Plotly](https://plotly.com/python/))
 - use vector operations where possible  
-- use fast code libraries over slow code libraries (i.e. Conc uses
+- use fast code libraries and fast data structures (i.e. Conc uses
   [Polars vs Pandas](https://pola.rs/posts/benchmarks/) - you can still
   output Pandas dataframes if you want to use them)  
-- provide important information when reporting results  
+- provide clear and complete information when reporting results  
 - pre-compute time-intensive and repeatedly used views of the data  
 - work with smaller slices of the data where possible  
 - cache specific anaysis during a session to reduce computation for
   repeated calls  
 - document corpus representations so that they can be worked with
   directly  
-- provide a way to work with access Conc results for further processing
-  with standard Python libraries
+- allow researchers to work with Conc results and extend analysis using
+  other Python libraries
 
-## Development Status
+## Table of Contents
 
-Conc is in active development. It is currently
-[released](https://pypi.org/project/conc/) for beta testing. The Github
-site may be ahead of the Pypi version, so for latest functionality
-install from Github (see below). The Github code is pre-release and may
-change. For the latest release, install from Pypi (`pip install conc`).
-The [documentation](https://geoffford.nz/conc/) reflects the most recent
-functionality. See the
-[CHANGELOG](https://github.com/polsci/conc/blob/main/CHANGELOG.md) for
-notes on releases and the Roadmap below for upcoming features.
+- [Acknowledgements](#acknowledgements)  
+- [Development Status](#development-status)  
+- [Installation](#installation)
+  - [Install via pip](#install-via-pip)  
+  - [Install a spaCy model for
+    tokenization](#install-a-spacy-model-for-tokenization)  
+  - [Install optional dependencies](#install-optional-dependencies)  
+  - [Pre-2013 CPU? Install Polars with support for older
+    machines](#pre-2013-cpu-install-polars-with-support-for-older-machines)  
+- [Using Conc](#using-conc)  
+- [Roadmap](#roadmap)  
+- [Developer Guide](#developer-guide)
 
 ## Acknowledgements
 
@@ -74,6 +82,18 @@ Digital Lab (ADL)](https://artsdigitallab.canterbury.ac.nz/). Thanks to
 the ADL team and the ongoing support of the University of Canterbury’s
 Faculty of Arts who make work like this possible.
 
+## Development Status
+
+Conc is in active development. It is currently
+[released](https://pypi.org/project/conc/) for beta testing. The Github
+site may be ahead of the Pypi version, so for latest functionality
+install from Github (see below). The Github code is pre-release and may
+change. For the latest release, install from Pypi (`pip install conc`).
+The [documentation](https://geoffford.nz/conc/) reflects the most recent
+functionality. See the
+[CHANGELOG](https://github.com/polsci/conc/blob/main/CHANGELOG.md) for
+notes on releases and the Roadmap below for upcoming features.
+
 ## Installation
 
 ### Install via pip
@@ -93,7 +113,7 @@ the version on Pypi, you can install from the
 $ pip install git+https://github.com/polsci/conc.git
 ```
 
-### Install a language model
+### Install a spaCy model for tokenization
 
 The first releases of Conc require a SpaCy language model for
 tokenization. After installing Conc, install a model. Here’s an example
@@ -174,15 +194,13 @@ The conc.core module implements a number of helpful functions …
 
 - [ ] add tutorial / getting started notebook
 - [ ] add citation information
+- [ ] Corpus tokenize support for functionality from earlier versions of
+  Conc for wildcards, multiple strings, case insensitive tokenization
 - [ ] extend caching support to all intensive reports, revise storage of
   cached results for in-memory/disk option
 - [ ] relegate some logger warnings to debug level and audit logger
   messages for consistency and clarity for users
 - [ ] add support for build from datasets library
-- [ ] anatomy - explain token2doc_index -1 and has_spaces on tokens
-  display and various other fields for vocab.
-- [ ] Corpus tokenize support for functionality from earlier versions of
-  Conc for wildcards, multiple strings, case insensitive tokenization
 - [ ] ngrams method - implement case handling
 - [ ] get_ngrams_by_index - implement case handling
 - [ ] improve concordance ordering so not fixed options e.g. include
@@ -191,8 +209,6 @@ The conc.core module implements a number of helpful functions …
   (i.e. define positions relative to ngram, or ANY)
 - [ ] concordancing - add in ordering by metadata columns or doc
 - [ ] annotations support for spaCy POS, TAG, SENT_START, LEMMA
-- [ ] move tokens sort order to build process - takes \> 1 second for
-  large corpora, but not needed for all results
 - [ ] shift more processing from in-memory to polars with support for
   streaming or in-memory processing
 - [ ] revisit polars streaming - potentially implement a batched write

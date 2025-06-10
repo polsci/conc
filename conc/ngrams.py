@@ -19,7 +19,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/71_ngrams.ipynb 10
+# %% ../nbs/71_ngrams.ipynb 8
 class Ngrams:
 	""" Class for n-gram analysis reporting. """
 	def __init__(self,
@@ -28,7 +28,7 @@ class Ngrams:
 		self.corpus = corpus
 
 
-# %% ../nbs/71_ngrams.ipynb 13
+# %% ../nbs/71_ngrams.ipynb 11
 @patch
 def _get_ngrams(self:Ngrams, 
 			   token_sequence: list[np.ndarray], # token sequence to get index for 
@@ -87,7 +87,7 @@ def _get_ngrams(self:Ngrams,
 	return ngrams
 
 
-# %% ../nbs/71_ngrams.ipynb 18
+# %% ../nbs/71_ngrams.ipynb 16
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
@@ -170,7 +170,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/71_ngrams.ipynb 23
+# %% ../nbs/71_ngrams.ipynb 21
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram

@@ -18,7 +18,7 @@ from .corpus import Corpus
 from .result import Result
 from .core import logger, PAGE_SIZE
 
-# %% ../nbs/74_collocates.ipynb 12
+# %% ../nbs/74_collocates.ipynb 10
 class Collocates:
 	""" Class for collocation analysis reporting. """
 	def __init__(self,
@@ -27,7 +27,7 @@ class Collocates:
 		self.corpus = corpus
 
 
-# %% ../nbs/74_collocates.ipynb 13
+# %% ../nbs/74_collocates.ipynb 11
 @patch
 def collocates(self:Collocates, 
 				token_str:str, # Token to search for
