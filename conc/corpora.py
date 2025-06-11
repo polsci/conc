@@ -197,15 +197,12 @@ def build_sample_corpora(
 		os.makedirs(save_path)
 
 	if not os.path.exists(f'{source_path}toy.csv.gz'):
-		from conc.core import create_toy_corpus_sources
 		create_toy_corpus_sources(source_path)
 
 	if not os.path.exists(f'{source_path}garden-party-corpus.zip'):
-		from conc.core import get_garden_party
 		get_garden_party(source_path)
 
 	if not os.path.exists(f'{source_path}brown.csv.gz'):
-		from conc.core import get_nltk_corpus_sources
 		get_nltk_corpus_sources(source_path)
 
 	for corpus_name, corpus_details in corpora.items():
