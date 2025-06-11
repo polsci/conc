@@ -13,5 +13,7 @@ jobs:
         run: pip install spacy
       - name: Install spaCy English model
         run: python -m spacy download en_core_web_sm
+      - name: Download and build sample corpora for tests
+        run: conc_build_sample_corpora ~/data/ ~/data/conc-test-corpora/
       # end changes from default CI
       - uses: fastai/workflows/nbdev-ci@master
