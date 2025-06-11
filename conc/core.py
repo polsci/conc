@@ -15,7 +15,7 @@ from memory_profiler import _get_memory
 
 # %% auto 0
 __all__ = ['PAGE_SIZE', 'EOF_TOKEN_STR', 'ERR_TOKEN_STR', 'DOCUMENTATION_URL', 'REPOSITORY_URL', 'PYPI_URL', 'CITATION_STR',
-           'logger', 'set_logger_state', 'spacy_attribute_name', 'CorpusMetadata', 'list_corpora', 'get_stop_words',
+           'logger', 'set_logger_state', 'spacy_attribute_name', 'CorpusMetadata', 'get_stop_words', 'list_corpora',
            'create_toy_corpus_sources', 'show_toy_corpus', 'get_nltk_corpus_sources', 'get_garden_party',
            'get_large_dataset', 'create_large_dataset_sizes']
 
@@ -107,7 +107,6 @@ class CorpusMetadata(msgspec.Struct):
     unique_tokens: int
     unique_word_tokens: int
     date_created: str
-    #source_path: str
     EOF_TOKEN: int
     SPACY_EOF_TOKEN: int
     SPACY_MODEL: str
@@ -118,27 +117,6 @@ class CorpusMetadata(msgspec.Struct):
 
 
 # %% ../nbs/80_core.ipynb 19
-def list_corpora(
-		path: str # path to load corpus
-		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
-	""" Scan a directory for available corpora """
-	
-	available_corpora = {'corpus': [], 'name': [], 'date_created': [], 'document_count': [], 'token_count': []}
-	for dir in os.listdir(path):
-		if os.path.isdir(os.path.join(path, dir)) and os.path.isfile( os.path.join(path, dir, 'corpus.json')):
-			with open(os.path.join(path, dir, 'corpus.json'), 'rb') as f:
-				data = msgspec.json.decode(f.read(), type=CorpusMetadata)
-
-			available_corpora['corpus'].append(dir)
-			for k in ['name', 'document_count', 'token_count', 'date_created']:
-				attr = getattr(data, k)
-				if isinstance(attr, int):
-					attr = f'{attr:,}'
-				available_corpora[k].append(attr)
-
-	return pl.DataFrame(available_corpora)
-
-# %% ../nbs/80_core.ipynb 22
 def get_stop_words(save_path:str, # directory to save stop words to, file name will be created based on spaCy model name
 				   spacy_model:str = 'en_core_web_sm' # model to get stop words for
 					):
@@ -167,137 +145,77 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 
 	return stop_words
 
-# %% ../nbs/80_core.ipynb 25
-toy_data = []
-toy_data.append(['1.txt', 'The cat sat on the mat.', 'feline', 'cat'])
-toy_data.append(['2.txt', 'The dog sat on the mat.', 'canine', 'dog'])
-toy_data.append(['3.txt', 'The cat is meowing.', 'feline', 'cat'])
-toy_data.append(['4.txt', 'The dog is barking.', 'canine', 'dog'])
-toy_data.append(['5.txt', 'The cat is climbing a tree.', 'feline', 'cat'])
-toy_data.append(['6.txt', 'The dog is digging a hole.', 'canine', 'dog'])
+# %% ../nbs/80_core.ipynb 22
+def list_corpora(
+		path: str # path to load corpus
+		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
+	""" (Depreciated - call via conc.corpora) Scan a directory for available corpora """
+	
+	logger.warning(DeprecationWarning("Calling list_corpora via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import list_corpora' and call as before."))
 
-# %% ../nbs/80_core.ipynb 27
+	from conc.corpora import list_corpora as _list_corpora
+	return _list_corpora(path=path)
+
+
+# %% ../nbs/80_core.ipynb 23
 def create_toy_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
-	""" Create txt files and csv to test build of toy corpus. """
+	""" (Depreciated - call via conc.corpora) Create txt files and csv to test build of toy corpus. """
 
-	toy_path = os.path.join(source_path, 'toy')
-	if not os.path.exists(toy_path):
-		os.makedirs(toy_path, exist_ok=True)
-	for row in toy_data:
-		with open(f'{source_path}/toy/{row[0]}', 'w', encoding='utf-8') as f:
-			f.write(row[1])
-	df = pl.DataFrame(toy_data, orient='row', schema=(('source', str), ('text', str), ('category', str), ('species', str)))
-	df.write_csv(os.path.join(source_path, 'toy.csv'))
-	df.write_csv(os.path.join(source_path, 'toy.csv.gz'))
+	logger.warning(DeprecationWarning("Calling create_toy_corpus_sources via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_toy_corpus_sources' and call as before."))
 
+	from conc.corpora import create_toy_corpus_sources as _create_toy_corpus_sources
+	return _create_toy_corpus_sources(source_path=source_path)
 
-# %% ../nbs/80_core.ipynb 29
+# %% ../nbs/80_core.ipynb 24
 def show_toy_corpus(
         csv_path:str # path to location of csv for building corpora
         ) -> GT: 
-    """ Show toy corpus in a table. """
-    
-    toy_corpus_df = pl.read_csv(csv_path)
-    GT(toy_corpus_df).tab_options(table_margin_left = 0).show()
+    """ (Depreciated - call via conc.corpora) Show toy corpus in a table. """
 
-# %% ../nbs/80_core.ipynb 31
+    logger.warning(DeprecationWarning("Calling show_toy_corpus via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import show_toy_corpus' and call as before."))
+    
+    from conc.corpora import show_toy_corpus as _show_toy_corpus
+    return _show_toy_corpus(csv_path=csv_path)
+
+# %% ../nbs/80_core.ipynb 25
 def get_nltk_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
-	""" Get NLTK corpora as sources for development or testing Conc functionality. """
+	""" (Depreciated - call via conc.corpora) Get NLTK corpora as sources for development or testing Conc functionality. """
 
-	try:
-		import nltk
-	except ImportError as e:
-		raise ImportError('This function requires NLTK. To minimise requirements this is not installed by default. You can install NLTK with "pip install nltk"')
+	logger.warning(DeprecationWarning("Calling get_nltk_corpus_sources via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_nltk_corpus_sources' and call as before."))
 
-	import nltk
-	nltk.download('gutenberg')
-	nltk.download('brown')
-	nltk.download('reuters')
-	from nltk.corpus import gutenberg
-	from nltk.corpus import reuters
-	from nltk.corpus import brown
+	from conc.corpora import get_nltk_corpus_sources as _get_nltk_corpus_sources
+	return _get_nltk_corpus_sources(source_path=source_path)
 
-	def clean_text(text):
-		# to match words/punc that followed by /tags
-		pattern = re.compile(r"(\S+)(/[^ ]+)") # match non-space followed by / and non-space
-		return pattern.sub(r"\1", text)
-
-	if not os.path.exists(source_path):
-		os.makedirs(source_path, exist_ok=True)
-	if not os.path.exists(f'{source_path}/brown'):
-		os.makedirs(f'{source_path}/brown', exist_ok=True)
-	brown_path = os.path.join(source_path, 'brown.csv.gz')
-	corpus_data = []
-	for fileid in brown.fileids():
-		corpus_data.append([fileid, clean_text(brown.raw(fileid))])
-		with open(f'{source_path}/brown/{fileid}.txt', 'w', encoding='utf-8') as f:
-			f.write(clean_text(brown.raw(fileid)))
-	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
-	df.write_csv(brown_path)
-
-	gutenberg_path = os.path.join(source_path, 'gutenberg.csv.gz')
-	corpus_data = []
-	for fileid in gutenberg.fileids():
-		corpus_data.append([fileid, clean_text(gutenberg.raw(fileid))])
-	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
-	df.write_csv(gutenberg_path)
-
-	reuters_path = os.path.join(source_path, 'reuters.csv.gz')
-	corpus_data = []
-	for fileid in reuters.fileids():
-		fileid_name = fileid.split('/')[1]
-		corpus_data.append([fileid_name, clean_text(reuters.raw(fileid))])
-	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
-	df.write_csv(reuters_path)
-
-
-# %% ../nbs/80_core.ipynb 34
+# %% ../nbs/80_core.ipynb 26
 def get_garden_party(source_path: str #path to location of sources for building corpora
 					):
-	""" Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
+	""" (Depreciated - call via conc.corpora) Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
 
-	path = 'https://github.com/ucdh/scraping-garden-party/raw/master/garden-party-corpus.zip'
+	logger.warning(DeprecationWarning("Calling get_garden_party via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_garden_party' and call as before."))
 
-	import requests
-	try:
-		import requests
-	except ImportError as e:
-		raise ImportError('This function requires the requests library. To minimise requirements this is not installed by default. You can install requests with "pip install requests"')
+	from conc.corpora import get_garden_party as _get_garden_party
+	return _get_garden_party(source_path=source_path)
 
-	r = requests.get(path)
-	with open(f'{source_path}/garden-party-corpus.zip', 'wb') as f:
-		f.write(r.content)
-	# converting to .tar and tar.gz files for testing
-	import zipfile
-	with zipfile.ZipFile(f'{source_path}/garden-party-corpus.zip', 'r') as z:
-		z.extractall(f'{source_path}/garden-party-corpus')
-	import shutil # make tar.gz
-	shutil.make_archive(f'{source_path}/garden-party-corpus', 'gztar', f'{source_path}/garden-party-corpus')
-	shutil.move(f'{source_path}/garden-party-corpus.tar.gz', f'{source_path}/garden-party-corpus.tar.gz')
-	shutil.make_archive(f'{source_path}/garden-party-corpus', 'tar', f'{source_path}/garden-party-corpus')
-	shutil.move(f'{source_path}/garden-party-corpus.tar', f'{source_path}/garden-party-corpus.tar')
-	shutil.rmtree(f'{source_path}/garden-party-corpus')
-	
-
-# %% ../nbs/80_core.ipynb 38
+# %% ../nbs/80_core.ipynb 27
 def get_large_dataset(source_path: str #path to location of sources for building corpora
                     ):
-    """ Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
-    df = pl.read_parquet('hf://datasets/Eugleo/us-congressional-speeches-subset/data/train-*.parquet')
-    df.sample(1000000).select(['speech_id', 'date', 'speaker', 'chamber', 'state', 'text']).write_csv(f'{source_path}/us-congressional-speeches-subset-1m.csv.gz')
-    del df
+    """ (Depreciated - call via conc.corpora) Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
 
+    logger.warning(DeprecationWarning("Calling get_large_dataset via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_large_dataset' and call as before."))
 
-# %% ../nbs/80_core.ipynb 41
+    from conc.corpora import get_large_dataset as _get_large_dataset
+    return _get_large_dataset(source_path=source_path)
+
+# %% ../nbs/80_core.ipynb 28
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
-	""" Create datasets of different sizes from data source retrieved by get_large_dataset for testing. """
-	for max_i in sizes:
-		max_i_label = int(max_i / 1000)
-		df = pl.read_csv(f'{source_path}/us-congressional-speeches-subset-1m.csv.gz')
-		df.sample(max_i).write_csv(f'{source_path}/us-congressional-speeches-subset-{max_i_label}k.csv.gz')
-		logger.info(f'Creating dataset of {max_i_label}k rows')
+	""" (Depreciated - call via conc.corpora) Create datasets of different sizes from data source retrieved by get_large_dataset for testing. """
+	
+	logger.warning(DeprecationWarning("Calling create_large_dataset_sizes via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_large_dataset_sizes' and call as before."))
+
+	from conc.corpora import create_large_dataset_sizes as _create_large_dataset_sizes
+	return _create_large_dataset_sizes(source_path=source_path, sizes = sizes)
 

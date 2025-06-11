@@ -115,10 +115,15 @@ def concordance(self: Conc,
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
-				use_cache:bool = True # retrieve the results from cache if available
+				use_cache:bool = True # retrieve the results from cache if available (currently ignored)
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
-	return self.concordance_.concordance(token_str, context_length=context_length, order=order, page_size=page_size, page_current=page_current, show_all_columns=show_all_columns, use_cache=use_cache)
+	return self.concordance_.concordance(token_str = token_str, 
+									  context_length=context_length, 
+									  order=order, page_size=page_size, 
+									  page_current=page_current, 
+									  show_all_columns=show_all_columns, 
+									  use_cache=use_cache)
 
 # %% ../nbs/57_conc.ipynb 24
 @patch

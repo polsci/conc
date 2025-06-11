@@ -1145,45 +1145,6 @@ def build_test_corpora(
 		save_path:str, # path to save corpora
 		force_rebuild:bool = False # force rebuild of corpora, useful for development and testing
 		):
-	"""Build all test corpora from source files."""
+	"""(Depreciated - moved to conc.corpora) Build all test corpora from source files."""
 
-	corpora = {}
-	corpora['toy'] = {'name': 'Toy Corpus', 'slug': 'toy', 'description': 'Toy corpus is a very small dataset for testing and library development. ', 'extension': '.csv.gz'}
-	corpora['brown'] = {'name': 'Brown Corpus', 'slug': 'brown', 'description': 'A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['reuters'] = {'name': 'Reuters Corpus', 'slug': 'reuters', 'description': 'Reuters corpus (Reuters-21578, Distribution 1.0). "The copyright for the text of newswire articles and Reuters annotations in the Reuters-21578 collection resides with Reuters Ltd. Reuters Ltd. and Carnegie Group, Inc. have agreed to allow the free distribution of this data *for research purposes only*. If you publish results based on this data set, please acknowledge its use, refer to the data set by the name (Reuters-21578, Distribution 1.0), and inform your readers of the current location of the data set." https://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['gutenberg'] = {'name': 'Gutenberg Corpus', 'slug': 'gutenberg', 'description': 'Project Gutenberg Selections NLTK Corpus. Source: https://gutenberg.org/. Public domain. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['garden-party-corpus'] = {'name': 'Garden Party Corpus', 'slug': 'garden-party', 'description': 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party', 'extension': '.zip'}
-
-	if not os.path.exists(source_path):
-		os.makedirs(source_path)
-	if not os.path.exists(save_path):
-		os.makedirs(save_path)
-
-	if not os.path.exists(f'{source_path}toy.csv.gz'):
-		from conc.core import create_toy_corpus_sources
-		create_toy_corpus_sources(source_path)
-
-	if not os.path.exists(f'{source_path}garden-party-corpus.zip'):
-		from conc.core import get_garden_party
-		get_garden_party(source_path)
-
-	if not os.path.exists(f'{source_path}brown.csv.gz'):
-		from conc.core import get_nltk_corpus_sources
-		get_nltk_corpus_sources(source_path)
-
-	for corpus_name, corpus_details in corpora.items():
-		if force_rebuild and os.path.isdir(f'{save_path}{corpus_details["slug"]}.corpus'):
-			import shutil
-			shutil.rmtree(f'{save_path}{corpus_details["slug"]}.corpus', ignore_errors=True)
-
-		try:
-			corpus = Corpus().load(f"{save_path}{corpus_details['slug']}.corpus")
-		except FileNotFoundError:
-
-			if 'csv' in corpus_details['extension']:
-				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_csv(source_path = f'{source_path}{corpus_name}.csv.gz', text_column='text', metadata_columns=['source'], save_path = save_path)
-			else:
-				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_files(source_path = f'{source_path}{corpus_name}{corpus_details["extension"]}', save_path = save_path)
-		except Exception as e:
-			raise e
-		del corpus
+	raise DeprecationWarning("Calling build_test_corpora via conc.corpus is depreciated and will be removed by v1.0.0, instead import as 'from conc.corpora import build_test_corpora' and use 'build_sample_corpora'.")
