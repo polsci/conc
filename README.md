@@ -34,9 +34,10 @@ functionality to annotate texts will be supported soon.
 - work with smaller slices of the data where possible  
 - cache specific anaysis during a session to reduce computation for
   repeated calls  
-- document corpus representations so that they can be worked with
-  directly  
-- allow researchers to work with Conc results and extend analysis using
+- [document corpus representations so that they can be worked with
+  directly](https://geoffford.nz/conc/anatomy.html)  
+- TODO - document this in walkthrough and results module and link here -
+  allow researchers to work with Conc results and extend analysis using
   other Python libraries
 
 ## Table of Contents
@@ -81,6 +82,9 @@ Dr Ford is a researcher with [Te Pokapū Aronui ā-Matihiko \| UC Arts
 Digital Lab (ADL)](https://artsdigitallab.canterbury.ac.nz/). Thanks to
 the ADL team and the ongoing support of the University of Canterbury’s
 Faculty of Arts who make work like this possible.
+
+Thanks to Dr Chris Thomson and Karin Stahel for their feedback on early
+versions of Conc.
 
 ## Development Status
 
