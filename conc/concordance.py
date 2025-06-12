@@ -199,7 +199,7 @@ def concordance_plot(self: Concordance,
 	import numpy as np
 	import plotly.graph_objects as go
 	from plotly.subplots import make_subplots
-	import ipywidgets as widgets
+	#import ipywidgets as widgets
 
 	# Tokenize and get positions
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
@@ -213,172 +213,317 @@ def concordance_plot(self: Concordance,
 	document_ids = self.corpus.get_tokens_by_index('token2doc_index')[token_positions[0]]
 	unique_document_ids = np.unique(document_ids)
 	num_docs = len(unique_document_ids)
-
+	num_pages = math.ceil(num_docs / page_size)
+	
 	font_family = "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;"
 	plots_per_page = page_size
-	num_pages = int(np.ceil(num_docs / plots_per_page))
 	per_subplot_height = 50
+	band_gap = 0.05
+	
 
-	# Create FigureWidget with empty subplots
+	frames = []
+	for page in range(num_pages):
+		start = page * plots_per_page
+		end = min(start + plots_per_page, num_docs)
+		page_document_ids = unique_document_ids[start:end]
+		n_bands = len(page_document_ids)
+		data = []
+		shapes = []
+		annotations = []
+
+		for idx, doc_id in enumerate(page_document_ids):
+			y_base = (n_bands - idx - 1) * (per_subplot_height + band_gap)
+			doc_mask = (document_ids == doc_id)
+			doc_positions = np.array(token_positions[0])[doc_mask]
+			if len(doc_positions) == 0:
+				continue
+
+			# Get min/max positions for normalization
+			tokens_df = self.corpus.tokens.with_row_index('position')
+			doc_range = tokens_df.filter(
+				pl.col('token2doc_index') == doc_id
+			).select(['position']).collect().to_numpy()
+			position_min = doc_range.min()
+			position_max = doc_range.max()
+
+			norm_pos = [
+				(pos - position_min) / (position_max - position_min) * 100 if position_max > position_min else 0
+				for pos in doc_positions
+			]
+			# Example context for each line
+			examples = []
+			for pos in doc_positions:
+				tokens_for_example = self.corpus.get_tokens_by_index('orth_index')[pos-5:pos+6]
+				if self.corpus.EOF_TOKEN in tokens_for_example:
+					positions_eof = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
+					if len(positions_eof) > 0 and positions_eof[0] < 5:
+						tokens_for_example = tokens_for_example[positions_eof[0] + 1:]
+					else:
+						positions_eof = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
+						if len(positions_eof) > 0 and positions_eof[-1] > 5:
+							tokens_for_example = tokens_for_example[:positions_eof[-1]]
+				tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
+				examples.append(' '.join(tokens_for_example))
+
+			# Add concordance lines as vertical traces
+			for x0, example in zip(norm_pos, examples):
+				row = idx + 1
+				data.append(
+					go.Scatter(
+						x=[x0, x0],
+						y=[y_base, y_base + per_subplot_height],
+						mode='lines',
+						line=dict(color='black', width=2),
+						showlegend=False,
+						hoverinfo='text',
+						hovertext=example
+					),
+				)
+			# Doc label and line count as annotation
+			lines_count = len(norm_pos)
+			doc_label = f"Doc {doc_id}"
+			lines_string = f"{lines_count} line" + ("s" if lines_count != 1 else "")
+			annotations.append(
+				dict(
+					text=doc_label,
+					x=-5, y=y_base + per_subplot_height * 0.65,
+					xref="x", yref="y",
+					showarrow=False,
+					xanchor="right",
+					yanchor="middle",
+					font=dict(size=12, family=font_family)
+				)
+			)
+			annotations.append(
+				dict(
+					text=lines_string,
+					x=-5, y=y_base + per_subplot_height * 0.22,
+					xref="x", yref="y",
+					showarrow=False,
+					xanchor="right",
+					yanchor="middle",
+					font=dict(size=11, color="gray", family=font_family)
+				)
+			)
+
+		frames.append(go.Frame(
+			data=data,
+			name=f"{page+1}",
+			layout=go.Layout(
+				annotations=annotations
+			)
+		))
+
 	fig = make_subplots(
 		rows=plots_per_page,
 		cols=1,
 		vertical_spacing=0.05,
 		subplot_titles=[None] * plots_per_page,
-	)
-	fig_widget = go.FigureWidget(fig)
 
-	# Add background shapes and configure axes for each subplot
+	)
+
 	for idx in range(plots_per_page):
 		row = idx + 1
-		fig_widget.add_shape(
+		fig.add_shape(
 			type="rect",
 			x0=0, y0=0, x1=100, y1=1,
 			line=dict(color="black", width=1),
 			fillcolor="gray",
-			opacity=0.08,
+			opacity=0.2,  # more visible
 			layer="below",
 			row=row, col=1
 		)
-		fig_widget.update_xaxes(range=[0, 100], visible=False, fixedrange=True, row=row, col=1)
-		fig_widget.update_yaxes(range=[0, 1], visible=False, fixedrange=True, row=row, col=1)
 
-	fig_widget.update_layout(
+		fig.update_xaxes(range=[0, 100], visible=False, fixedrange=True, row=row, col=1)
+		fig.update_yaxes(range=[0, 1], visible=False, fixedrange=True, row=row, col=1)
+
+	fig.update_layout(
 		height=per_subplot_height * plots_per_page,
 		width=600,
 		showlegend=False,
 		title_text=f'Concordance Plot for "{token_str}"',
 		title_x=0.5,
-		margin=dict(t=40, b=20, l=80, r=20),
-		font=dict(family=font_family, size=12),
+		title_y=0.95,
+		margin=dict(t=50, b=150, l=80, r=20),
+		font=dict(family=font_family, color="black", size=12),
+		plot_bgcolor="white",  # ensure white background
+		paper_bgcolor="white"
 	)
 
 	# Slider for paging
-	page_slider = widgets.IntSlider(value=1, min=1, max=num_pages, step=1, description='Page', layout=widgets.Layout(width='600px', margin='10px 0 10px 0'))
+	# page_slider = widgets.IntSlider(value=1, min=1, max=num_pages, step=1, description='Page', layout=widgets.Layout(width='600px', margin='10px 0 10px 0'))
 
-	footer = widgets.HTML(
-		value=f"<div style='text-align: left; font-size: 12px; color: black; margin-left: 80px;margin-bottom:10px;line-height:1.7;'>{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}</div>"
+
+	footer_text = f"{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}"
+
+	fig.update_layout(
+		annotations=[
+			dict(
+				text=footer_text,
+				xref="paper", yref="paper",
+				x=0, y=-0.30,  # y < 0 puts it below the plot area; adjust as needed
+				showarrow=False,
+				xanchor="left",
+				yanchor="top",
+				align="left",
+				font=dict(size=12, color="black", family=font_family)
+			)
+		]
 	)
 
-	def update(change):
-		page = change['new']
-		fig_widget.data = ()  # Remove all previous traces
-		fig_widget.layout.annotations = ()
 
-		start = (page - 1) * plots_per_page
-		end = min(start + plots_per_page, num_docs)
-		page_document_ids = unique_document_ids[start:end]
+	fig.frames = frames
 
-		# Get min/max positions for normalization
-		doc_range = self.corpus.tokens.with_row_index('position').filter(
-			pl.col('token2doc_index').is_in(page_document_ids)
-		).group_by('token2doc_index').agg([
-			pl.col('position').min().alias('min'),
-			pl.col('position').max().alias('max')
-		]).collect()
+	# # print data for first frame for debugging
+	# print("First frame data:")
+	# if len(frames) > 0:
+	# 	first_frame = frames[0]
+	# 	for trace in first_frame.data:
+	# 		print(f"Trace: {trace.name}, x: {trace.x}, y: {trace.y}, hovertext: {trace.hovertext}")
+	# 	for annotation in frames[0].layout.annotations:
+	# 		print(f"Annotation: {annotation.text}, x: {annotation.x}, y: {annotation.y}")
 
-		# Prepare normalized positions for each doc on this page
-		documents = [[] for _ in range(len(page_document_ids))]
-		normalized_documents = [[] for _ in range(len(page_document_ids))]
-		examples = [[] for _ in range(len(page_document_ids))]
-		for i, doc_id in enumerate(document_ids):
-			if doc_id not in page_document_ids:
-				continue
-			doc_index = np.where(page_document_ids == doc_id)[0][0]
-			documents[doc_index].append(token_positions[0][i])
-			position_min, position_max = doc_range.filter(
-				pl.col('token2doc_index') == doc_id
-			).select(['min', 'max']).to_numpy()[0]
-			norm_pos = (token_positions[0][i] - position_min) / (position_max - position_min) * 100 if position_max > position_min else 0
-			normalized_documents[doc_index].append(norm_pos)
-			tokens_for_example = self.corpus.get_tokens_by_index('orth_index')[token_positions[0][i]-5:token_positions[0][i]+6]
+
+
+	fig.update_layout(
+		sliders=[{
+			"active": 0,
+			"currentvalue": {"prefix": "Page: "},
+			"pad": {"t": 10, "b": 10},
+			"steps": [
+				{
+					"method": "animate",
+					"args": [[f.name], {"frame": {"duration": 0, "redraw": True}, "mode": "immediate"}],
+					"label": str(i+1),
+				}
+				for i, f in enumerate(frames)
+			]
+		}]
+	)
+
+	fig.show(config={'staticPlot': True})  # Renders in notebook or browser	
+
+	# def update(change):
+	# 	page = change['new']
+	# 	fig_widget.data = ()  # Remove all previous traces
+	# 	fig_widget.layout.annotations = ()
+
+	# 	start = (page - 1) * plots_per_page
+	# 	end = min(start + plots_per_page, num_docs)
+	# 	page_document_ids = unique_document_ids[start:end]
+
+	# 	# Get min/max positions for normalization
+	# 	doc_range = self.corpus.tokens.with_row_index('position').filter(
+	# 		pl.col('token2doc_index').is_in(page_document_ids)
+	# 	).group_by('token2doc_index').agg([
+	# 		pl.col('position').min().alias('min'),
+	# 		pl.col('position').max().alias('max')
+	# 	]).collect()
+
+	# 	# Prepare normalized positions for each doc on this page
+	# 	documents = [[] for _ in range(len(page_document_ids))]
+	# 	normalized_documents = [[] for _ in range(len(page_document_ids))]
+	# 	examples = [[] for _ in range(len(page_document_ids))]
+	# 	for i, doc_id in enumerate(document_ids):
+	# 		if doc_id not in page_document_ids:
+	# 			continue
+	# 		doc_index = np.where(page_document_ids == doc_id)[0][0]
+	# 		documents[doc_index].append(token_positions[0][i])
+	# 		position_min, position_max = doc_range.filter(
+	# 			pl.col('token2doc_index') == doc_id
+	# 		).select(['min', 'max']).to_numpy()[0]
+	# 		norm_pos = (token_positions[0][i] - position_min) / (position_max - position_min) * 100 if position_max > position_min else 0
+	# 		normalized_documents[doc_index].append(norm_pos)
+	# 		tokens_for_example = self.corpus.get_tokens_by_index('orth_index')[token_positions[0][i]-5:token_positions[0][i]+6]
 			
-			if self.corpus.EOF_TOKEN in tokens_for_example:
-				positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-				if len(positions) > 0 and positions[0] < 5:
-					tokens_for_example = tokens_for_example[positions[0] + 1:]
-				else:
-					positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-					if len(positions) > 0 and positions[-1] > 5:
-						tokens_for_example = tokens_for_example[:positions[-1]]
-			tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
-			examples[doc_index].append(' '.join(tokens_for_example))
+	# 		if self.corpus.EOF_TOKEN in tokens_for_example:
+	# 			positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
+	# 			if len(positions) > 0 and positions[0] < 5:
+	# 				tokens_for_example = tokens_for_example[positions[0] + 1:]
+	# 			else:
+	# 				positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
+	# 				if len(positions) > 0 and positions[-1] > 5:
+	# 					tokens_for_example = tokens_for_example[:positions[-1]]
+	# 		tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
+	# 		examples[doc_index].append(' '.join(tokens_for_example))
 
-			# yref = "y" if i == 0 else f"y{i + 1} domain"
+	# 		# yref = "y" if i == 0 else f"y{i + 1} domain"
 
-		n_plots_this_page = end - start
-		if n_plots_this_page < plots_per_page or ('old' in change and change['old'] == num_pages):
-			fig_widget.layout.shapes = ()
-			for idx in range(n_plots_this_page):
-				row = idx + 1
-				fig_widget.add_shape(
-					type="rect",
-					x0=0, y0=0, x1=100, y1=1,
-					line=dict(color="black", width=1),
-					fillcolor="gray",
-					opacity=0.08,
-					layer="below",
-					row=row, col=1
-				)
+	# 	n_plots_this_page = end - start
+	# 	if n_plots_this_page < plots_per_page or ('old' in change and change['old'] == num_pages):
+	# 		fig_widget.layout.shapes = ()
+	# 		for idx in range(n_plots_this_page):
+	# 			row = idx + 1
+	# 			fig_widget.add_shape(
+	# 				type="rect",
+	# 				x0=0, y0=0, x1=100, y1=1,
+	# 				line=dict(color="black", width=1),
+	# 				fillcolor="gray",
+	# 				opacity=0.08,
+	# 				layer="below",
+	# 				row=row, col=1
+	# 			)
 
-		# Add traces for each subplot
-		for idx, positions in enumerate(normalized_documents):
-			row = idx + 1
-			for pos, x0 in enumerate(positions):
-				fig_widget.add_trace(
-					go.Scatter(
-						x=[x0, x0],
-						y=[0, 1],
-						mode='lines',
-						line=dict(color='black', width=2),
-						showlegend=False,
-						hoverinfo='text',
-						hovertext=f"{examples[idx][pos]}" if examples[idx] else ""
-					),
-					row=row, col=1
-				)
+	# 	# Add traces for each subplot
+	# 	for idx, positions in enumerate(normalized_documents):
+	# 		row = idx + 1
+	# 		for pos, x0 in enumerate(positions):
+	# 			fig_widget.add_trace(
+	# 				go.Scatter(
+	# 					x=[x0, x0],
+	# 					y=[0, 1],
+	# 					mode='lines',
+	# 					line=dict(color='black', width=2),
+	# 					showlegend=False,
+	# 					hoverinfo='text',
+	# 					hovertext=f"{examples[idx][pos]}" if examples[idx] else ""
+	# 				),
+	# 				row=row, col=1
+	# 			)
 
-			yref = "y" if row == 1 else f"y{row} domain"
+	# 		yref = "y" if row == 1 else f"y{row} domain"
 
-			# doc id from document_ids
-			doc_id = page_document_ids[idx]
-			fig_widget.add_annotation(
-				text=f"Doc {doc_id}",
-				xref="paper", yref=yref,
-				x=-0.03, y=0.65,
-				showarrow=False,
-				xanchor="right",
-				yanchor="middle",
-				font=dict(size=12, family = font_family)
-			)
+	# 		# doc id from document_ids
+	# 		doc_id = page_document_ids[idx]
+	# 		fig_widget.add_annotation(
+	# 			text=f"Doc {doc_id}",
+	# 			xref="paper", yref=yref,
+	# 			x=-0.03, y=0.65,
+	# 			showarrow=False,
+	# 			xanchor="right",
+	# 			yanchor="middle",
+	# 			font=dict(size=12, family = font_family)
+	# 		)
 
-			lines_count = len(normalized_documents[idx])
-			if lines_count == 0:
-				lines_string = "No lines"
-			elif lines_count == 1:
-				lines_string = "1 line"
-			else:
-				# pluralize 'line' based on count
-				# e.g. "5 lines"
-				lines_string = f"{lines_count} lines"
+	# 		lines_count = len(normalized_documents[idx])
+	# 		if lines_count == 0:
+	# 			lines_string = "No lines"
+	# 		elif lines_count == 1:
+	# 			lines_string = "1 line"
+	# 		else:
+	# 			# pluralize 'line' based on count
+	# 			# e.g. "5 lines"
+	# 			lines_string = f"{lines_count} lines"
 
-			fig_widget.add_annotation(
-				text=f"{lines_string}",
-				xref="paper", yref=yref,
-				x=-0.03, y=0.22, 
-				showarrow=False,
-				xanchor="right",
-				yanchor="middle",
-				font=dict(size=11, color="gray", family = font_family)
-			)
+	# 		fig_widget.add_annotation(
+	# 			text=f"{lines_string}",
+	# 			xref="paper", yref=yref,
+	# 			x=-0.03, y=0.22, 
+	# 			showarrow=False,
+	# 			xanchor="right",
+	# 			yanchor="middle",
+	# 			font=dict(size=11, color="gray", family = font_family)
+	# 		)
 
-	# Initial plot
-	update({'new': 1})
-	page_slider.observe(update, names='value')
 
-	display(page_slider)
-	display(fig_widget)
-	display(footer)
+
+	# footer = widgets.HTML(
+	# 	value=f"<div style='text-align: left; font-size: 12px; color: black; margin-left: 80px;margin-bottom:10px;line-height:1.7;'>{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}</div>"
+	# )
+
+	# display(page_slider)
+	# display(fig_widget)
+	# display(footer)
 
 
 
