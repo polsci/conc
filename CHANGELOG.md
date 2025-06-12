@@ -27,6 +27,6 @@
 
 - move memory_profiler from dev to main dependencies
 
-### [0.1.0] - 2025-06-09
+## [0.1.0] - 2025-06-09
 
 Initial release of Conc
