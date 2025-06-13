@@ -16,5 +16,13 @@ website:
     search: true
   sidebar:
     style: floating
+    contents:
+      - auto: "/*.ipynb"
+      - text: "Introduction to Conc"
+        href: index.ipynb
+      - section: Explanations
+        contents: explanations/*
+      - section: API
+        contents: api/*
 
-metadata-files: [nbdev.yml, sidebar.yml]
+metadata-files: [nbdev.yml]

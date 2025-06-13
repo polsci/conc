@@ -1,0 +1,23 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - section: api
+        contents:
+          - api/45_corpus.ipynb
+          - api/50_conc.ipynb
+          - api/52_corpora.ipynb
+          - api/70_frequency.ipynb
+          - api/71_ngrams.ipynb
+          - api/72_concordance.ipynb
+          - api/73_keyness.ipynb
+          - api/74_collocates.ipynb
+          - api/76_result.ipynb
+          - api/78_text.ipynb
+          - api/80_core.ipynb
+        href: api/index.qmd
+      - section: explanations
+        contents:
+          - explanations/40_anatomy.ipynb
+          - explanations/90_performance.ipynb
+        href: explanations/index.qmd

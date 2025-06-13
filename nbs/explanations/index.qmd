@@ -1,0 +1,14 @@
+---
+order: 6
+title: Explanations
+listing:
+  fields: [title, description]
+  type: table
+  sort: "filename"
+  sort-ui: false
+  filter-ui: false
+toc: false
+page-layout: full
+---
+
+This section provides information on Conc, how it works, and how to access Conc results or data structures for use with other Python libraries.

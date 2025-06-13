@@ -1,0 +1,14 @@
+---
+order: 9
+title: API
+listing:
+  fields: [title, description]
+  type: table
+  sort: "filename"
+  sort-ui: false
+  filter-ui: false
+toc: false
+page-layout: full
+---
+
+This section documents the Conc API. Conc's submodules are listed below. There are specific modules for different kinds of analysis or reporting. This may be helpful for understand functionality, but if you want to use Conc you can load a corpus with the `Corpus` class and access the main reporting functionality using the `Conc` class.   

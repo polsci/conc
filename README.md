@@ -171,24 +171,24 @@ for analysis. The current Conc components are listed below.
 
 | Class / Function | Module | Functionality | Note |
 |----|----|----|----|
-| [`Corpus`](https://geoffford.nz/conc/corpus.html#corpus) | conc.corpus | Build and load and get information on a corpus, methods to work with a corpus | Required |
-| [`Conc`](https://geoffford.nz/conc/conc.html#conc) | conc.conc | Inferface to Conc reports for corpus analysis | Recommended way to access reports for analysis, requires a corpus created by Corpus module |
-| [`Text`](https://geoffford.nz/conc/text.html#text) | conc.text | Output text from the corpus | Access via Corpus |
-| [`Frequency`](https://geoffford.nz/conc/frequency.html#frequency) | conc.frequency | Frequency reporting | Access via Conc |
-| [`Ngrams`](https://geoffford.nz/conc/ngrams.html#ngrams) | conc.ngrams | Reporting on `ngram_frequencies` across corpus and `ngrams` containing specific tokens | Access via Conc |
-| [`Concordance`](https://geoffford.nz/conc/concordance.html#concordance) | conc.concordance | Concordancing | Access via Conc |
-| [`Keyness`](https://geoffford.nz/conc/keyness.html#keyness) | conc.keyness | Reporting for keyness analysis | Access via Conc |
-| [`Collocates`](https://geoffford.nz/conc/collocates.html#collocates) | conc.collocates | Reporting for collocation analysis | Access via Conc |
-| [`Result`](https://geoffford.nz/conc/result.html#result) | conc.result | Handles report results, output result as table or get dataframe | Used by all reports |
-| [`ConcLogger`](https://geoffford.nz/conc/core.html#conclogger) | conc.core | Logger | Logging implemented in all modules |
-| [`CorpusMetadata`](https://geoffford.nz/conc/core.html#corpusmetadata) | conc.core | Class to validate Corpus Metadata JSON | Used by Corpus class |
+| [`Corpus`](https://geoffford.nz/conc/api/corpus.html#corpus) | conc.corpus | Build and load and get information on a corpus, methods to work with a corpus | Required |
+| [`Conc`](https://geoffford.nz/conc/api/conc.html#conc) | conc.conc | Inferface to Conc reports for corpus analysis | Recommended way to access reports for analysis, requires a corpus created by Corpus module |
+| [`Text`](https://geoffford.nz/conc/api/text.html#text) | conc.text | Output text from the corpus | Access via Corpus |
+| [`Frequency`](https://geoffford.nz/conc/api/frequency.html#frequency) | conc.frequency | Frequency reporting | Access via Conc |
+| [`Ngrams`](https://geoffford.nz/conc/api/ngrams.html#ngrams) | conc.ngrams | Reporting on `ngram_frequencies` across corpus and `ngrams` containing specific tokens | Access via Conc |
+| [`Concordance`](https://geoffford.nz/conc/api/concordance.html#concordance) | conc.concordance | Concordancing | Access via Conc |
+| [`Keyness`](https://geoffford.nz/conc/api/keyness.html#keyness) | conc.keyness | Reporting for keyness analysis | Access via Conc |
+| [`Collocates`](https://geoffford.nz/conc/api/collocates.html#collocates) | conc.collocates | Reporting for collocation analysis | Access via Conc |
+| [`Result`](https://geoffford.nz/conc/api/result.html#result) | conc.result | Handles report results, output result as table or get dataframe | Used by all reports |
+| [`ConcLogger`](https://geoffford.nz/conc/api/core.html#conclogger) | conc.core | Logger | Logging implemented in all modules |
+| [`CorpusMetadata`](https://geoffford.nz/conc/api/core.html#corpusmetadata) | conc.core | Class to validate Corpus Metadata JSON | Used by Corpus class |
 
 The conc.core module implements a number of helpful functions …
 
 | Function | Functionality |
 |----|----|
-| [`list_corpora`](https://geoffford.nz/conc/core.html#list_corpora) | Scan a directory for corpora and return a summary |
-| [`get_stop_words`](https://geoffford.nz/conc/core.html#get_stop_words) | Get a spaCy stop word list list for a specific model |
+| [`list_corpora`](https://geoffford.nz/conc/api/core.html#list_corpora) | Scan a directory for corpora and return a summary |
+| [`get_stop_words`](https://geoffford.nz/conc/api/core.html#get_stop_words) | Get a spaCy stop word list list for a specific model |
 | Various - see `Get data sources` | Functions to download source texts to create sample corpora. Primarily intended for development/testing. To minimize requirements not all libraries are installed by default. Functions will raise errors with information on installing required libraries. |
 
 ## Roadmap
