@@ -12,7 +12,6 @@ from fastcore.basics import patch
 import msgspec
 from IPython.display import display, HTML
 
-
 # %% auto 0
 __all__ = ['Concordance']
 
@@ -283,7 +282,7 @@ def _get_concordance_plot_style(
 	html_styles += '.conc-plot-wrapper h3, .conc-concordance-plot-summary { font-size: ' + str(default_font_size * 1.25) + 'px; }'
 	html_styles += '.conc-concordance-plot-controls label { font-size: ' + str(default_font_size) + 'px; }'
 	html_styles += '</style>'
-	# TODO probably use minify-html
+
 	return html_styles
 
 
@@ -293,10 +292,31 @@ def _get_concordance_plot_script(
 	self: Concordance,
 	) -> str:
 	""" Get the JavaScript for the concordance plot. """
-	# TODO - need option to append '(token x of y)' to str
-	# TODO - need handling of eof token and err token
-	html_script = '''<script>
+
+	html_script = '''
+	function filter_token_ids(token_ids) {
+		var centre_index = Math.floor(token_ids.length / 2);
+		var left_tokens = token_ids.slice(0, centre_index);
+		var right_tokens = token_ids.slice(centre_index);
+		if (left_tokens.includes(eof_token)) {
+			var eof_index_pos = left_tokens.lastIndexOf(eof_token);
+			if (eof_index_pos !== -1) {
+				left_tokens = left_tokens.slice(eof_index_pos + 1);
+			}
+		}
+		if (right_tokens.includes(eof_token)) {
+			var eof_index_pos = right_tokens.indexOf(eof_token);
+			if (eof_index_pos !== -1) {
+				right_tokens = right_tokens.slice(0, eof_index_pos);
+			}
+		}
+		token_ids = left_tokens.concat(right_tokens);
+		return token_ids;
+	}
 	function token_ids_to_str(token_ids) {
+		if (token_ids.includes(eof_token)) {
+			token_ids = filter_token_ids(token_ids);
+		}
 		const token_strs = [];
 		for (let i = 0; i < token_ids.length; i++) {
 			const token_id = token_ids[i];
@@ -308,19 +328,9 @@ def _get_concordance_plot_script(
 		}
 		return token_strs.join(' ');
 	}
-	function populatePlot(page, plots_per_page) {
-		const row_height = 60;
-		const start_first_row_at = 30;
-		const row_adjustment = row_height - start_first_row_at;
-		const default_font_size = 12;
-		const subplot_height = 40;
-		const plot_height = start_first_row_at + (row_height * plots_per_page) + subplot_height - row_height;
-		const plot_x = 160;
-		const label_x_right = plot_x - 10;
-		const footer_margin = 20;
-
-		start = (page - 1) * plots_per_page;
-		end = start + plots_per_page;
+	function populatePlot(page, page_size) {
+		start = (page - 1) * page_size;
+		end = start + page_size;
 		const plot = document.getElementById('conc-concordance-plot');
 		const lines = plot.getElementsByClassName('conc-concordance-plot-line');
 		while (lines.length > 0) {
@@ -401,7 +411,12 @@ def _get_concordance_plot_script(
 				text.setAttribute('text-anchor', anchor);
 				text.setAttribute('font-size', '12');
 				text.setAttribute('fill', 'black');
-				text.textContent = token_ids_to_str(examples[i].orth_indices[j]);
+				append = ''
+				if (append_info) {
+					position_offset_1 = doc.positions[j] + 1;
+					append = ` (token ${position_offset_1} of ${doc.count})`;
+				}
+				text.textContent = token_ids_to_str(examples[i].orth_indices[j]) + append;
 				line.appendChild(text);
 				plot.appendChild(line);
 			}
@@ -409,8 +424,28 @@ def _get_concordance_plot_script(
 		}
 	}
 
-	</script>'''
-
+	function tryInit() {
+	const targetNode = document.getElementById('conc-plot-wrapper');
+	if (targetNode && targetNode.querySelector('.conc-plot-footer')) {
+		vizInit();
+		return true;
+	}
+	return false;
+	}
+	function vizInit() {
+		current_page = 1;
+		const slider = document.getElementById('conc-concordance-plot-slider');
+		
+		populatePlot(current_page, page_size);
+		slider.addEventListener('input', function() {
+			const page = parseInt(this.value, 10);
+			populatePlot(page, page_size);
+			const page_number = document.getElementById('conc-concordance-plot-page-number');
+			page_number.textContent = `${page}`;
+		});
+	}
+	
+	'''
 	return html_script
 
 # %% ../nbs/72_concordance.ipynb 25
@@ -418,20 +453,19 @@ def _get_concordance_plot_script(
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
 				page_size: int = 10, # number of plots per page
+				append_info: bool = True # append token position info to the concordance line preview screens visible when hover over the plot lines
 				):
-	"""Create concordance plot."""
+	"""Display a concordance plot."""
 
-	# TODO - sort between here and js - make configurable and ensure used where should be - check by tweaking page_size
-	plots_per_page = 10
+	# may make these configurable in function call in the future - but would need to ensure these don't have to passed to styles
 	row_height = 60
 	start_first_row_at = 30
 	row_adjustment = row_height - start_first_row_at
 	default_font_size = 12
 	subplot_height = 40
-	plot_height = start_first_row_at + (row_height * plots_per_page) + subplot_height - row_height
+	plot_height = start_first_row_at + (row_height * page_size) + subplot_height - row_height
 	plot_x = 160
 	label_x_right = plot_x - 10
-	footer_margin = 20
 
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 	token_positions = self.corpus.get_token_positions(token_sequence, index_id)
@@ -470,7 +504,7 @@ def concordance_plot(self: Concordance,
 		(pl.col('position') + 2).alias('position_5'),
 		(pl.col('position') + 3).alias('position_6'),
 	)
-	# using 3 tokens either side for testing - but will adjust to 5 tokens either side TODO tweak so configurable
+	# using 3 tokens either side for initial release - see range below and hardcoded positions above - tweak so configurable in future release
 	for i in range(0, 7): 
 		if i == 3: # node
 			continue
@@ -517,12 +551,28 @@ def concordance_plot(self: Concordance,
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8"><title>Conc Plot</title>
-	{(self._get_concordance_plot_style(default_font_size=default_font_size))}
-	{(self._get_concordance_plot_script())}
-	</head>
-	<body>'''
+	'''
 
-	html += '<div class="conc-plot-wrapper">'
+	html += '<script>\n'
+	html += f'var eof_token = {self.corpus.EOF_TOKEN};\n'
+	html += f'var page_size = {page_size};\n'
+	html += f'var append_info = {"true" if append_info else "false"};\n'
+	html += f'var row_height = {row_height};\n'
+	html += f'var start_first_row_at = {start_first_row_at};\n'
+	html += f'var row_adjustment = {row_adjustment};\n'
+	html += f'var default_font_size = {default_font_size};\n'
+	html += f'var subplot_height = {subplot_height};\n'
+	html += f'var plot_height = {plot_height};\n'
+	html += f'var plot_x = {plot_x};\n'
+	html += f'var label_x_right = {label_x_right};\n'
+	html += 'var docs = ' + msgspec.json.encode([row for row in docs_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
+	html += 'var tokens = ' + msgspec.json.encode({row['token_id']: row['token'] for row in unique_df.collect().iter_rows(named=True)}).decode("utf-8") + ';\n'
+	html += 'var examples = ' + msgspec.json.encode([row for row in examples_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
+	html += f'{(self._get_concordance_plot_script())}\n'
+	html += '</script>\n'
+	html += f'''{(self._get_concordance_plot_style(default_font_size=default_font_size))}</head><body>'''
+
+	html += '<div class="conc-plot-wrapper" id="conc-plot-wrapper">'
 	html += f'<h2>Concordance Plot for &quot;{token_str}&quot;</h2>'
 	html += f'<h3>{self.corpus.name}</h3>'
 	html += f'<svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
@@ -534,36 +584,32 @@ def concordance_plot(self: Concordance,
 	html += '</svg>'
 	html += f'<div class="conc-concordance-plot-summary">Total Documents: {num_docs}<br>Total Concordance Lines: {concordance_lines}</div>'
 	html += f'''<div class="conc-concordance-plot-controls"><label for="conc-concordance-plot-slider" id="conc-concordance-plot-slider-label">Page <span id="conc-concordance-plot-page-number">1</span> of {num_pages}</label>
-	<input type="range" min="1" max="{num_pages}" value="1" step="1" class="slider" id="conc-concordance-plot-slider"></div>
+	<input type="range" min="1" max="{num_pages}" value="1" step="1" class="slider" id="conc-concordance-plot-slider" autocomplete="off"></div>
+	<div class="conc-plot-footer"></div>
 	</div>'''
 
-	html += '<script>'
-	html += 'const docs = ' + msgspec.json.encode([row for row in docs_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
-	html += 'const tokens = ' + msgspec.json.encode({row['token_id']: row['token'] for row in unique_df.collect().iter_rows(named=True)}).decode("utf-8") + ';\n'
-	html += 'const examples = ' + msgspec.json.encode([row for row in examples_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
-
-	# TODO - handle this better-  issues on vs code
-	# TODO slider on page refresh may not be set to 1 - get current page slider position
-	# TODO - populate the plots_per_page parameter below from page_size - currently hardcoded
 	html += '''
-	populatePlot(1, 10);
-	const slider = document.getElementById('conc-concordance-plot-slider');
-	slider.addEventListener('input', function() {
-		const page = parseInt(this.value, 10);
-		populatePlot(page, 10);
-		const page_number = document.getElementById('conc-concordance-plot-page-number');
-		page_number.textContent = `${page}`;
+	<script>
+
+
+	if (!tryInit()) {
+	// Only set up observer if not ready yet
+	const observer = new MutationObserver(function(mutationsList, observer) {
+		if (tryInit()) {
+		observer.disconnect();
+		}
 	});
-	'''
-
-	html += '</script>'
-
-	html += '''</body>
+	observer.observe(document.body, { childList: true, subtree: true });
+	}
+	</script>
+	</body>
 	</html>'''
 
-	# TODO - remove this when not debugging
-	with open('tmp.html', 'w', encoding='utf8') as f:
-		f.write(html)
+	# may add rust based minify-html here in future
+
+	# leaving for debug option in future
+	# with open('tmp.html', 'w', encoding='utf8') as f:
+	# 	f.write(html)
 
 	display(HTML(html))
 	#return html	
