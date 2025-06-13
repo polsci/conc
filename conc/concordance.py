@@ -9,9 +9,9 @@ import numpy as np
 import polars as pl
 import math
 from fastcore.basics import patch
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import ipywidgets as widgets
+import msgspec
+from IPython.display import display, HTML
+
 
 # %% auto 0
 __all__ = ['Concordance']
@@ -191,17 +191,248 @@ def concordance(self: Concordance,
 
 # %% ../nbs/72_concordance.ipynb 23
 @patch
+def _get_concordance_plot_style(
+	self: Concordance,
+	default_font_size: int = 12, # default font size for the plot
+	) -> str: # HTML styles markup
+	""" Get the HTML styles for the concordance plot. """
+
+	html_styles = '''<style>
+	.conc-plot-wrapper {
+	background: #fff;
+	width:1000px;
+	color: #000;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.1;
+	margin: 20px 0 20px 0;
+	}
+	.conc-plot-wrapper h2 {
+	color: #000;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	text-align:center;
+	font-weight: 600;
+	line-height: 2;
+	margin:0;
+	padding:0;
+	}
+	.conc-plot-wrapper h3 {
+	color: #000;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	text-align:center;
+	font-weight: 300;
+	line-height: 1;
+	margin:0;
+	padding:0;
+	}
+	.conc-concordance-plot {
+	}
+	.conc-concordance-plot-summary {
+	margin: 20px 40px 10px 160px;
+	color: #000;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	}
+	.conc-concordance-plot-controls {
+	height: 60px;
+	margin: 0 40px 20px 40px;
+	}
+	.conc-concordance-plot-controls input[type="range"] {
+	-webkit-appearance: none;
+	width: 100%;
+	height: 15px;
+	background: #ccc;
+	border-radius: 5px;
+	outline: none;
+	opacity: 0.7;
+	transition: opacity .2s;
+	}
+	.conc-concordance-plot-controls label {
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	color: #000;
+	display: block;
+	margin-bottom: 5px;
+	}
+	.conc-concordance-plot rect {
+	fill: #ccc;
+	width: 800px;
+	height: 40px;
+	}
+	.conc-concordance-plot .label {
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	}
+	g.conc-concordance-plot-line {
+	cursor: pointer;
+	}
+	g.conc-concordance-plot-line line {
+	stroke:#666;
+	}
+	g.conc-concordance-plot-line:hover line {
+	stroke:#000;
+	}
+	g.conc-concordance-plot-line > text {
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+	display:none;
+	}
+	g.conc-concordance-plot-line:hover > text {
+	display:block;
+	}
+	g.conc-concordance-plot-line.highlight line {
+	}
+	'''
+	html_styles += '.conc-plot-wrapper { font-size: ' + str(default_font_size) + 'px; }'
+	html_styles += '.conc-plot-wrapper h2 { font-size: ' + str(default_font_size * 2) + 'px; }'
+	html_styles += '.conc-plot-wrapper h3, .conc-concordance-plot-summary { font-size: ' + str(default_font_size * 1.25) + 'px; }'
+	html_styles += '.conc-concordance-plot-controls label { font-size: ' + str(default_font_size) + 'px; }'
+	html_styles += '</style>'
+	# TODO probably use minify-html
+	return html_styles
+
+
+# %% ../nbs/72_concordance.ipynb 24
+@patch
+def _get_concordance_plot_script(
+	self: Concordance,
+	) -> str:
+	""" Get the JavaScript for the concordance plot. """
+	# TODO - need option to append '(token x of y)' to str
+	# TODO - need handling of eof token and err token
+	html_script = '''<script>
+	function token_ids_to_str(token_ids) {
+		const token_strs = [];
+		for (let i = 0; i < token_ids.length; i++) {
+			const token_id = token_ids[i];
+			if (tokens[token_id]) {
+				token_strs.push(tokens[token_id]);
+			} else {
+				token_strs.push(`Unknown Token ID: ${token_id}`);
+			}
+		}
+		return token_strs.join(' ');
+	}
+	function populatePlot(page, plots_per_page) {
+		const row_height = 60;
+		const start_first_row_at = 30;
+		const row_adjustment = row_height - start_first_row_at;
+		const default_font_size = 12;
+		const subplot_height = 40;
+		const plot_height = start_first_row_at + (row_height * plots_per_page) + subplot_height - row_height;
+		const plot_x = 160;
+		const label_x_right = plot_x - 10;
+		const footer_margin = 20;
+
+		start = (page - 1) * plots_per_page;
+		end = start + plots_per_page;
+		const plot = document.getElementById('conc-concordance-plot');
+		const lines = plot.getElementsByClassName('conc-concordance-plot-line');
+		while (lines.length > 0) {
+			lines[0].remove();
+		}
+		const labels = plot.getElementsByClassName('label');
+		while (labels.length > 0) {
+			labels[0].remove();
+		}
+		const rects = plot.getElementsByTagName('rect');
+		for (let i = 0; i < rects.length; i++) {
+			rects[i].setAttribute('style', 'opacity:1;');
+		}
+		for (let i = start; i < end; i++) {
+			page_i = (i - start + 1)
+			if (i >= docs.length) {
+				const rect = document.getElementById(`rect-${page_i}`);
+				if (rect) {
+					rect.setAttribute('style', 'opacity:0;');
+				}
+				continue;
+			}
+			const doc = docs[i];
+			const plot_y = (page_i * row_height) - row_adjustment;
+			const label_y = plot_y + (default_font_size * 1.4);
+			const label_y2 = plot_y + (default_font_size * 1.4 * 2);
+			const doc_positions_count = doc.positions.length;
+			const line_text = doc_positions_count === 1 ? '1 line' : `${doc_positions_count} lines`;
+			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			label.setAttribute('class', 'label');
+			label.setAttribute('x', label_x_right);
+			label.setAttribute('y', label_y);
+			label.setAttribute('font-size', default_font_size);
+			label.setAttribute('text-anchor', 'end');
+			label.textContent = `Doc ${doc.doc_id}`;
+			plot.appendChild(label);
+			const label2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			label2.setAttribute('class', 'label');
+			label2.setAttribute('x', label_x_right);
+			label2.setAttribute('y', label_y2);
+			label2.setAttribute('font-size', default_font_size);
+			label2.setAttribute('text-anchor', 'end');
+			label2.textContent = line_text;
+			plot.appendChild(label2);
+			const positions = doc.positions;
+			const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
+			for (let j = 0; j < x_values.length; j++) {
+				const x_value = x_values[j];
+				const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+				line.setAttribute('class', 'conc-concordance-plot-line');
+				const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+				line1.setAttribute('x1', plot_x + x_value);
+				line1.setAttribute('y1', plot_y);
+				line1.setAttribute('x2', plot_x + x_value);
+				line1.setAttribute('y2', plot_y + subplot_height);
+				line1.setAttribute('style', 'stroke-width:10;opacity:0;');
+				line.appendChild(line1);
+				const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+				line2.setAttribute('x1', plot_x + x_value);
+				line2.setAttribute('y1', plot_y);
+				line2.setAttribute('x2', plot_x + x_value);
+				line2.setAttribute('y2', plot_y + subplot_height);
+				line2.setAttribute('style', 'stroke-width:2;');
+				line.appendChild(line2);
+				let anchor = 'middle';
+				let x_adjustment = 0;
+				if (x_value < 150) {
+					anchor = 'start';
+					x_adjustment = -30;
+				}
+				if (x_value > 650) {
+					anchor = 'end';
+					x_adjustment = 30;
+				}
+				const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+				text.setAttribute('x', plot_x + x_value + x_adjustment);
+				text.setAttribute('y', plot_y - 5);
+				text.setAttribute('text-anchor', anchor);
+				text.setAttribute('font-size', '12');
+				text.setAttribute('fill', 'black');
+				text.textContent = token_ids_to_str(examples[i].orth_indices[j]);
+				line.appendChild(text);
+				plot.appendChild(line);
+			}
+
+		}
+	}
+
+	</script>'''
+
+	return html_script
+
+# %% ../nbs/72_concordance.ipynb 25
+@patch
 def concordance_plot(self: Concordance,
-					 token_str: str,
-					 page_size: int = 10):
-	"""Display concordance plot."""
+				token_str: str, # token string for concordance plot
+				page_size: int = 10, # number of plots per page
+				):
+	"""Create concordance plot."""
 
-	import numpy as np
-	import plotly.graph_objects as go
-	from plotly.subplots import make_subplots
-	#import ipywidgets as widgets
+	# TODO - sort between here and js - make configurable and ensure used where should be - check by tweaking page_size
+	plots_per_page = 10
+	row_height = 60
+	start_first_row_at = 30
+	row_adjustment = row_height - start_first_row_at
+	default_font_size = 12
+	subplot_height = 40
+	plot_height = start_first_row_at + (row_height * plots_per_page) + subplot_height - row_height
+	plot_x = 160
+	label_x_right = plot_x - 10
+	footer_margin = 20
 
-	# Tokenize and get positions
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 	token_positions = self.corpus.get_token_positions(token_sequence, index_id)
 	sequence_len = len(token_sequence[0])
@@ -210,322 +441,129 @@ def concordance_plot(self: Concordance,
 		print("No matches found.")
 		return
 
-	document_ids = self.corpus.get_tokens_by_index('token2doc_index')[token_positions[0]]
-	unique_document_ids = np.unique(document_ids)
-	num_docs = len(unique_document_ids)
+	lines_df = self.corpus.tokens.with_row_index('position').filter(
+		pl.col('position').is_in(token_positions[0])
+	).select(pl.col('position'), pl.col('token2doc_index').alias('doc_id'), pl.col('orth_index').alias('orth_index_3')).sort(by = ['doc_id', 'position'])
+
+	examples_df = lines_df
+
+	lines_df = lines_df.join(
+		self.corpus.tokens.with_row_index('position').group_by('token2doc_index').agg([
+			pl.col('position').min().alias('min'),
+			pl.col('position').max().alias('max')
+		]).select(pl.col('token2doc_index').alias('doc_id'), pl.col('min'), pl.col('max')),
+		on='doc_id',
+		how='inner', #only want rows where doc_id is in lines_df
+		maintain_order='left'
+	)
+
+	docs_df = lines_df.with_columns((pl.col('position') - pl.col('min')).alias('position'), (pl.col('max') - pl.col('min')).alias('count')).group_by('doc_id').agg([
+		pl.col('position').alias('positions'),
+		pl.col('count').first().alias('count'),
+	])
+
+	examples_df = examples_df.with_columns(
+		(pl.col('position') - 3).alias('position_0'),
+		(pl.col('position') - 2).alias('position_1'),
+		(pl.col('position') - 1).alias('position_2'),
+		(pl.col('position') + 1).alias('position_4'),
+		(pl.col('position') + 2).alias('position_5'),
+		(pl.col('position') + 3).alias('position_6'),
+	)
+	# using 3 tokens either side for testing - but will adjust to 5 tokens either side TODO tweak so configurable
+	for i in range(0, 7): 
+		if i == 3: # node
+			continue
+		else:
+			examples_df = examples_df.join(
+				self.corpus.tokens.with_row_index('position').select(
+					pl.col('orth_index').alias(f'orth_index_{i}'),
+					pl.col('position').alias(f'position_{i}')
+				),
+				on=f'position_{i}',
+				how='inner',
+				maintain_order='left'
+			).drop(f'position_{i}')
+
+	orth_index_columns = [f'orth_index_{i}' for i in range(7)]
+
+	examples_df = examples_df.select(
+		pl.col('doc_id'),
+		pl.col('position'),
+		*orth_index_columns
+		).with_columns(pl.concat_list(orth_index_columns).alias('orth_indices')).sort(by=['doc_id', 'position'])
+
+	unique_df = examples_df.explode('orth_indices').select(
+		pl.col('orth_indices').unique().alias('token_id')
+	)
+
+	examples_df = examples_df.drop(orth_index_columns).drop('position')
+	examples_df = examples_df.group_by('doc_id').agg(
+		pl.concat_list(pl.col('orth_indices')).alias('orth_indices'),
+	).sort(by='doc_id')
+	
+	unique_df = unique_df.join(
+		self.corpus.vocab.select(pl.col('token_id'), pl.col('token')),
+		on='token_id',
+		how='left', 
+		maintain_order='left'
+	).sort(by='token_id')
+
+	concordance_lines = len(token_positions[0])
+	num_docs = docs_df.select(pl.len()).collect().item()
 	num_pages = math.ceil(num_docs / page_size)
-	
-	font_family = "'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;"
-	plots_per_page = page_size
-	per_subplot_height = 50
-	band_gap = 0.05
-	
 
-	frames = []
-	for page in range(num_pages):
-		start = page * plots_per_page
-		end = min(start + plots_per_page, num_docs)
-		page_document_ids = unique_document_ids[start:end]
-		n_bands = len(page_document_ids)
-		data = []
-		shapes = []
-		annotations = []
+	html = f'''<!doctype html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"><title>Conc Plot</title>
+	{(self._get_concordance_plot_style(default_font_size=default_font_size))}
+	{(self._get_concordance_plot_script())}
+	</head>
+	<body>'''
 
-		for idx, doc_id in enumerate(page_document_ids):
-			y_base = (n_bands - idx - 1) * (per_subplot_height + band_gap)
-			doc_mask = (document_ids == doc_id)
-			doc_positions = np.array(token_positions[0])[doc_mask]
-			if len(doc_positions) == 0:
-				continue
+	html += '<div class="conc-plot-wrapper">'
+	html += f'<h2>Concordance Plot for &quot;{token_str}&quot;</h2>'
+	html += f'<h3>{self.corpus.name}</h3>'
+	html += f'<svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
+	# tmp
+	row_adjustment = row_height - start_first_row_at
+	n_plots_this_page = page_size
+	for i in range(1, page_size + 1):
+		html += f'<rect id="rect-{i}" x="{plot_x}" y="{((i * row_height) - row_adjustment)}" height="40" width="800" />'
+	html += '</svg>'
+	html += f'<div class="conc-concordance-plot-summary">Total Documents: {num_docs}<br>Total Concordance Lines: {concordance_lines}</div>'
+	html += f'''<div class="conc-concordance-plot-controls"><label for="conc-concordance-plot-slider" id="conc-concordance-plot-slider-label">Page <span id="conc-concordance-plot-page-number">1</span> of {num_pages}</label>
+	<input type="range" min="1" max="{num_pages}" value="1" step="1" class="slider" id="conc-concordance-plot-slider"></div>
+	</div>'''
 
-			# Get min/max positions for normalization
-			tokens_df = self.corpus.tokens.with_row_index('position')
-			doc_range = tokens_df.filter(
-				pl.col('token2doc_index') == doc_id
-			).select(['position']).collect().to_numpy()
-			position_min = doc_range.min()
-			position_max = doc_range.max()
+	html += '<script>'
+	html += 'const docs = ' + msgspec.json.encode([row for row in docs_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
+	html += 'const tokens = ' + msgspec.json.encode({row['token_id']: row['token'] for row in unique_df.collect().iter_rows(named=True)}).decode("utf-8") + ';\n'
+	html += 'const examples = ' + msgspec.json.encode([row for row in examples_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
 
-			norm_pos = [
-				(pos - position_min) / (position_max - position_min) * 100 if position_max > position_min else 0
-				for pos in doc_positions
-			]
-			# Example context for each line
-			examples = []
-			for pos in doc_positions:
-				tokens_for_example = self.corpus.get_tokens_by_index('orth_index')[pos-5:pos+6]
-				if self.corpus.EOF_TOKEN in tokens_for_example:
-					positions_eof = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-					if len(positions_eof) > 0 and positions_eof[0] < 5:
-						tokens_for_example = tokens_for_example[positions_eof[0] + 1:]
-					else:
-						positions_eof = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-						if len(positions_eof) > 0 and positions_eof[-1] > 5:
-							tokens_for_example = tokens_for_example[:positions_eof[-1]]
-				tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
-				examples.append(' '.join(tokens_for_example))
+	# TODO - handle this better-  issues on vs code
+	# TODO slider on page refresh may not be set to 1 - get current page slider position
+	# TODO - populate the plots_per_page parameter below from page_size - currently hardcoded
+	html += '''
+	populatePlot(1, 10);
+	const slider = document.getElementById('conc-concordance-plot-slider');
+	slider.addEventListener('input', function() {
+		const page = parseInt(this.value, 10);
+		populatePlot(page, 10);
+		const page_number = document.getElementById('conc-concordance-plot-page-number');
+		page_number.textContent = `${page}`;
+	});
+	'''
 
-			# Add concordance lines as vertical traces
-			for x0, example in zip(norm_pos, examples):
-				row = idx + 1
-				data.append(
-					go.Scatter(
-						x=[x0, x0],
-						y=[y_base, y_base + per_subplot_height],
-						mode='lines',
-						line=dict(color='black', width=2),
-						showlegend=False,
-						hoverinfo='text',
-						hovertext=example
-					),
-				)
-			# Doc label and line count as annotation
-			lines_count = len(norm_pos)
-			doc_label = f"Doc {doc_id}"
-			lines_string = f"{lines_count} line" + ("s" if lines_count != 1 else "")
-			annotations.append(
-				dict(
-					text=doc_label,
-					x=-5, y=y_base + per_subplot_height * 0.65,
-					xref="x", yref="y",
-					showarrow=False,
-					xanchor="right",
-					yanchor="middle",
-					font=dict(size=12, family=font_family)
-				)
-			)
-			annotations.append(
-				dict(
-					text=lines_string,
-					x=-5, y=y_base + per_subplot_height * 0.22,
-					xref="x", yref="y",
-					showarrow=False,
-					xanchor="right",
-					yanchor="middle",
-					font=dict(size=11, color="gray", family=font_family)
-				)
-			)
+	html += '</script>'
 
-		frames.append(go.Frame(
-			data=data,
-			name=f"{page+1}",
-			layout=go.Layout(
-				annotations=annotations
-			)
-		))
+	html += '''</body>
+	</html>'''
 
-	fig = make_subplots(
-		rows=plots_per_page,
-		cols=1,
-		vertical_spacing=0.05,
-		subplot_titles=[None] * plots_per_page,
+	# TODO - remove this when not debugging
+	with open('tmp.html', 'w', encoding='utf8') as f:
+		f.write(html)
 
-	)
-
-	for idx in range(plots_per_page):
-		row = idx + 1
-		fig.add_shape(
-			type="rect",
-			x0=0, y0=0, x1=100, y1=1,
-			line=dict(color="black", width=1),
-			fillcolor="gray",
-			opacity=0.2,  # more visible
-			layer="below",
-			row=row, col=1
-		)
-
-		fig.update_xaxes(range=[0, 100], visible=False, fixedrange=True, row=row, col=1)
-		fig.update_yaxes(range=[0, 1], visible=False, fixedrange=True, row=row, col=1)
-
-	fig.update_layout(
-		height=per_subplot_height * plots_per_page,
-		width=600,
-		showlegend=False,
-		title_text=f'Concordance Plot for "{token_str}"',
-		title_x=0.5,
-		title_y=0.95,
-		margin=dict(t=50, b=150, l=80, r=20),
-		font=dict(family=font_family, color="black", size=12),
-		plot_bgcolor="white",  # ensure white background
-		paper_bgcolor="white"
-	)
-
-	# Slider for paging
-	# page_slider = widgets.IntSlider(value=1, min=1, max=num_pages, step=1, description='Page', layout=widgets.Layout(width='600px', margin='10px 0 10px 0'))
-
-
-	footer_text = f"{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}"
-
-	fig.update_layout(
-		annotations=[
-			dict(
-				text=footer_text,
-				xref="paper", yref="paper",
-				x=0, y=-0.30,  # y < 0 puts it below the plot area; adjust as needed
-				showarrow=False,
-				xanchor="left",
-				yanchor="top",
-				align="left",
-				font=dict(size=12, color="black", family=font_family)
-			)
-		]
-	)
-
-
-	fig.frames = frames
-
-	# # print data for first frame for debugging
-	# print("First frame data:")
-	# if len(frames) > 0:
-	# 	first_frame = frames[0]
-	# 	for trace in first_frame.data:
-	# 		print(f"Trace: {trace.name}, x: {trace.x}, y: {trace.y}, hovertext: {trace.hovertext}")
-	# 	for annotation in frames[0].layout.annotations:
-	# 		print(f"Annotation: {annotation.text}, x: {annotation.x}, y: {annotation.y}")
-
-
-
-	fig.update_layout(
-		sliders=[{
-			"active": 0,
-			"currentvalue": {"prefix": "Page: "},
-			"pad": {"t": 10, "b": 10},
-			"steps": [
-				{
-					"method": "animate",
-					"args": [[f.name], {"frame": {"duration": 0, "redraw": True}, "mode": "immediate"}],
-					"label": str(i+1),
-				}
-				for i, f in enumerate(frames)
-			]
-		}]
-	)
-
-	fig.show(config={'staticPlot': True})  # Renders in notebook or browser	
-
-	# def update(change):
-	# 	page = change['new']
-	# 	fig_widget.data = ()  # Remove all previous traces
-	# 	fig_widget.layout.annotations = ()
-
-	# 	start = (page - 1) * plots_per_page
-	# 	end = min(start + plots_per_page, num_docs)
-	# 	page_document_ids = unique_document_ids[start:end]
-
-	# 	# Get min/max positions for normalization
-	# 	doc_range = self.corpus.tokens.with_row_index('position').filter(
-	# 		pl.col('token2doc_index').is_in(page_document_ids)
-	# 	).group_by('token2doc_index').agg([
-	# 		pl.col('position').min().alias('min'),
-	# 		pl.col('position').max().alias('max')
-	# 	]).collect()
-
-	# 	# Prepare normalized positions for each doc on this page
-	# 	documents = [[] for _ in range(len(page_document_ids))]
-	# 	normalized_documents = [[] for _ in range(len(page_document_ids))]
-	# 	examples = [[] for _ in range(len(page_document_ids))]
-	# 	for i, doc_id in enumerate(document_ids):
-	# 		if doc_id not in page_document_ids:
-	# 			continue
-	# 		doc_index = np.where(page_document_ids == doc_id)[0][0]
-	# 		documents[doc_index].append(token_positions[0][i])
-	# 		position_min, position_max = doc_range.filter(
-	# 			pl.col('token2doc_index') == doc_id
-	# 		).select(['min', 'max']).to_numpy()[0]
-	# 		norm_pos = (token_positions[0][i] - position_min) / (position_max - position_min) * 100 if position_max > position_min else 0
-	# 		normalized_documents[doc_index].append(norm_pos)
-	# 		tokens_for_example = self.corpus.get_tokens_by_index('orth_index')[token_positions[0][i]-5:token_positions[0][i]+6]
-			
-	# 		if self.corpus.EOF_TOKEN in tokens_for_example:
-	# 			positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-	# 			if len(positions) > 0 and positions[0] < 5:
-	# 				tokens_for_example = tokens_for_example[positions[0] + 1:]
-	# 			else:
-	# 				positions = np.where(tokens_for_example == self.corpus.EOF_TOKEN)[0]
-	# 				if len(positions) > 0 and positions[-1] > 5:
-	# 					tokens_for_example = tokens_for_example[:positions[-1]]
-	# 		tokens_for_example = self.corpus.token_ids_to_tokens(tokens_for_example)
-	# 		examples[doc_index].append(' '.join(tokens_for_example))
-
-	# 		# yref = "y" if i == 0 else f"y{i + 1} domain"
-
-	# 	n_plots_this_page = end - start
-	# 	if n_plots_this_page < plots_per_page or ('old' in change and change['old'] == num_pages):
-	# 		fig_widget.layout.shapes = ()
-	# 		for idx in range(n_plots_this_page):
-	# 			row = idx + 1
-	# 			fig_widget.add_shape(
-	# 				type="rect",
-	# 				x0=0, y0=0, x1=100, y1=1,
-	# 				line=dict(color="black", width=1),
-	# 				fillcolor="gray",
-	# 				opacity=0.08,
-	# 				layer="below",
-	# 				row=row, col=1
-	# 			)
-
-	# 	# Add traces for each subplot
-	# 	for idx, positions in enumerate(normalized_documents):
-	# 		row = idx + 1
-	# 		for pos, x0 in enumerate(positions):
-	# 			fig_widget.add_trace(
-	# 				go.Scatter(
-	# 					x=[x0, x0],
-	# 					y=[0, 1],
-	# 					mode='lines',
-	# 					line=dict(color='black', width=2),
-	# 					showlegend=False,
-	# 					hoverinfo='text',
-	# 					hovertext=f"{examples[idx][pos]}" if examples[idx] else ""
-	# 				),
-	# 				row=row, col=1
-	# 			)
-
-	# 		yref = "y" if row == 1 else f"y{row} domain"
-
-	# 		# doc id from document_ids
-	# 		doc_id = page_document_ids[idx]
-	# 		fig_widget.add_annotation(
-	# 			text=f"Doc {doc_id}",
-	# 			xref="paper", yref=yref,
-	# 			x=-0.03, y=0.65,
-	# 			showarrow=False,
-	# 			xanchor="right",
-	# 			yanchor="middle",
-	# 			font=dict(size=12, family = font_family)
-	# 		)
-
-	# 		lines_count = len(normalized_documents[idx])
-	# 		if lines_count == 0:
-	# 			lines_string = "No lines"
-	# 		elif lines_count == 1:
-	# 			lines_string = "1 line"
-	# 		else:
-	# 			# pluralize 'line' based on count
-	# 			# e.g. "5 lines"
-	# 			lines_string = f"{lines_count} lines"
-
-	# 		fig_widget.add_annotation(
-	# 			text=f"{lines_string}",
-	# 			xref="paper", yref=yref,
-	# 			x=-0.03, y=0.22, 
-	# 			showarrow=False,
-	# 			xanchor="right",
-	# 			yanchor="middle",
-	# 			font=dict(size=11, color="gray", family = font_family)
-	# 		)
-
-
-
-	# footer = widgets.HTML(
-	# 	value=f"<div style='text-align: left; font-size: 12px; color: black; margin-left: 80px;margin-bottom:10px;line-height:1.7;'>{self.corpus.name}<br>Total Documents: {num_docs}<br>Total Concordance Lines: {len(token_positions[0])}</div>"
-	# )
-
-	# display(page_slider)
-	# display(fig_widget)
-	# display(footer)
-
-
-
-
-
+	display(HTML(html))
+	#return html	
