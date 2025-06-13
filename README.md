@@ -36,8 +36,7 @@ functionality to annotate texts will be supported soon.
   repeated calls  
 - [document corpus representations so that they can be worked with
   directly](https://geoffford.nz/conc/anatomy.html)  
-- TODO - document this in walkthrough and results module and link here -
-  allow researchers to work with Conc results and extend analysis using
+- allow researchers to work with Conc results and extend analysis using
   other Python libraries
 
 ## Table of Contents
@@ -196,8 +195,11 @@ The conc.core module implements a number of helpful functions …
 
 ### Short-term
 
-- [ ] add tutorial / getting started notebook
+- [ ] add tutorial/walkthrough/ getting started notebook
 - [ ] add citation information
+- [ ] document use of Conc results in other Python libraries
+  (e.g. Pandas) via tutorial/walkthrough, results module (include link
+  on README principles)
 - [ ] Corpus tokenize support for functionality from earlier versions of
   Conc for wildcards, multiple strings, case insensitive tokenization
 - [ ] extend caching support to all intensive reports, revise storage of
