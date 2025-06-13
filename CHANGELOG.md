@@ -24,9 +24,9 @@ Based on https://keepachangelog.com/en/1.1.0/
 ### Changed
 
 - moved build_test_corpora from conc.core to conc.corpora as build_sample_corpora
-- raise depreciation error for build_test_corpora
+- raise deprecation error for build_test_corpora
 - move function from conc.core related to corpus source downloads to conc.corpora
-- depreciated calls in conc.core log warnings and run new functions in conc.corpora
+- deprecated calls in conc.core log warnings and run new functions in conc.corpora
 - changed CI workflow to use conc_build_sample_corpora
 
 ### Fixed

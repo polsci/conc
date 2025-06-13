@@ -318,9 +318,9 @@ def _create_indices(self: Corpus,
 				   lower_index: list[np.ndarray], # list of np arrays of lower token ids
 				   token2doc_index: list[np.ndarray] # list of np arrays of doc ids
 				   ):
-	""" (Depreciated) Use Numpy to create internal representation of the corpus for faster analysis and efficient representation on disk. Only used when the disk-based build process is not used. """
-
-	raise DeprecationWarning('This method is depreciated, the current build process uses _complete_build_process instead.')
+	""" (Deprecated) Use Numpy to create internal representation of the corpus for faster analysis and efficient representation on disk. Only used when the disk-based build process is not used. """
+	
+	raise DeprecationWarning('This method is deprecated, the current build process uses _complete_build_process instead.')
 
 	self.token2doc_index = np.concatenate(token2doc_index)
 	unique_values, inverse = np.unique(np.concatenate(orth_index + lower_index), return_inverse=True)
@@ -505,7 +505,7 @@ def build(self: Corpus,
 		lower_index, orth_index, token2doc_index, has_spaces = [], [], [], []
 		self._complete_build_process(build_process_cleanup = build_process_cleanup)
 	else:
-		# depreciated - leaving for now
+		# deprecated - leaving for now
 		self._create_indices(orth_index, lower_index, token2doc_index)
 		# self.document_count = len(self.offsets)
 
@@ -792,7 +792,7 @@ def _init_token_arrays(self: Corpus):
 		logger.info(f'Created tokens_sort_order in {(time.time() - start_time):.3f} seconds')
 
 		# start_time = time.time()  # move tokens sort order to build process - takes > 1 second for large corpora, but not needed for all results
-		# # building tokens_sort_order was implemented in _init_tokens_sort_order - depreciating to simplify as makes sense to build all these in one go
+		# # building tokens_sort_order was implemented in _init_tokens_sort_order - deprecating to simplify as makes sense to build all these in one go
 		# tokens_array_lower = np.char.lower(self.results_cache['tokens_array'].astype(str))
 		# self.results_cache['tokens_sort_order'] = np.argsort(np.argsort(tokens_array_lower)) # lowercasing then sorting	
 		# logger.info(f'Created tokens_sort_order in {(time.time() - start_time):.3f} seconds')
@@ -1145,6 +1145,6 @@ def build_test_corpora(
 		save_path:str, # path to save corpora
 		force_rebuild:bool = False # force rebuild of corpora, useful for development and testing
 		):
-	"""(Depreciated - moved to conc.corpora) Build all test corpora from source files."""
+	"""(Deprecated - moved to conc.corpora) Build all test corpora from source files."""
 
-	raise DeprecationWarning("Calling build_test_corpora via conc.corpus is depreciated and will be removed by v1.0.0, instead import as 'from conc.corpora import build_test_corpora' and use 'build_sample_corpora'.")
+	raise DeprecationWarning("Calling build_test_corpora via conc.corpus is deprecated and will be removed by v1.0.0, instead import as 'from conc.corpora import build_test_corpora' and use 'build_sample_corpora'.")

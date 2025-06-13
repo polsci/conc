@@ -149,9 +149,9 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 def list_corpora(
 		path: str # path to load corpus
 		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
-	""" (Depreciated - call via conc.corpora) Scan a directory for available corpora """
+	""" (Deprecated - call via conc.corpora) Scan a directory for available corpora """
 	
-	logger.warning(DeprecationWarning("Calling list_corpora via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import list_corpora' and call as before."))
+	logger.warning(DeprecationWarning("Calling list_corpora via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import list_corpora' and call as before."))
 
 	from conc.corpora import list_corpora as _list_corpora
 	return _list_corpora(path=path)
@@ -160,9 +160,9 @@ def list_corpora(
 # %% ../nbs/80_core.ipynb 23
 def create_toy_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
-	""" (Depreciated - call via conc.corpora) Create txt files and csv to test build of toy corpus. """
+	""" (Deprecated - call via conc.corpora) Create txt files and csv to test build of toy corpus. """
 
-	logger.warning(DeprecationWarning("Calling create_toy_corpus_sources via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_toy_corpus_sources' and call as before."))
+	logger.warning(DeprecationWarning("Calling create_toy_corpus_sources via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_toy_corpus_sources' and call as before."))
 
 	from conc.corpora import create_toy_corpus_sources as _create_toy_corpus_sources
 	return _create_toy_corpus_sources(source_path=source_path)
@@ -171,9 +171,9 @@ def create_toy_corpus_sources(source_path:str # path to location of sources for 
 def show_toy_corpus(
         csv_path:str # path to location of csv for building corpora
         ) -> GT: 
-    """ (Depreciated - call via conc.corpora) Show toy corpus in a table. """
+    """ (Deprecated - call via conc.corpora) Show toy corpus in a table. """
 
-    logger.warning(DeprecationWarning("Calling show_toy_corpus via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import show_toy_corpus' and call as before."))
+    logger.warning(DeprecationWarning("Calling show_toy_corpus via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import show_toy_corpus' and call as before."))
     
     from conc.corpora import show_toy_corpus as _show_toy_corpus
     return _show_toy_corpus(csv_path=csv_path)
@@ -181,9 +181,9 @@ def show_toy_corpus(
 # %% ../nbs/80_core.ipynb 25
 def get_nltk_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
-	""" (Depreciated - call via conc.corpora) Get NLTK corpora as sources for development or testing Conc functionality. """
+	""" (Deprecated - call via conc.corpora) Get NLTK corpora as sources for development or testing Conc functionality. """
 
-	logger.warning(DeprecationWarning("Calling get_nltk_corpus_sources via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_nltk_corpus_sources' and call as before."))
+	logger.warning(DeprecationWarning("Calling get_nltk_corpus_sources via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_nltk_corpus_sources' and call as before."))
 
 	from conc.corpora import get_nltk_corpus_sources as _get_nltk_corpus_sources
 	return _get_nltk_corpus_sources(source_path=source_path)
@@ -191,9 +191,9 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 # %% ../nbs/80_core.ipynb 26
 def get_garden_party(source_path: str #path to location of sources for building corpora
 					):
-	""" (Depreciated - call via conc.corpora) Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
+	""" (Deprecated - call via conc.corpora) Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
 
-	logger.warning(DeprecationWarning("Calling get_garden_party via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_garden_party' and call as before."))
+	logger.warning(DeprecationWarning("Calling get_garden_party via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_garden_party' and call as before."))
 
 	from conc.corpora import get_garden_party as _get_garden_party
 	return _get_garden_party(source_path=source_path)
@@ -201,9 +201,9 @@ def get_garden_party(source_path: str #path to location of sources for building 
 # %% ../nbs/80_core.ipynb 27
 def get_large_dataset(source_path: str #path to location of sources for building corpora
                     ):
-    """ (Depreciated - call via conc.corpora) Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
+    """ (Deprecated - call via conc.corpora) Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
 
-    logger.warning(DeprecationWarning("Calling get_large_dataset via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_large_dataset' and call as before."))
+    logger.warning(DeprecationWarning("Calling get_large_dataset via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import get_large_dataset' and call as before."))
 
     from conc.corpora import get_large_dataset as _get_large_dataset
     return _get_large_dataset(source_path=source_path)
@@ -212,9 +212,9 @@ def get_large_dataset(source_path: str #path to location of sources for building
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
-	""" (Depreciated - call via conc.corpora) Create datasets of different sizes from data source retrieved by get_large_dataset for testing. """
+	""" (Deprecated - call via conc.corpora) Create datasets of different sizes from data source retrieved by get_large_dataset for testing. """
 	
-	logger.warning(DeprecationWarning("Calling create_large_dataset_sizes via conc.core is depreciated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_large_dataset_sizes' and call as before."))
+	logger.warning(DeprecationWarning("Calling create_large_dataset_sizes via conc.core is deprecated and will be removed by v1.0.0, instead import with 'from conc.corpora import create_large_dataset_sizes' and call as before."))
 
 	from conc.corpora import create_large_dataset_sizes as _create_large_dataset_sizes
 	return _create_large_dataset_sizes(source_path=source_path, sizes = sizes)
