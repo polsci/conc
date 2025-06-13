@@ -24,5 +24,7 @@ website:
         contents: explanations/*
       - section: API
         contents: api/*
+      - section: Development
+        contents: development/*
 
 metadata-files: [nbdev.yml]
