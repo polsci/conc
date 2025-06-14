@@ -16,8 +16,17 @@ website:
           - api/78_text.ipynb
           - api/80_core.ipynb
         href: api/index.qmd
+      - section: development
+        contents:
+          - development/40_roadmap.ipynb
+          - development/50_developer_guide.ipynb
+        href: development/index.qmd
       - section: explanations
         contents:
           - explanations/40_anatomy.ipynb
           - explanations/90_performance.ipynb
         href: explanations/index.qmd
+      - section: tutorials
+        contents:
+          - tutorials/10_start.ipynb
+        href: tutorials/index.qmd

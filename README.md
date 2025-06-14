@@ -62,8 +62,7 @@ functionality to annotate texts will be supported soon.
     - [Conc API](https://geoffford.nz/conc/api) (Detailed documentation
       of Conc classes and functions)  
     - [Development](https://geoffford.nz/conc/development) (Information
-      on Conc development, including a Roadmap and Developer’s Guide)  
-  - [Overview of Conc functionality](#overview-of-conc-functionality)
+      on Conc development, including a Roadmap and Developer’s Guide)
 
 ## Acknowledgements
 
@@ -187,7 +186,866 @@ $ pip install polars-lts-cpu
 
 A good place to start is [Get started with
 Conc](https://geoffford.nz/conc/start.html) tutorial, which demonstrates
-how to build a corpus and output Conc reports.
+how to build a corpus and output Conc reports. Here are some minimal
+examples to get you started. See the [Conc API
+Reference](https://geoffford.nz/conc/api) for information on available
+methods, functions and parameters.
+
+> [!NOTE]
+>
+> ### Minimal import to use Conc functionality
+>
+> ``` python
+> from conc.corpus import Corpus # for building/saving, loading, and working with a corpus
+> from conc.conc import Conc # for running reporting on your corpus
+> ```
+
+> [!NOTE]
+>
+> ### Build a Conc corpus from text files (or a compressed archive of text files)
+>
+> ``` python
+> name = 'Garden Party Corpus'
+> description = 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party'
+> source_file = 'garden-party-corpus.zip'
+>
+> corpus = Corpus(name=name, description=description).build_from_files(source_path = f'{source_path}{source_file}', save_path = save_path)
+> corpus.summary()
+> ```
+>
+> <div id="wlrlwrcvtk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #wlrlwrcvtk table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#wlrlwrcvtk thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #wlrlwrcvtk p { margin: 0 !important; padding: 0 !important; }
+>  #wlrlwrcvtk .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #wlrlwrcvtk .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #wlrlwrcvtk .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #wlrlwrcvtk .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #wlrlwrcvtk .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #wlrlwrcvtk .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #wlrlwrcvtk .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #wlrlwrcvtk .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #wlrlwrcvtk .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #wlrlwrcvtk .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #wlrlwrcvtk .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #wlrlwrcvtk .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #wlrlwrcvtk .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #wlrlwrcvtk .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #wlrlwrcvtk .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #wlrlwrcvtk .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #wlrlwrcvtk .gt_row_group_first td { border-top-width: 2px !important; }
+>  #wlrlwrcvtk .gt_row_group_first th { border-top-width: 2px !important; }
+>  #wlrlwrcvtk .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #wlrlwrcvtk .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #wlrlwrcvtk .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #wlrlwrcvtk .gt_left { text-align: left !important; }
+>  #wlrlwrcvtk .gt_center { text-align: center !important; }
+>  #wlrlwrcvtk .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #wlrlwrcvtk .gt_font_normal { font-weight: normal !important; }
+>  #wlrlwrcvtk .gt_font_bold { font-weight: bold !important; }
+>  #wlrlwrcvtk .gt_font_italic { font-style: italic !important; }
+>  #wlrlwrcvtk .gt_super { font-size: 65% !important; }
+>  #wlrlwrcvtk .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #wlrlwrcvtk .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Corpus Summary |  |
+> |----|----|
+> |  |  |
+> | Attribute | Value |
+> | Name | Garden Party Corpus |
+> | Description | A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party |
+> | Date Created | 2025-06-14 21:06:02 |
+> | Conc Version | 0.1.3 |
+> | Corpus Path | /home/geoff/data/conc-test-corpora//garden-party.corpus |
+> | Document Count | 15 |
+> | Token Count | 74,664 |
+> | Word Token Count | 63,311 |
+> | Unique Tokens | 5,410 |
+> | Unique Word Tokens | 5,398 |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Load a Conc corpus
+>
+> ``` python
+> corpus = Corpus().load(corpus_path=f'{save_path}garden-party.corpus')
+> ```
+
+> [!NOTE]
+>
+> ### Prepare to report on your corpus
+>
+> ``` python
+> conc = Conc(corpus=corpus)
+> ```
+
+> [!NOTE]
+>
+> ### Frequency report
+>
+> ``` python
+> conc.frequencies().display()
+> ```
+>
+> <div id="qhrobmxrrq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #qhrobmxrrq table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#qhrobmxrrq thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #qhrobmxrrq p { margin: 0 !important; padding: 0 !important; }
+>  #qhrobmxrrq .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #qhrobmxrrq .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #qhrobmxrrq .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #qhrobmxrrq .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #qhrobmxrrq .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #qhrobmxrrq .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #qhrobmxrrq .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #qhrobmxrrq .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #qhrobmxrrq .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #qhrobmxrrq .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #qhrobmxrrq .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #qhrobmxrrq .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #qhrobmxrrq .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #qhrobmxrrq .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #qhrobmxrrq .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #qhrobmxrrq .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #qhrobmxrrq .gt_row_group_first td { border-top-width: 2px !important; }
+>  #qhrobmxrrq .gt_row_group_first th { border-top-width: 2px !important; }
+>  #qhrobmxrrq .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #qhrobmxrrq .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #qhrobmxrrq .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #qhrobmxrrq .gt_left { text-align: left !important; }
+>  #qhrobmxrrq .gt_center { text-align: center !important; }
+>  #qhrobmxrrq .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #qhrobmxrrq .gt_font_normal { font-weight: normal !important; }
+>  #qhrobmxrrq .gt_font_bold { font-weight: bold !important; }
+>  #qhrobmxrrq .gt_font_italic { font-style: italic !important; }
+>  #qhrobmxrrq .gt_super { font-size: 65% !important; }
+>  #qhrobmxrrq .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #qhrobmxrrq .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Frequencies |  |  |  |
+> |----|----|----|----|
+> | Frequencies of word tokens, Garden Party Corpus |  |  |  |
+> | Rank | Token | Frequency | Normalized Frequency |
+> | 1 | the | 2,911 | 459.79 |
+> | 2 | and | 1,798 | 283.99 |
+> | 3 | “ | 1,615 | 255.09 |
+> | 4 | ” | 1,614 | 254.93 |
+> | 5 | a | 1,407 | 222.24 |
+> | 6 | to | 1,376 | 217.34 |
+> | 7 | she | 1,171 | 184.96 |
+> | 8 | was | 1,102 | 174.06 |
+> | 9 | it | 1,021 | 161.27 |
+> | 10 | her | 937 | 148.00 |
+> | 11 | of | 908 | 143.42 |
+> | 12 | i | 719 | 113.57 |
+> | 13 | he | 718 | 113.41 |
+> | 14 | in | 683 | 107.88 |
+> | 15 | that | 643 | 101.56 |
+> | 16 | you | 642 | 101.40 |
+> | 17 | ’s | 524 | 82.77 |
+> | 18 | n’t | 522 | 82.45 |
+> | 19 | said | 514 | 81.19 |
+> | 20 | on | 504 | 79.61 |
+> | Report based on word tokens |  |  |  |
+> | Normalized Frequency is per 10,000 tokens |  |  |  |
+> | Total word tokens: 63,311 |  |  |  |
+> | Unique word tokens: 5,398 |  |  |  |
+> | Showing 20 rows |  |  |  |
+> | Page 1 of 270 |  |  |  |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Ngram frequencies report
+>
+> ``` python
+> conc.ngram_frequencies(ngram_length = 2).display()
+> ```
+>
+> <div id="jggsgdalyx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #jggsgdalyx table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#jggsgdalyx thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #jggsgdalyx p { margin: 0 !important; padding: 0 !important; }
+>  #jggsgdalyx .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #jggsgdalyx .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #jggsgdalyx .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #jggsgdalyx .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #jggsgdalyx .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #jggsgdalyx .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #jggsgdalyx .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #jggsgdalyx .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #jggsgdalyx .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #jggsgdalyx .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #jggsgdalyx .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #jggsgdalyx .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #jggsgdalyx .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #jggsgdalyx .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #jggsgdalyx .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #jggsgdalyx .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #jggsgdalyx .gt_row_group_first td { border-top-width: 2px !important; }
+>  #jggsgdalyx .gt_row_group_first th { border-top-width: 2px !important; }
+>  #jggsgdalyx .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #jggsgdalyx .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #jggsgdalyx .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #jggsgdalyx .gt_left { text-align: left !important; }
+>  #jggsgdalyx .gt_center { text-align: center !important; }
+>  #jggsgdalyx .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #jggsgdalyx .gt_font_normal { font-weight: normal !important; }
+>  #jggsgdalyx .gt_font_bold { font-weight: bold !important; }
+>  #jggsgdalyx .gt_font_italic { font-style: italic !important; }
+>  #jggsgdalyx .gt_super { font-size: 65% !important; }
+>  #jggsgdalyx .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #jggsgdalyx .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Ngram Frequencies |  |  |  |
+> |----|----|----|----|
+> | Garden Party Corpus |  |  |  |
+> | Rank | Ngram | Frequency | Normalized Frequency |
+> | 1 | ” said | 328 | 51.81 |
+> | 2 | ” “ | 326 | 51.49 |
+> | 3 | it was | 247 | 39.01 |
+> | 4 | in the | 214 | 33.80 |
+> | 5 | “ i | 197 | 31.12 |
+> | 6 | on the | 183 | 28.90 |
+> | 7 | of the | 156 | 24.64 |
+> | 8 | ” she | 156 | 24.64 |
+> | 9 | to the | 139 | 21.96 |
+> | 10 | at the | 133 | 21.01 |
+> | 11 | she was | 132 | 20.85 |
+> | 12 | and the | 124 | 19.59 |
+> | 13 | it ’s | 120 | 18.95 |
+> | 14 | do n’t | 105 | 16.58 |
+> | 15 | they were | 104 | 16.43 |
+> | 16 | ” and | 102 | 16.11 |
+> | 17 | he was | 100 | 15.80 |
+> | 18 | she had | 95 | 15.01 |
+> | 19 | ” he | 91 | 14.37 |
+> | 20 | “ oh | 90 | 14.22 |
+> | Report based on word tokens |  |  |  |
+> | Ngram length: 2 |  |  |  |
+> | Ngrams containing punctuation tokens excluded |  |  |  |
+> | Normalized Frequency is per 10,000 tokens |  |  |  |
+> | Total unique ngrams: 25,568 |  |  |  |
+> | Total ngrams: 52,112 |  |  |  |
+> | Showing 20 rows |  |  |  |
+> | Page 1 of 1279 |  |  |  |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Keywords report
+>
+> ``` python
+> reference_corpus = Corpus().load(f'{save_path}brown.corpus')
+> conc.set_reference_corpus(reference_corpus)
+> conc.keywords(min_document_frequency = 5, min_document_frequency_reference = 5).display()
+> ```
+>
+> <div id="hkjqezjwsx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #hkjqezjwsx table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#hkjqezjwsx thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #hkjqezjwsx p { margin: 0 !important; padding: 0 !important; }
+>  #hkjqezjwsx .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #hkjqezjwsx .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #hkjqezjwsx .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #hkjqezjwsx .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #hkjqezjwsx .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #hkjqezjwsx .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #hkjqezjwsx .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #hkjqezjwsx .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #hkjqezjwsx .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #hkjqezjwsx .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #hkjqezjwsx .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #hkjqezjwsx .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #hkjqezjwsx .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #hkjqezjwsx .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #hkjqezjwsx .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #hkjqezjwsx .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #hkjqezjwsx .gt_row_group_first td { border-top-width: 2px !important; }
+>  #hkjqezjwsx .gt_row_group_first th { border-top-width: 2px !important; }
+>  #hkjqezjwsx .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #hkjqezjwsx .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #hkjqezjwsx .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #hkjqezjwsx .gt_left { text-align: left !important; }
+>  #hkjqezjwsx .gt_center { text-align: center !important; }
+>  #hkjqezjwsx .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #hkjqezjwsx .gt_font_normal { font-weight: normal !important; }
+>  #hkjqezjwsx .gt_font_bold { font-weight: bold !important; }
+>  #hkjqezjwsx .gt_font_italic { font-style: italic !important; }
+>  #hkjqezjwsx .gt_super { font-size: 65% !important; }
+>  #hkjqezjwsx .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #hkjqezjwsx .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Keywords |  |  |  |  |  |  |  |  |
+> |----|----|----|----|----|----|----|----|----|
+> | Target corpus: Garden Party Corpus, Reference corpus: Brown Corpus |  |  |  |  |  |  |  |  |
+> | Rank | Token | Frequency | Frequency Reference | Normalized Frequency | Normalized Frequency Reference | Relative Risk | Log Ratio | Log Likelihood |
+> | 1 | bye | 25 | 7 | 3.95 | 0.07 | 55.29 | 5.79 | 107.37 |
+> | 2 | velvet | 14 | 5 | 2.21 | 0.05 | 43.35 | 5.44 | 57.19 |
+> | 3 | shone | 13 | 5 | 2.05 | 0.05 | 40.25 | 5.33 | 52.21 |
+> | 4 | queer | 15 | 6 | 2.37 | 0.06 | 38.70 | 5.27 | 59.69 |
+> | 5 | gloves | 17 | 7 | 2.69 | 0.07 | 37.60 | 5.23 | 67.18 |
+> | 6 | cried | 59 | 26 | 9.32 | 0.27 | 35.13 | 5.13 | 229.24 |
+> | 7 | faintly | 14 | 7 | 2.21 | 0.07 | 30.96 | 4.95 | 52.61 |
+> | 8 | darling | 36 | 18 | 5.69 | 0.18 | 30.96 | 4.95 | 135.27 |
+> | 9 | oh | 149 | 93 | 23.53 | 0.95 | 24.80 | 4.63 | 524.30 |
+> | 10 | handkerchief | 14 | 9 | 2.21 | 0.09 | 24.08 | 4.59 | 48.80 |
+> | 11 | dear | 78 | 54 | 12.32 | 0.55 | 22.36 | 4.48 | 265.31 |
+> | 12 | breathed | 13 | 9 | 2.05 | 0.09 | 22.36 | 4.48 | 44.22 |
+> | 13 | awful | 23 | 17 | 3.63 | 0.17 | 20.95 | 4.39 | 76.48 |
+> | 14 | ah | 26 | 20 | 4.11 | 0.20 | 20.13 | 4.33 | 85.24 |
+> | 15 | breast | 14 | 11 | 2.21 | 0.11 | 19.70 | 4.30 | 45.54 |
+> | 16 | dashed | 10 | 8 | 1.58 | 0.08 | 19.35 | 4.27 | 32.32 |
+> | 17 | gasped | 6 | 5 | 0.95 | 0.05 | 18.58 | 4.22 | 19.09 |
+> | 18 | parted | 6 | 5 | 0.95 | 0.05 | 18.58 | 4.22 | 19.09 |
+> | 19 | timid | 6 | 5 | 0.95 | 0.05 | 18.58 | 4.22 | 19.09 |
+> | 20 | sigh | 13 | 11 | 2.05 | 0.11 | 18.30 | 4.19 | 41.13 |
+> | Report based on word tokens |  |  |  |  |  |  |  |  |
+> | Filtered tokens by minimum document frequency in target corpus (5), minimum document frequency in reference corpus (5) |  |  |  |  |  |  |  |  |
+> | Normalized Frequency is per 10,000 tokens |  |  |  |  |  |  |  |  |
+> | Total word tokens in target corpus: 63,311 |  |  |  |  |  |  |  |  |
+> | Total word tokens in reference corpus: 980,144 |  |  |  |  |  |  |  |  |
+> | Keywords: 825 |  |  |  |  |  |  |  |  |
+> | Showing 20 rows |  |  |  |  |  |  |  |  |
+> | Page 1 of 42 |  |  |  |  |  |  |  |  |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Collocates report
+>
+> ``` python
+> conc.collocates('could').display()
+> ```
+>
+> <div id="wycnyqdopd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #wycnyqdopd table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#wycnyqdopd thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #wycnyqdopd p { margin: 0 !important; padding: 0 !important; }
+>  #wycnyqdopd .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #wycnyqdopd .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #wycnyqdopd .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #wycnyqdopd .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #wycnyqdopd .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #wycnyqdopd .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #wycnyqdopd .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #wycnyqdopd .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #wycnyqdopd .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #wycnyqdopd .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #wycnyqdopd .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #wycnyqdopd .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #wycnyqdopd .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #wycnyqdopd .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #wycnyqdopd .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #wycnyqdopd .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #wycnyqdopd .gt_row_group_first td { border-top-width: 2px !important; }
+>  #wycnyqdopd .gt_row_group_first th { border-top-width: 2px !important; }
+>  #wycnyqdopd .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #wycnyqdopd .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #wycnyqdopd .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #wycnyqdopd .gt_left { text-align: left !important; }
+>  #wycnyqdopd .gt_center { text-align: center !important; }
+>  #wycnyqdopd .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #wycnyqdopd .gt_font_normal { font-weight: normal !important; }
+>  #wycnyqdopd .gt_font_bold { font-weight: bold !important; }
+>  #wycnyqdopd .gt_font_italic { font-style: italic !important; }
+>  #wycnyqdopd .gt_super { font-size: 65% !important; }
+>  #wycnyqdopd .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #wycnyqdopd .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Collocates of "could" |  |  |  |  |  |
+> |----|----|----|----|----|----|
+> | Garden Party Corpus |  |  |  |  |  |
+> | Rank | Token | Collocate Frequency | Frequency | Logdice | Log Likelihood |
+> | 1 | n’t | 108 | 522 | 12.25 | 233.49 |
+> | 2 | have | 33 | 240 | 11.24 | 47.15 |
+> | 3 | she | 94 | 1,171 | 11.13 | 59.84 |
+> | 4 | he | 55 | 718 | 10.93 | 31.84 |
+> | 5 | they | 35 | 398 | 10.89 | 26.42 |
+> | 6 | it | 70 | 1,021 | 10.87 | 31.56 |
+> | 7 | be | 26 | 251 | 10.86 | 25.59 |
+> | 8 | help | 12 | 27 | 10.71 | 45.92 |
+> | 9 | what | 23 | 270 | 10.63 | 16.39 |
+> | 10 | not | 18 | 229 | 10.40 | 10.99 |
+> | 11 | but | 25 | 417 | 10.36 | 7.83 |
+> | 12 | how | 13 | 126 | 10.32 | 12.72 |
+> | 13 | could | 16 | 207 | 10.31 | 109.35 |
+> | 14 | hardly | 8 | 17 | 10.19 | 31.77 |
+> | 15 | understand | 8 | 19 | 10.18 | 29.55 |
+> | 16 | do | 15 | 242 | 10.10 | 5.18 |
+> | 17 | that | 28 | 643 | 10.08 | 2.13 |
+> | 18 | was | 43 | 1,102 | 10.07 | 1.27 |
+> | 19 | all | 16 | 281 | 10.07 | 4.25 |
+> | 20 | possibly | 7 | 9 | 10.05 | 38.44 |
+> | Report based on word tokens |  |  |  |  |  |
+> | Context tokens left: 5, context tokens right: 5 |  |  |  |  |  |
+> | Filtered tokens by minimum collocation frequency (5) |  |  |  |  |  |
+> | Unique collocates: 83 |  |  |  |  |  |
+> | Showing 20 rows |  |  |  |  |  |
+> | Page 1 of 5 |  |  |  |  |  |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Concordance
+>
+> ``` python
+> conc.concordance('could', order = '1R2R3R', context_length = 10).display()
+> ```
+>
+> <div id="xnuxzqvfih" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+> <style>
+> #xnuxzqvfih table {
+>           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>           -webkit-font-smoothing: antialiased;
+>           -moz-osx-font-smoothing: grayscale;
+>         }
+> &#10;#xnuxzqvfih thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+>  tr { background-color: transparent !important; }
+> #xnuxzqvfih p { margin: 0 !important; padding: 0 !important; }
+>  #xnuxzqvfih .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+>  #xnuxzqvfih .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+>  #xnuxzqvfih .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+>  #xnuxzqvfih .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+>  #xnuxzqvfih .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+>  #xnuxzqvfih .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+>  #xnuxzqvfih .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+>  #xnuxzqvfih .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+>  #xnuxzqvfih .gt_spanner_row { border-bottom-style: hidden !important; }
+>  #xnuxzqvfih .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+>  #xnuxzqvfih .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+>  #xnuxzqvfih .gt_from_md> :first-child { margin-top: 0 !important; }
+>  #xnuxzqvfih .gt_from_md> :last-child { margin-bottom: 0 !important; }
+>  #xnuxzqvfih .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+>  #xnuxzqvfih .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+>  #xnuxzqvfih .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+>  #xnuxzqvfih .gt_row_group_first td { border-top-width: 2px !important; }
+>  #xnuxzqvfih .gt_row_group_first th { border-top-width: 2px !important; }
+>  #xnuxzqvfih .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+>  #xnuxzqvfih .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+>  #xnuxzqvfih .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+>  #xnuxzqvfih .gt_left { text-align: left !important; }
+>  #xnuxzqvfih .gt_center { text-align: center !important; }
+>  #xnuxzqvfih .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+>  #xnuxzqvfih .gt_font_normal { font-weight: normal !important; }
+>  #xnuxzqvfih .gt_font_bold { font-weight: bold !important; }
+>  #xnuxzqvfih .gt_font_italic { font-style: italic !important; }
+>  #xnuxzqvfih .gt_super { font-size: 65% !important; }
+>  #xnuxzqvfih .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+>  #xnuxzqvfih .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+>  &#10;</style>
+>
+> | Concordance for "could" |  |  |  |
+> |----|----|----|----|
+> | Garden Party Corpus, Context tokens: 10, Order: 1R2R3R |  |  |  |
+> | Document Id | Left | Node | Right |
+> | 4 | herself and got as close to the sea as she | could | , and sung something , something she had made up |
+> | 11 | I sat up and called out as loud as I | could | , “ \_ I do want to go on a |
+> | 13 | ’ll not be a minute . ” And before he | could | answer she was gone . He had half a mind |
+> | 4 | until I ’ve had something . Do you think we | could | ask Kate for two cups of hot water ? ” |
+> | 2 | , and there will be no time to explain what | could | be explained so simply .... But to - night it |
+> | 1 | Here ’s this huge house and garden . Surely you | could | be happy in — in — appreciating it for a |
+> | 12 | away from the Listening Ear . Good Heavens , what | could | be more tragic than that lament ! Every note was |
+> | 1 | even a successful , established , big paying concern — | could | be played with . A man had either to put |
+> | 8 | play . It was exactly like a play . Who | could | believe the sky at the back was n’t painted ? |
+> | 13 | . Was her luggage ready ? In that case they | could | cut off sharp with her cabin luggage and let the |
+> | 2 | but , after all , they ’re boys . I | could | cut off to sea , or get a job up |
+> | 2 | one leg over . But which leg ? She never | could | decide . And when she did finally put one leg |
+> | 10 | loved having to arrange things ; she always felt she | could | do it so much better than anybody else . Four |
+> | 2 | sitting there in the washhouse ; it was all they | could | do not to burst into a little chorus of animals |
+> | 11 | to practise . ” Oh , it was all I | could | do not to burst out crying . I went over |
+> | 7 | . But after supper they were all so tired they | could | do nothing but yawn until it was late enough to |
+> | 14 | astonished Fenella . “ You did n’t think your grandma | could | do that , did you ? ” said she . |
+> | 2 | wanted , somehow , to celebrate the fact that they | could | do what they liked now . There was no man |
+> | 9 | bent over her . This was such bliss that he | could | dream no further . But it gave him the courage |
+> | 6 | away — anywhere , as though by walking away he | could | escape .... It was cold in the street . There |
+> | Total Concordance Lines: 207 |  |  |  |
+> | Total Documents: 15 |  |  |  |
+> | Showing 20 lines |  |  |  |
+> | Page 1 of 11 |  |  |  |
+>
+> &#10;</div>
+
+> [!NOTE]
+>
+> ### Concordance plot
+>
+> ``` python
+> conc.concordance_plot('could')
+> ```
+>
+> <script>
+> var eof_token = 5223;
+> var page_size = 10;
+> var append_info = true;
+> var row_height = 60;
+> var start_first_row_at = 30;
+> var row_adjustment = 30;
+> var default_font_size = 12;
+> var subplot_height = 40;
+> var plot_height = 610;
+> var plot_x = 160;
+> var label_x_right = 150;
+> var docs = [{"doc_id":1,"positions":[83,91,251,603,622,804,819,858,902,1129,2237],"count":3174},{"doc_id":2,"positions":[40,1657,1932,3106,3482,3721,3847,4319,5139,5148,5565,5604,5913,5919,5956,7396,7402,7520,7625,7674,7951,9411,9417,9473,10023,10274,10858,11276,12220,13303,14236,14467,15316,16196,16242,16355,16360,16446],"count":17017},{"doc_id":3,"positions":[450],"count":1573},{"doc_id":4,"positions":[645,683,1133,1195,1239,1454,1516,1890,2381,2679,2775,2827,2992,3004,3013,3389,3854,3875,4375,4885,5494,5795,5970,6743,6796,7288,7304,7493,7951,8202,8547,8639,8841],"count":9214},{"doc_id":5,"positions":[316,592,981,2792,3105],"count":3202},{"doc_id":6,"positions":[127,701,792,1043,2186,2311,2376,2514,2541,2757,2874,2968,2977,2984,3028,3047,3063,3106,3139],"count":3178},{"doc_id":7,"positions":[494,1446,1953,2131,3567,4014,4265,4333,4663,4763,4912],"count":4997},{"doc_id":8,"positions":[251,1491],"count":2407},{"doc_id":9,"positions":[188,286,438,526,583,594,818,992,1187,2593,2963,3145,3245,3388,3712,3780],"count":4393},{"doc_id":10,"positions":[9,97,223,337,412,1079,1384,1807,2786,3087,4433,4506,4634,5836,5842,6515,6873,7095],"count":7118},{"doc_id":11,"positions":[402,518,578,584,1189,1198,1552,1700,2258,2285,2362],"count":2779},{"doc_id":12,"positions":[499,985,1058,1069,1209,1265,1869,1947,1972,2332],"count":2792},{"doc_id":13,"positions":[55,1274,1837,2122,2212,2837,2957,3015,3044,3065,3935,4659,4739,4863,5208,5213,5376,5859],"count":5963},{"doc_id":14,"positions":[1620,2413,2799,2952,3100,3168,3197],"count":3963},{"doc_id":15,"positions":[1713,1791,2065,2312,2412,2693,2697],"count":2879}];
+> var tokens = {"4":"_","7":"Where","26":"alone","28":"tell","87":"landing","90":"ask","98":"star","103":"happy","111":"voice","123":"Meg","155":"dashed","159":"prove","178":"not","181":"simply","240":"’s","247":";","251":"pay","276":"letter","279":"Josephine","292":"prevent","294":"cut","318":"of","349":"about","437":"told","438":"immense","443":"safely","460":"possible","480":"guess","485":"Grandma","544":"your","561":"listened","571":"he","588":"He","592":"out","596":"world","605":"him","645":"strangers","676":"much","691":"this","697":"willows","699":"get","702":"longer","708":"watch","709":"meringues","721":"there","733":"do","734":"more","739":"myself","748":"up","765":"understand","772":"and","816":"hook","830":"thing","838":"old","847":"strokes","874":",","879":"it?—confirmed","889":"own","891":"chucked","892":"his","902":"possessed","916":"shook","918":"course","933":"head—“I","972":"until","991":"herself","1002":"in","1037":"eye","1054":"Could","1079":"recover","1086":"faint","1112":"sea","1121":"Why","1141":"Stanley","1159":"escape","1200":"things","1205":"speak","1208":"forget","1225":"questions","1228":"decide","1247":"impossible","1248":"love","1255":"bear","1259":"brain","1271":"to","1283":"fact","1286":"eight","1300":"who","1330":"left","1334":"ideal","1363":"her","1370":"Really","1418":"Mrs.","1420":"fork","1423":"gone","1431":"As","1451":"that","1464":"bed","1482":"sky","1487":"Constantia","1490":"again","1495":"well","1548":"You","1554":"I","1585":"breathe","1586":"punishment","1595":"evening","1624":"bliss","1630":"lean","1633":"us","1635":"Who","1674":"The","1678":"rid","1691":"led","1694":"chest","1742":"She","1751":"cry","1779":"tired","1855":"on","1863":"shuddering","1875":"else","1901":"paying","1935":"what","1942":"anywhere","1944":"Isabel","1957":"What","1960":"still","1970":"sworn","2017":"Neave","2023":"hoping","2031":"sneaking","2052":"wait","2057":"ever","2077":"Jug","2114":"again—“we","2119":"friends","2127":"amount","2134":"these","2183":"wrong","2206":"settle","2239":"she","2241":"”","2256":"far","2258":"take","2290":"meet","2301":"strawberries","2311":"boy","2332":"some","2344":"off","2345":"wondering","2346":"real","2347":"walking","2375":"made","2381":"just","2394":"late","2447":"pretty","2462":"the","2467":"true","2470":"as","2482":"Hennie","2490":"same","2492":"could","2534":"stars","2537":"you","2574":"know","2580":"marry","2594":"chap","2607":"from","2608":"drowsing","2619":"It","2652":"believe","2665":"them","2677":"go","2681":"explain","2683":"kiss","2716":"case","2753":"?","2758":"play","2763":"Or","2774":"reason","2788":"played","2813":"stop","2815":"strange","2842":"disloyal","2869":"neither","2904":"Kate","2925":"....","2927":"say","2944":"difference","2970":"excuse","3053":"forgotten","3067":"keep","3090":"thought","3113":"Hammond","3139":"stern","3149":"agreeing","3157":"added","3163":"conjurer","3170":"everything","3171":"explained","3190":"house","3247":"make","3252":"single","3273":"If","3276":"leave","3289":"Farolles","3300":"little","3304":"so","3324":"eat","3326":"sleep","3354":"was","3394":"taken","3397":"Everybody","3455":"it","3490":"thinking","3496":"Laura","3497":"be","3508":"round","3510":"possibly","3512":"occasions","3534":"Heavens","3542":"plainly","3572":"trust","3595":"anything","3626":"answer","3684":"never","3715":"scarcely","3723":"sat","3744":"Suppose","3754":"hardly","3779":"imagine","3785":"quite","3802":"Was","3832":"further","3844":"Lottie","3847":"before","3880":"cured","3916":"put","3964":"square","3966":"at","4002":"read","4010":"loud","4042":"a","4059":"see","4076":"home","4096":"together","4097":"imagined","4119":"saying","4125":"tragic","4132":"And","4149":"running","4173":"too","4187":"thoughts","4206":"clock","4215":"sitting","4225":"heart","4242":"if","4261":"hide","4264":"with","4270":"been","4292":"got","4316":".","4318":"knowing","4324":"moment","4423":"had","4424":"long","4447":"swim","4449":"no","4475":"any","4505":"throw","4509":"kissed","4537":"sun","4549":"twelve","4564":"felt","4567":"helped","4574":"only","4577":"spasm","4578":"all","4584":"after","4589":"Kezia","4620":"laughed","4631":"move","4643":"sharp","4667":"—","4679":"nothing","4715":"Suddenly","4736":"Strange","4753":"Now","4771":"Here","4781":"anybody","4794":"care","4809":"awkward","4819":"window","4827":"boys","4846":"sit","4862":"going","4909":"spared","4910":"done","4965":"but","4979":"room","4993":"really","5005":"have","5042":"meeting","5068":"ear","5096":"They","5131":"dream","5141":"an","5152":"glare","5198":"back","5208":"Mr.","5209":"expected","5229":"stick","5241":"blouse","5251":"till","5292":"Before","5319":"mean","5341":"Did","5350":"We","5358":"William","5359":"stay","5372":"away","5429":"feeling","5444":"Sheridan","5451":"married","5473":"for","5478":"reach","5482":"sent","5488":"we","5493":"“","5509":"look","5521":"stand","5535":"smothered","5539":"hear","5547":"nearly","5557":"ached","5588":"why","5589":"Hobbies","5592":"where","5595":"how","5598":"spine","5599":"manage","5607":"concern","5640":"life","5667":"find","5677":"asked","5679":"believed","5684":"describe","5705":"though","5716":"n’t","5728":"How","5759":"expect","5764":"Surely","5765":"they","5766":"think","5792":"because","5799":"Men","5809":"laughing","5810":"kept","5837":"throat","5851":"now","5913":"even","5920":"something","5922":"different","5926":"face","5951":"one","5953":"help","5958":"always","5967":"!","5969":"smiling","5992":"said","5995":"our","6067":"sung","6133":"But","6152":"doctor","6153":"roses","6195":"like","6196":"me","6228":"boast","6260":"cried","6265":"grandma","6266":"realize"};
+> var examples = [{"doc_id":1,"orth_indices":[[4316,4132,571,2492,5716,2290,1363],[4449,247,571,2492,5716,3964,748],[838,5208,2017,2492,178,5599,3966],[5967,6133,3455,2492,5716,3497,4910],[1901,5607,4667,2492,3497,2788,4264],[4316,5764,2537,2492,3497,103,1002],[4316,2763,2537,2492,2258,748,2332],[1495,5967,588,2492,5716,5953,4042],[2574,2753,5589,2492,5716,251,5473],[5992,4316,5096,2492,5005,5451,4781],[892,2608,1259,2492,5766,318,3354]]},{"doc_id":2,"orth_indices":[[5535,4316,1548,2492,178,4059,5592],[1141,4316,588,2492,5229,4449,734],[3170,4316,1548,2492,5716,5953,5429],[1855,2134,3512,2492,178,3497,2346],[1283,1451,5765,2492,733,1935,5765],[2753,1742,3684,2492,1228,4316,4132],[2241,6133,4589,2492,5716,3276,3844],[816,4316,1742,2492,5716,765,5588],[1944,874,1300,2492,4447,4549,847],[4589,874,1300,2492,5547,4447,1286],[3304,4424,2537,2492,178,765,5588],[4537,4316,1742,2492,5521,4475,2127],[3326,4316,5799,2492,5716,5521,605],[605,874,5765,2492,5716,699,4042],[5967,5096,181,2492,5716,3497,437],[4225,4316,588,2492,178,3497,2842],[2842,247,571,2492,178,28,4042],[4042,3190,1451,2492,5716,3497,3880],[3354,1935,2239,2492,178,765,4316],[5473,5951,874,2492,159,1451,2183],[2241,1674,2311,2492,5716,2652,1363],[1271,4316,1548,2492,5716,3276,6196],[6196,4316,1548,2492,5716,178,3497],[1464,247,2239,2492,5716,1255,3455],[5598,4316,1742,2492,5716,2652,1451],[4574,4042,3163,2492,292,2665,2607],[4119,4316,588,2492,5716,5521,3595],[5042,5792,5765,2492,3247,2470,676],[3354,4578,5765,2492,733,178,1271],[2537,561,2537,2492,2381,5539,2462],[4827,4316,1554,2492,294,2344,1271],[1271,2681,1935,2492,3497,3171,3304],[2332,2774,571,2492,5716,2927,3455],[3455,4316,1742,2492,5716,3497,1330],[1431,4242,1554,2492,1208,1363,5967],[3455,2753,1635,2492,3455,3497,2753],[3497,2753,2619,2492,5716,3497,4042],[5967,5493,1554,2492,5716,4316,3397]]},{"doc_id":3,"orth_indices":[[676,2470,2537,2492,3916,1002,2462]]},{"doc_id":4,"orth_indices":[[4736,5967,1742,2492,5716,5005,3916],[874,2241,2239,2492,5005,6260,4242],[874,4965,2239,2492,3754,5759,1271],[4270,26,5765,2492,2381,5005,5677],[4316,1370,5765,2492,5716,5953,5429],[4316,2241,279,2492,3754,1255,1451],[279,4316,1742,2492,5716,3572,991],[708,4316,2619,2492,5716,5005,4270],[772,5208,3289,2492,178,3510,1630],[2869,318,2665,2492,3510,2652,1451],[1957,460,2970,2492,5765,3247,2753],[645,247,5765,2492,5716,3497,5209],[6133,1935,1875,2492,5488,5005,4910],[4316,5493,5350,2492,5716,5005,5810],[2077,4667,5488,2492,5716,5005,5810],[2904,5967,2619,2492,5716,3497,4567],[2753,2241,279,2492,4574,5152,4316],[4316,6133,5595,2492,2239,2681,1271],[2537,5766,5488,2492,90,2904,5473],[1451,4449,5951,2492,3510,480,1935],[6133,1960,571,2492,5716,3497,5209],[709,4316,5728,2492,1554,5005,3053],[4206,4316,1742,2492,5716,3247,748],[4324,4316,5096,2492,3754,2258,3455],[4316,5493,5728,2492,2537,5759,1633],[1363,111,2114,2492,5599,5995,889],[1487,4316,1742,2492,5716,5953,5969],[1200,874,5595,2492,5951,2753,3744],[5922,4316,1742,2492,5716,3497,4862],[3455,874,1935,2492,3455,3497,2753],[2665,874,5595,2492,5765,5005,4292],[4002,247,5765,2492,5716,5913,3247],[1112,2470,2239,2492,874,772,6067]]},{"doc_id":5,"orth_indices":[[1247,874,2239,2492,5716,5005,4567],[4979,4316,2619,2492,5716,2052,247],[772,2927,2239,2492,5716,2677,4584],[3802,3455,4667,2492,3455,4578,3497],[874,972,2239,2492,5667,123,4316]]},{"doc_id":6,"orth_indices":[[4809,4316,588,2492,3754,2677,5198],[874,772,571,2492,5716,765,5588],[3300,4819,2537,2492,4059,5141,438],[4042,1595,2537,2492,4059,2462,2534],[2815,4316,1554,2492,5005,1970,1554],[240,1935,2239,2492,5716,765,4316],[1694,1451,571,2492,5716,699,1678],[2470,5705,571,2492,5716,5005,5679],[874,2239,181,2492,5716,5766,349],[2347,5372,571,2492,1159,2925,2619],[4316,3273,2239,2492,4574,1751,5851],[3455,4316,1742,2492,5716,3916,3455],[702,247,2239,2492,5716,2052,4475],[734,2925,7,2492,2239,2677,2753],[7,2753,1742,2492,5716,2677,4076],[5640,4316,1742,2492,5716,4846,1855],[1225,4316,1742,2492,5716,3510,2677],[1942,5592,2239,2492,4261,772,3067],[596,5592,2239,2492,5005,1363,1751]]},{"doc_id":7,"orth_indices":[[1944,240,2119,2492,3754,2677,2031],[4316,6133,5488,2492,5716,5005,1423],[4096,2925,5358,2492,5716,5953,4042],[3354,4578,571,2492,2927,5473,2462],[3304,1779,5765,2492,733,4679,4965],[2241,6133,1944,2492,5716,5953,2345],[3354,2925,1957,2492,5005,2375,605],[4620,5251,2239,2492,5716,2813,5809],[4132,3847,5765,2492,1079,2239,4423],[4910,4316,5728,2492,2239,5005,4910],[874,4965,5595,2492,721,3497,4475]]},{"doc_id":8,"orth_indices":[[5068,4316,1742,2492,5005,3394,3455],[2758,4316,1635,2492,2652,2462,1482]]},{"doc_id":9,"orth_indices":[[1935,1875,2239,2492,2927,4316,4771],[4149,4316,588,2492,5716,5913,6228],[155,4242,571,2492,5766,318,5951],[4993,4679,2239,2492,5716,733,247],[3252,830,2537,2492,5766,318,874],[1248,1451,571,2492,5716,5953,2023],[1624,1451,571,2492,5131,4449,3832],[1586,4042,2594,2492,5005,4316,4132],[5005,3090,2537,2492,5005,4909,544],[4316,5493,1554,2492,5521,4475,2127],[2537,5766,2537,2492,2057,4794,5473],[874,772,2239,2492,5716,2813,991],[4316,5493,5728,2492,721,3497,2753],[916,1363,933,2492,5716,3510,2580],[2467,1451,571,2492,3754,1255,3455],[5837,5557,5967,1054,571,1205,2753]]},{"doc_id":10,"orth_indices":[[1334,4316,5096,2492,178,5005,4423],[6153,874,2537,2492,178,5953,5429],[2241,6133,123,2492,178,3510,2677],[5958,4564,2239,2492,733,3455,3304],[874,772,2239,2492,5716,3510,4505],[3090,4316,1121,2492,5716,2239,5005],[4316,4715,2239,2492,5716,2813,991],[98,4316,1742,2492,5005,4509,3455],[721,1418,5444,2492,178,3779,4316],[2490,874,5765,2492,5716,5953,3149],[4316,5292,3496,2492,2813,1363,2239],[1490,4316,1742,2492,5716,5509,3966],[2239,4097,2239,2492,5509,6195,1451],[874,772,2239,2492,5716,6266,3455],[3455,4316,1121,2492,5716,2239,2753],[2470,5705,2239,2492,5716,765,5588],[874,772,2239,2492,5716,2677,592],[5640,3354,2239,2492,5716,2681,4316]]},{"doc_id":11,"orth_indices":[[2447,4667,1554,2492,5716,5953,3490],[721,4449,5951,2492,28,2462,2944],[5920,4316,1742,2492,5716,3067,1960],[1960,874,2239,2492,5716,2206,4316],[3455,4316,588,2492,5716,1255,2462],[6196,4584,4316,1054,5716,3324,892],[918,874,1554,2492,5716,4316,1554],[4010,2470,1554,2492,874,5493,4],[3354,4578,1554,2492,733,178,1271],[874,772,1554,2492,5716,3067,739],[5716,2574,1554,2492,4059,1363,4667]]},{"doc_id":12,"orth_indices":[[2665,4316,1957,2492,2462,4187,318],[3534,874,1935,2492,3497,734,4125],[4316,4,1957,2492,5005,902,605],[276,5967,1957,2492,5005,1691,748],[3157,874,5951,2492,3715,5953,1863],[4173,4316,588,2492,5716,5953,4318],[874,772,5951,2492,5539,2462,697],[3304,1451,2239,2492,5716,4002,3455],[4173,4316,1742,2492,3684,5926,2462],[4002,4316,1742,2492,5716,2258,1363]]},{"doc_id":13,"orth_indices":[[3139,4316,1548,2492,2381,4059,3300],[4225,5208,3113,2492,5716,2927,4316],[4577,1451,571,2492,5005,6260,592],[3354,4578,571,2492,2927,4316,4132],[1451,2716,5765,2492,294,2344,4643],[588,4564,571,2492,5005,3723,721],[4132,3847,571,2492,3626,2239,3354],[3455,2753,1121,2492,5716,2239,5005],[6152,2753,1742,2492,5005,5482,4042],[5341,3455,4667,2492,3455,5319,1451],[1330,4316,5096,2492,5766,1935,5765],[3354,4316,5728,2492,571,2574,2753],[5241,4316,588,2492,5005,891,2665],[2683,4667,5595,2492,571,5684,879],[1086,4316,588,2492,5716,4631,247],[4631,247,571,2492,5716,1585,4316],[2394,4316,588,2492,5716,5005,4910],[3455,4316,588,2492,5716,5521,3455]]},{"doc_id":14,"orth_indices":[[1420,4316,485,2492,3754,2652,3455],[5766,544,6265,2492,733,1451,874],[3455,2753,1957,2492,3455,3497,2753],[3508,1037,2239,2492,4059,2256,2344],[1271,5592,2239,2492,5716,5478,3455],[4316,4753,5765,2492,4059,3785,3542],[2925,4753,5765,2492,4059,2462,87]]},{"doc_id":15,"orth_indices":[[2301,4316,1742,2492,3754,1255,1271],[2665,247,1554,2492,5716,5967,2241],[3354,4578,2239,2492,443,2927,4316],[605,2239,181,2492,5716,4059,4316],[1451,874,2239,2492,5716,5521,691],[4449,5967,2482,2492,5359,4316,1742],[5359,4316,1742,2492,5716,1255,4215]]}];
+> &#10;    function filter_token_ids(token_ids) {
+>         var centre_index = Math.floor(token_ids.length / 2);
+>         var left_tokens = token_ids.slice(0, centre_index);
+>         var right_tokens = token_ids.slice(centre_index);
+>         if (left_tokens.includes(eof_token)) {
+>             var eof_index_pos = left_tokens.lastIndexOf(eof_token);
+>             if (eof_index_pos !== -1) {
+>                 left_tokens = left_tokens.slice(eof_index_pos + 1);
+>             }
+>         }
+>         if (right_tokens.includes(eof_token)) {
+>             var eof_index_pos = right_tokens.indexOf(eof_token);
+>             if (eof_index_pos !== -1) {
+>                 right_tokens = right_tokens.slice(0, eof_index_pos);
+>             }
+>         }
+>         token_ids = left_tokens.concat(right_tokens);
+>         return token_ids;
+>     }
+>     function token_ids_to_str(token_ids) {
+>         if (token_ids.includes(eof_token)) {
+>             token_ids = filter_token_ids(token_ids);
+>         }
+>         const token_strs = [];
+>         for (let i = 0; i < token_ids.length; i++) {
+>             const token_id = token_ids[i];
+>             if (tokens[token_id]) {
+>                 token_strs.push(tokens[token_id]);
+>             } else {
+>                 token_strs.push(`Unknown Token ID: ${token_id}`);
+>             }
+>         }
+>         return token_strs.join(' ');
+>     }
+>     function populatePlot(page, page_size) {
+>         start = (page - 1) * page_size;
+>         end = start + page_size;
+>         const plot = document.getElementById('conc-concordance-plot');
+>         const lines = plot.getElementsByClassName('conc-concordance-plot-line');
+>         while (lines.length > 0) {
+>             lines[0].remove();
+>         }
+>         const labels = plot.getElementsByClassName('label');
+>         while (labels.length > 0) {
+>             labels[0].remove();
+>         }
+>         const rects = plot.getElementsByTagName('rect');
+>         for (let i = 0; i < rects.length; i++) {
+>             rects[i].setAttribute('style', 'opacity:1;');
+>         }
+>         for (let i = start; i < end; i++) {
+>             page_i = (i - start + 1)
+>             if (i >= docs.length) {
+>                 const rect = document.getElementById(`rect-${page_i}`);
+>                 if (rect) {
+>                     rect.setAttribute('style', 'opacity:0;');
+>                 }
+>                 continue;
+>             }
+>             const doc = docs[i];
+>             const plot_y = (page_i * row_height) - row_adjustment;
+>             const label_y = plot_y + (default_font_size * 1.4);
+>             const label_y2 = plot_y + (default_font_size * 1.4 * 2);
+>             const doc_positions_count = doc.positions.length;
+>             const line_text = doc_positions_count === 1 ? '1 line' : `${doc_positions_count} lines`;
+>             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+>             label.setAttribute('class', 'label');
+>             label.setAttribute('x', label_x_right);
+>             label.setAttribute('y', label_y);
+>             label.setAttribute('font-size', default_font_size);
+>             label.setAttribute('text-anchor', 'end');
+>             label.textContent = `Doc ${doc.doc_id}`;
+>             plot.appendChild(label);
+>             const label2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+>             label2.setAttribute('class', 'label');
+>             label2.setAttribute('x', label_x_right);
+>             label2.setAttribute('y', label_y2);
+>             label2.setAttribute('font-size', default_font_size);
+>             label2.setAttribute('text-anchor', 'end');
+>             label2.textContent = line_text;
+>             plot.appendChild(label2);
+>             const positions = doc.positions;
+>             const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
+>             for (let j = 0; j < x_values.length; j++) {
+>                 const x_value = x_values[j];
+>                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+>                 line.setAttribute('class', 'conc-concordance-plot-line');
+>                 const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+>                 line1.setAttribute('x1', plot_x + x_value);
+>                 line1.setAttribute('y1', plot_y);
+>                 line1.setAttribute('x2', plot_x + x_value);
+>                 line1.setAttribute('y2', plot_y + subplot_height);
+>                 line1.setAttribute('style', 'stroke-width:10;opacity:0;');
+>                 line.appendChild(line1);
+>                 const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+>                 line2.setAttribute('x1', plot_x + x_value);
+>                 line2.setAttribute('y1', plot_y);
+>                 line2.setAttribute('x2', plot_x + x_value);
+>                 line2.setAttribute('y2', plot_y + subplot_height);
+>                 line2.setAttribute('style', 'stroke-width:2;');
+>                 line.appendChild(line2);
+>                 let anchor = 'middle';
+>                 let x_adjustment = 0;
+>                 if (x_value < 150) {
+>                     anchor = 'start';
+>                     x_adjustment = -30;
+>                 }
+>                 if (x_value > 650) {
+>                     anchor = 'end';
+>                     x_adjustment = 30;
+>                 }
+>                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+>                 text.setAttribute('x', plot_x + x_value + x_adjustment);
+>                 text.setAttribute('y', plot_y - 5);
+>                 text.setAttribute('text-anchor', anchor);
+>                 text.setAttribute('font-size', '12');
+>                 text.setAttribute('fill', 'black');
+>                 append = ''
+>                 if (append_info) {
+>                     position_offset_1 = doc.positions[j] + 1;
+>                     append = ` (token ${position_offset_1} of ${doc.count})`;
+>                 }
+>                 text.textContent = token_ids_to_str(examples[i].orth_indices[j]) + append;
+>                 line.appendChild(text);
+>                 plot.appendChild(line);
+>             }
+> &#10;        }
+>     }
+> &#10;    function tryInit() {
+>     const targetNode = document.getElementById('conc-plot-wrapper');
+>     if (targetNode && targetNode.querySelector('.conc-plot-footer')) {
+>         vizInit();
+>         return true;
+>     }
+>     return false;
+>     }
+>     function vizInit() {
+>         current_page = 1;
+>         const slider = document.getElementById('conc-concordance-plot-slider');
+>         &#10;        populatePlot(current_page, page_size);
+>         slider.addEventListener('input', function() {
+>             const page = parseInt(this.value, 10);
+>             populatePlot(page, page_size);
+>             const page_number = document.getElementById('conc-concordance-plot-page-number');
+>             page_number.textContent = `${page}`;
+>         });
+>     }
+>     &#10;    
+> </script>
+> <style>
+>     .conc-plot-wrapper {
+>     background: #fff;
+>     width:1000px;
+>     color: #000;
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     line-height: 1.1;
+>     margin: 20px 0 20px 0;
+>     }
+>     .conc-plot-wrapper h2 {
+>     color: #000;
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     text-align:center;
+>     font-weight: 600;
+>     line-height: 2;
+>     margin:0;
+>     padding:0;
+>     }
+>     .conc-plot-wrapper h3 {
+>     color: #000;
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     text-align:center;
+>     font-weight: 300;
+>     line-height: 1;
+>     margin:0;
+>     padding:0;
+>     }
+>     .conc-concordance-plot {
+>     }
+>     .conc-concordance-plot-summary {
+>     margin: 20px 40px 10px 160px;
+>     color: #000;
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     }
+>     .conc-concordance-plot-controls {
+>     height: 60px;
+>     margin: 0 40px 20px 40px;
+>     }
+>     .conc-concordance-plot-controls input[type="range"] {
+>     -webkit-appearance: none;
+>     width: 100%;
+>     height: 15px;
+>     background: #ccc;
+>     border-radius: 5px;
+>     outline: none;
+>     opacity: 0.7;
+>     transition: opacity .2s;
+>     }
+>     .conc-concordance-plot-controls label {
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     color: #000;
+>     display: block;
+>     margin-bottom: 5px;
+>     }
+>     .conc-concordance-plot rect {
+>     fill: #ccc;
+>     width: 800px;
+>     height: 40px;
+>     }
+>     .conc-concordance-plot .label {
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     }
+>     g.conc-concordance-plot-line {
+>     cursor: pointer;
+>     }
+>     g.conc-concordance-plot-line line {
+>     stroke:#666;
+>     }
+>     g.conc-concordance-plot-line:hover line {
+>     stroke:#000;
+>     }
+>     g.conc-concordance-plot-line > text {
+>     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+>     display:none;
+>     }
+>     g.conc-concordance-plot-line:hover > text {
+>     display:block;
+>     }
+>     g.conc-concordance-plot-line.highlight line {
+>     }
+>     .conc-plot-wrapper { font-size: 12px; }.conc-plot-wrapper h2 { font-size: 24px; }.conc-plot-wrapper h3, .conc-concordance-plot-summary { font-size: 15.0px; }.conc-concordance-plot-controls label { font-size: 12px; }</style><div class="conc-plot-wrapper" id="conc-plot-wrapper"><h2>Concordance Plot for &quot;could&quot;</h2><h3>Garden Party Corpus</h3><svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="610" xmlns="http://www.w3.org/2000/svg"><rect id="rect-1" x="160" y="30" height="40" width="800" /><rect id="rect-2" x="160" y="90" height="40" width="800" /><rect id="rect-3" x="160" y="150" height="40" width="800" /><rect id="rect-4" x="160" y="210" height="40" width="800" /><rect id="rect-5" x="160" y="270" height="40" width="800" /><rect id="rect-6" x="160" y="330" height="40" width="800" /><rect id="rect-7" x="160" y="390" height="40" width="800" /><rect id="rect-8" x="160" y="450" height="40" width="800" /><rect id="rect-9" x="160" y="510" height="40" width="800" /><rect id="rect-10" x="160" y="570" height="40" width="800" /></svg><div class="conc-concordance-plot-summary">Total Documents: 15<br>Total Concordance Lines: 207</div><div class="conc-concordance-plot-controls"><label for="conc-concordance-plot-slider" id="conc-concordance-plot-slider-label">Page <span id="conc-concordance-plot-page-number">1</span> of 2</label>
+>     <input type="range" min="1" max="2" value="1" step="1" class="slider" id="conc-concordance-plot-slider" autocomplete="off"></div>
+>     <div class="conc-plot-footer"></div>
+>     </div>
+>     <script>
+> &#10;
+>     if (!tryInit()) {
+>     // Only set up observer if not ready yet
+>     const observer = new MutationObserver(function(mutationsList, observer) {
+>         if (tryInit()) {
+>         observer.disconnect();
+>         }
+>     });
+>     observer.observe(document.body, { childList: true, subtree: true });
+>     }
+>     </script>
+>     </body></html>
+
+> [!NOTE]
+>
+> ### Work with Conc report data using other Python libraries (e.g. Pandas)
+>
+> You are not restricted to Conc for your analysis. Conc report data can
+> be exported to other formats. For example, although Conc uses
+> [Polars](https://pola.rs/) internally, you can convert report results
+> into a [Pandas](https://pandas.pydata.org/) dataframe, which, although
+> not as efficient as Polars, is flexible and interoperable with many
+> Python libraries for data analysis. You can convert Conc results to a
+> Pandas dataframe like this …
+>
+> ``` python
+> import pandas as pd # Conc does not require Pandas - so you will need to install it with "pip install pandas"
+> ```
+>
+> ``` python
+> pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'mine', 'yours', 
+>             'his', 'hers', 'its', 'ours', 'yours', 'theirs']
+> # retrieve keyword report for these pronouns, which has normalized frequencies for each corpus
+> # the next line returns the result as a Polars dataframe, which is then converted to a Pandas dataframe
+> df = conc.keywords(restrict_tokens = pronouns).to_frame().to_pandas() # page_size = 0 returns all
+> # now go for it - do stuff in pandas! 
+> # e.g. here we plot normalized frequency of each pronoun in the Garden Party corpus against the Brown corpus
+> pd.options.plotting.backend = "plotly"
+> max_normalized_frequency = max(df['normalized_frequency'].max(), df['normalized_frequency_reference'].max()) # geting max of each axis
+> df.plot.scatter(
+>     x='normalized_frequency_reference', 
+>     y='normalized_frequency', 
+>     text='token', 
+>     title='Normalized frequencies of personal pronouns in Garden Party Corpus vs Brown Corpus',
+>     range_x=[0, max_normalized_frequency * 1.1],
+>     range_y=[0, max_normalized_frequency * 1.1],
+>     width=800,
+>     height=800
+> ).update_traces(textposition='top center')
+> ```
+>
+>     Unable to display output for mime type(s): application/vnd.plotly.v1+json
 
 ### Conc Documentation
 
@@ -206,30 +1064,3 @@ and methods. Here are links to the documentation site sections:
   Conc classes and functions)  
 - [Development](https://geoffford.nz/conc/development) (Information on
   Conc development, including a Roadmap and Developer’s Guide)
-
-### Overview of Conc functionality
-
-The current Conc submodules and what they do are listed below with links
-to the [documentation site](https://geoffford.nz/conc/).
-
-| Class / Function | Module | Functionality | Note |
-|----|----|----|----|
-| [`Corpus`](https://geoffford.nz/conc/api/corpus.html#corpus) | conc.corpus | Build and load and get information on a corpus, methods to work with a corpus | Required |
-| [`Conc`](https://geoffford.nz/conc/api/conc.html#conc) | conc.conc | Inferface to Conc reports for corpus analysis | Recommended way to access reports for analysis, requires a corpus created by Corpus module |
-| [`Text`](https://geoffford.nz/conc/api/text.html#text) | conc.text | Output text from the corpus | Access via Corpus |
-| [`Frequency`](https://geoffford.nz/conc/api/frequency.html#frequency) | conc.frequency | Frequency reporting | Access via Conc |
-| [`Ngrams`](https://geoffford.nz/conc/api/ngrams.html#ngrams) | conc.ngrams | Reporting on `ngram_frequencies` across corpus and `ngrams` containing specific tokens | Access via Conc |
-| [`Concordance`](https://geoffford.nz/conc/api/concordance.html#concordance) | conc.concordance | Concordancing | Access via Conc |
-| [`Keyness`](https://geoffford.nz/conc/api/keyness.html#keyness) | conc.keyness | Reporting for keyness analysis | Access via Conc |
-| [`Collocates`](https://geoffford.nz/conc/api/collocates.html#collocates) | conc.collocates | Reporting for collocation analysis | Access via Conc |
-| [`Result`](https://geoffford.nz/conc/api/result.html#result) | conc.result | Handles report results, output result as table or get dataframe | Used by all reports |
-| [`ConcLogger`](https://geoffford.nz/conc/api/core.html#conclogger) | conc.core | Logger | Logging implemented in all modules |
-| [`CorpusMetadata`](https://geoffford.nz/conc/api/core.html#corpusmetadata) | conc.core | Class to validate Corpus Metadata JSON | Used by Corpus class |
-
-The conc.core module implements a number of helpful functions …
-
-| Function | Functionality |
-|----|----|
-| [`list_corpora`](https://geoffford.nz/conc/api/core.html#list_corpora) | Scan a directory for corpora and return a summary |
-| [`get_stop_words`](https://geoffford.nz/conc/api/core.html#get_stop_words) | Get a spaCy stop word list list for a specific model |
-| Various - see `Get data sources` | Functions to download source texts to create sample corpora. Primarily intended for development/testing. To minimize requirements not all libraries are installed by default. Functions will raise errors with information on installing required libraries. |
