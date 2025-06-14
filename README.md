@@ -185,10 +185,11 @@ $ pip install polars-lts-cpu
 ### Getting started
 
 A good place to start is the [Get started with
-Conc](https://geoffford.nz/conc/start.html) tutorial, which demonstrates
-how to build a corpus and output Conc reports. There are also [simple
-code recipes](https://geoffford.nz/conc/recipes.html) for common Conc
-taks.
+Conc](https://geoffford.nz/conc/tutorials/start.html) tutorial, which
+demonstrates how to build a corpus and output Conc reports. There are
+also [simple code
+recipes](https://geoffford.nz/conc/tutorials/recipes.html) for common
+Conc taks.
 
 ### Conc Documentation
 
