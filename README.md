@@ -25,10 +25,9 @@ functionality to annotate texts will be supported soon.
   visualisation (i.e. [Numpy](https://numpy.org/),
   [Scipy](https://scipy.org/), [Polars](https://pola.rs),
   [Plotly](https://plotly.com/python/))
-- use vector operations where possible  
-- use fast code libraries and fast data structures (i.e. Conc uses
-  [Polars vs Pandas](https://pola.rs/posts/benchmarks/) - you can still
-  output Pandas dataframes if you want to use them)  
+- use fast code libraries (i.e. Conc uses [Polars vs
+  Pandas](https://pola.rs/posts/benchmarks/) and fast data structures
+  (e.g. Numpy arrays, columnar data stores)  
 - provide clear and complete information when reporting results  
 - pre-compute time-intensive and repeatedly used views of the data  
 - work with smaller slices of the data where possible  
@@ -37,7 +36,9 @@ functionality to annotate texts will be supported soon.
 - [document corpus representations so that they can be worked with
   directly](https://geoffford.nz/conc/anatomy.html)  
 - allow researchers to work with Conc results and extend analysis using
-  other Python libraries
+  other Python libraries (e.g. output Pandas dataframes)  
+- make use of meta-data to allow within-corpus comparisons and to
+  provide context for analysis
 
 ## Table of Contents
 
@@ -50,9 +51,19 @@ functionality to annotate texts will be supported soon.
   - [Install optional dependencies](#install-optional-dependencies)  
   - [Pre-2013 CPU? Install Polars with support for older
     machines](#pre-2013-cpu-install-polars-with-support-for-older-machines)  
-- [Using Conc](#using-conc)  
-- [Roadmap](#roadmap)  
-- [Developer Guide](#developer-guide)
+- [Using Conc](#using-conc)
+  - [Getting Started](https://geoffford.nz/conc/tutorials/start.html)  
+  - [Conc Documentation](#conc-documentation)
+    - [Tutorials](https://geoffford.nz/conc/tutorials) (Tutorials to get
+      you started with Conc)  
+    - [Explanations](https://geoffford.nz/conc/explanations) (How Conc
+      works, working with Conc corpus formats and results using other
+      Python libraries)  
+    - [Conc API](https://geoffford.nz/conc/api) (Detailed documentation
+      of Conc classes and functions)  
+    - [Development](https://geoffford.nz/conc/development) (Information
+      on Conc development, including a Roadmap and Developer’s Guide)  
+  - [Overview of Conc functionality](#overview-of-conc-functionality)
 
 ## Acknowledgements
 
@@ -88,14 +99,22 @@ versions of Conc.
 ## Development Status
 
 Conc is in active development. It is currently
-[released](https://pypi.org/project/conc/) for beta testing. The Github
-site may be ahead of the Pypi version, so for latest functionality
-install from Github (see below). The Github code is pre-release and may
-change. For the latest release, install from Pypi (`pip install conc`).
-The [documentation](https://geoffford.nz/conc/) reflects the most recent
-functionality. See the
+[released](https://pypi.org/project/conc/) for beta testing.
+
+Although this is a Beta release, I’m currently using it for research and
+postgraduate teaching. I’m keen to support new users. If you have any
+questions, hurdles using Conc or feature requests, [create an
+issue](https://github.com/polsci/conc/issues/new).
+
+The Github site may be ahead of the Pypi version, so for latest
+functionality install from Github (see below). The Github code is
+pre-release and may change. For the latest release, install from Pypi
+(`pip install conc`). The [documentation](https://geoffford.nz/conc/)
+reflects the most recent functionality. See the
 [CHANGELOG](https://github.com/polsci/conc/blob/main/CHANGELOG.md) for
-notes on releases and the Roadmap below for upcoming features.
+notes on releases and the
+[Roadmap](https://geoffford.nz/development/roadmap.html) for planned
+updates.
 
 ## Installation
 
@@ -107,6 +126,8 @@ this command:
 ``` sh
 $ pip install conc
 ```
+
+Add the `-U` flag to upgrade if you are already running Conc.
 
 To install the latest development version of Conc, which may be ahead of
 the version on Pypi, you can install from the
@@ -162,12 +183,34 @@ $ pip install polars-lts-cpu
 
 ## Using Conc
 
-A good place to start is TODO, which demonstrates how to build a corpus
-and output Conc reports.
+### Getting started
 
-The [documentation site](https://geoffford.nz/conc/) provides a
-reference for Conc functionality and examples of how to create reports
-for analysis. The current Conc components are listed below.
+A good place to start is [Get started with
+Conc](https://geoffford.nz/conc/start.html) tutorial, which demonstrates
+how to build a corpus and output Conc reports.
+
+### Conc Documentation
+
+There is a dedicated [Conc documentation
+site](https://geoffford.nz/conc/). This includes tutorials, examples
+demonstrating how to create reports for analysis, explanation of Conc
+functionality and its Corpus format, and a reference to Conc’s classes
+and methods. Here are links to the documentation site sections:
+
+- [Tutorials](https://geoffford.nz/conc/tutorials) (Tutorials to get you
+  started with Conc)  
+- [Explanations](https://geoffford.nz/conc/explanations) (How Conc
+  works, working with Conc corpus formats and results using other Python
+  libraries)  
+- [Conc API](https://geoffford.nz/conc/api) (Detailed documentation of
+  Conc classes and functions)  
+- [Development](https://geoffford.nz/conc/development) (Information on
+  Conc development, including a Roadmap and Developer’s Guide)
+
+### Overview of Conc functionality
+
+The current Conc submodules and what they do are listed below with links
+to the [documentation site](https://geoffford.nz/conc/).
 
 | Class / Function | Module | Functionality | Note |
 |----|----|----|----|
@@ -190,59 +233,3 @@ The conc.core module implements a number of helpful functions …
 | [`list_corpora`](https://geoffford.nz/conc/api/core.html#list_corpora) | Scan a directory for corpora and return a summary |
 | [`get_stop_words`](https://geoffford.nz/conc/api/core.html#get_stop_words) | Get a spaCy stop word list list for a specific model |
 | Various - see `Get data sources` | Functions to download source texts to create sample corpora. Primarily intended for development/testing. To minimize requirements not all libraries are installed by default. Functions will raise errors with information on installing required libraries. |
-
-## Roadmap
-
-### Short-term
-
-- [ ] add tutorial/walkthrough/ getting started notebook
-- [ ] add citation information
-- [ ] document use of Conc results in other Python libraries
-  (e.g. Pandas) via tutorial/walkthrough, results module (include link
-  on README principles)
-- [ ] Corpus tokenize support for functionality from earlier versions of
-  Conc for wildcards, multiple strings, case insensitive tokenization
-- [ ] extend caching support to all intensive reports, revise storage of
-  cached results for in-memory/disk option
-- [ ] relegate some logger warnings to debug level and audit logger
-  messages for consistency and clarity for users
-- [ ] add support for build from datasets library
-- [ ] ngrams method - implement case handling
-- [ ] get_ngrams_by_index - implement case handling
-- [ ] improve concordance ordering so not fixed options e.g. include
-  3R1R2R
-- [ ] improve ngram support for ngram token position beyond LEFT/RIGHT
-  (i.e. define positions relative to ngram, or ANY)
-- [ ] concordancing - add in ordering by metadata columns or doc
-- [ ] annotations support for spaCy POS, TAG, SENT_START, LEMMA
-- [ ] shift more processing from in-memory to polars with support for
-  streaming or in-memory processing
-- [ ] revisit polars streaming - potentially implement a batched write
-  for very large files i.e. splitting vocab/tokens files into smaller
-  chunks to reduce memory usage.
-
-### Medium-term
-
-- [ ] Support for processing backends other than spaCy (i.e. other
-  tokenizers)
-
-## Developer Guide
-
-The instructions below are only relevant if you want to contribute to
-Conc. The [nbdev](https://nbdev.fast.ai/) library is being used for
-development. If you are new to using nbdevc, here are some useful
-pointers to get you started (or visit the [nbdev
-website](https://nbdev.fast.ai/)).
-
-### Install conc in Development mode
-
-``` sh
-# make sure conc package is installed in development mode
-$ pip install -e .
-
-# make changes under nbs/ directory
-# ...
-
-# compile to have changes apply to conc
-$ nbdev_prepare
-```
