@@ -2,10 +2,6 @@ body {
   font: 20px/1.5 'Roboto', sans-serif;
 }
 
-.sidebar {
-  padding-left:0;
-}
-
 .cell {
   margin-bottom: 1rem;
 }
@@ -63,3 +59,15 @@ section > h3 {
   overflow:auto;
 }
 
+@media (min-width: 992px) {
+  .sidebar {
+    padding-left:0;
+  }
+}
+
+@media (max-width: 991px) {
+  .navbar {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
