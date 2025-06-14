@@ -1,14 +1,42 @@
 ---
 order: 7
 title: API
-listing:
-  fields: [title, description]
-  type: table
-  sort: "filename"
-  sort-ui: false
-  filter-ui: false
+# listing:
+#   fields: [title, description]
+#   type: table
+#   sort: "filename"
+#   sort-ui: false
+#   filter-ui: false
 toc: false
 page-layout: full
 ---
 
 This section documents the Conc API. Conc's submodules are listed below. There are specific modules for different kinds of analysis or reporting. This may be helpful for understand functionality, but if you want to use Conc you can load a corpus with the `Corpus` class and access the main reporting functionality using the `Conc` class.   
+
+## Overview of Conc functionality
+
+The current Conc submodules and what they do are listed below with links to the relevant documentation page. 
+
+| Class / Function | Sub-module | Functionality | Note |
+| -------- | ------- | ------- | ------- |
+| `Corpus` | conc.corpus | Build and load and get information on a corpus, methods to work with a corpus | Required |
+| `Conc` | conc.conc | Inferface to Conc reports for corpus analysis | Recommended way to access reports for analysis, requires a corpus created by Corpus module |
+| `Corpora` | conc.conc | Functions to work with multiple corpora and download and build sample corpora.  | Optional |
+| `Frequency` | conc.frequency | Frequency reporting | Access via Conc |
+| `Ngrams` | conc.ngrams | Reporting on [ngram_frequencies](https://geoffford.nz/conc/api/ngrams.html#ngrams.ngram_frequencies) across corpus and [ngrams](https://geoffford.nz/conc/api/ngrams.html#ngrams.ngrams) containing specific tokens | Access via Conc |
+| `Concordance` | conc.concordance | Concordancing | Access via Conc |
+| `Keyness` | conc.keyness | Reporting for keyness analysis | Access via Conc |
+| `Collocates` | conc.collocates | Reporting for collocation analysis | Access via Conc |
+| `Result` | conc.result | Handles report results, output result as table or get dataframe | Used by all reports |
+| `Text` | conc.text |Output text from the corpus | Access via Corpus |
+| `ConcLogger` | conc.core | Logger | Logging implemented in all modules |
+| `CorpusMetadata` | conc.core | Class to validate Corpus Metadata JSON | Used by Corpus class |
+
+The conc.core and conc.corpora modules implements some helpful functions ...
+
+| Function | Sub-module | Functionality |
+| -------- | ------- | ------- |
+| `list_corpora` | conc.corpora | Scan a directory for corpora and return a summary |
+| `get_stop_words` | conc.core | Get a spaCy stop word list list for a specific model |
+| Various - see [Get data sources](https://geoffford.nz/conc/api/corpora.html#get-data-sources) | conc.corpora | Functions to download source texts to create sample corpora. Primarily intended for development/testing, but can be used to try out Conc. To minimize requirements not all libraries are installed by default. Functions will raise errors with information on installing required libraries. |
+
