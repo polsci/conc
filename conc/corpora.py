@@ -139,6 +139,9 @@ def get_garden_party(source_path: str #path to location of sources for building 
 	except ImportError as e:
 		raise ImportError('This function requires the requests library. To minimise requirements this is not installed by default. You can install requests with "pip install requests"')
 
+	if not os.path.exists(source_path):
+		os.makedirs(source_path)
+
 	r = requests.get(path)
 	with open(f'{source_path}/garden-party-corpus.zip', 'wb') as f:
 		f.write(r.content)
