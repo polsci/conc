@@ -20,6 +20,8 @@ website:
       - auto: "/*.ipynb"
       - text: "Introduction to Conc"
         href: index.ipynb
+      - section: Tutorials
+        contents: tutorials/*
       - section: Explanations
         contents: explanations/*
       - section: API
