@@ -71,3 +71,7 @@ section > h3 {
     padding-right: 0;
   }
 }
+
+.breadcrumb-item + .breadcrumb-item {
+  display: none;
+}
