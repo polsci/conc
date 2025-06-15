@@ -383,12 +383,9 @@ spaCy model: {SPACY_MODEL}, version {SPACY_MODEL_VERSION}
 
 ## Using this corpus
  
-Conc can be installed [via pip]({PYPI_URL}):  
-```
-pip install conc
-```
-Documentation to get you started with Conc are available:
-[Conc Documentation]({DOCUMENTATION_URL})
+Conc can be installed [via pip]({PYPI_URL}). The [Conc documentation site]({DOCUMENTATION_URL}) 
+has tutorials and detailed information to get you started with Conc or to work with the corpus 
+data directly.  
 
 ## Cite Conc
 

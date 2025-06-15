@@ -27,7 +27,7 @@ ERR_TOKEN_STR = 'ERROR: not a token'
 # %% ../nbs/api/80_core.ipynb 5
 DOCUMENTATION_URL = 'https://geoffford.nz/conc'
 REPOSITORY_URL = 'https://github.com/polsci/conc'
-PYPI_URL = ''
+PYPI_URL = 'https://pypi.org/project/conc/'
 CITATION_STR = '''If you use Conc in your work, please cite it as follows:'''
 
 # %% ../nbs/api/80_core.ipynb 9
