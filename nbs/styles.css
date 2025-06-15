@@ -75,3 +75,27 @@ section > h3 {
 .breadcrumb-item + .breadcrumb-item {
   display: none;
 }
+
+@media (min-width: 0px) {
+  .navbar #quarto-search {
+    margin-left: .25rem;
+    order: 999;
+  }
+}
+
+#quarto-header > nav {
+  padding-left: 1em;
+  padding-right: 0;
+}
+
+.sidebar-info img {
+  width: 35px;margin-right:3px;float:left;
+}
+
+.sidebar-info-text {
+  margin-left: 10px;
+  color: inherit; 
+  text-decoration: none; 
+  font-size: 12px; 
+  display: block; 
+}

@@ -6,14 +6,40 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    include-in-header:
+      text: |
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            var sidebar = document.getElementsByClassName('sidebar-menu-container')[0];
+            var logo = document.createElement('div');
+            logo.className = 'sidebar-info';
+            logo.innerHTML = '<a href="https://geoffford.nz/"><img src="https://geoffford.nz/assets/images/geoff-icon.png" alt="Geoff Ford"></a>';
+            var textLink = document.createElement('a');
+            textLink.className = 'sidebar-info-text';
+            textLink.href = "https://geoffford.nz/";
+            textLink.innerText = "Author: Dr Geoff Ford";
+            textLink.className = 'sidebar-info-text';
+            logo.appendChild(textLink);
+            var textLink = document.createElement('a');
+            textLink.href = "https://geoffford.nz/";
+            textLink.innerText = "↪ Main Website";
+            textLink.className = 'sidebar-info-text';
+            logo.appendChild(textLink);
+            sidebar.appendChild(logo);
+          });
+        </script>
+
 
 website:
   twitter-card: true
+  favicon: /assets/images/conc/conc.svg
   open-graph: true
   repo-actions: [issue]
   navbar:
     background: primary
     search: true
+    collapse: false
+    logo: https://geoffford.nz/assets/images/conc/conc.svg
     right:
       - icon: github
         href: "https://github.com/polsci/conc"
