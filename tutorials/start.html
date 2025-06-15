@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Here is how to get started with Conc.">
+
+<title>Get Started with Conc – conc</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../conc.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-06f49dda7689f94c7678c1763e921aac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var sidebar = document.getElementsByClassName('sidebar-menu-container')[0];
+    var logo = document.createElement('div');
+    logo.className = 'sidebar-info';
+    logo.innerHTML = '<a href="https://geoffford.nz/"><img src="https://geoffford.nz/assets/images/geoff-icon.png" alt="Geoff Ford"></a>';
+    var textLink = document.createElement('a');
+    textLink.className = 'sidebar-info-text';
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "Author: Dr Geoff Ford";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    var textLink = document.createElement('a');
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "↪ Main Website";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    sidebar.appendChild(logo);
+  });
+</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Get Started with Conc – conc">
+<meta property="og:description" content="Here is how to get started with Conc.">
+<meta property="og:site_name" content="conc">
+<meta name="twitter:title" content="Get Started with Conc – conc">
+<meta name="twitter:description" content="Here is how to get started with Conc.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="https://geoffford.nz/assets/images/conc/conc.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">conc</span>
+    </a>
+  </div>
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/polsci/conc"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          <div class="quarto-navbar-tools">
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/start.html">Get Started with Conc</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Conc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/start.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Get Started with Conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quick Conc Recipes</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../explanations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/anatomy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Anatomy of a corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/conc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpora.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpora</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/frequency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">frequency</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/ngrams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ngrams</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/concordance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">concordance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/keyness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">keyness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/collocates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">collocates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/result.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">result</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../development/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Development</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/roadmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roadmap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/developer_guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer Guide</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/index.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/start.html">Get Started with Conc</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Get Started with Conc</h1>
+</div>
+
+<div>
+  <div class="description">
+    Here is how to get started with Conc.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>This is a quick, no-frills introduction to using Conc. You can skip part 1 if you already have some data you want to work with.</p>
+<section id="get-some-sample-texts" class="level2">
+<h2 class="anchored" data-anchor-id="get-some-sample-texts">1. Get some sample texts</h2>
+<p>For this getting started guide I’m going to use the example of a collection of short stories from Katherine Mansfield’s <em>The Garden Party</em> as sample texts. This corpus is available as a zip file of text files and can be downloaded via the <a href="https://geoffford.nz/conc/api/corpora.html#get_garden_party">conc.corpora submodule</a>. First, we will import the function from conc.corpora to get the sample data.</p>
+<div id="cell-4" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> conc.corpora <span class="im">import</span> get_garden_party</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we define where we want the data to be stored (<code>source_path</code>) and where we want the corpus to be saved (<code>save_path</code>). When the corpus is built it will be saved in a new directory in <code>save_path</code>. Note: the os.environ.get in the paths below are not required. You can specify paths directly as strings (e.g.&nbsp;/some/path/).</p>
+<div id="cell-6" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>source_path <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>os<span class="sc">.</span>environ<span class="sc">.</span>get(<span class="st">"HOME"</span>)<span class="sc">}</span><span class="ss">/data/'</span>  </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>save_path <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>os<span class="sc">.</span>environ<span class="sc">.</span>get(<span class="st">"HOME"</span>)<span class="sc">}</span><span class="ss">/data/conc-test-corpora/'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we download the data. This will create the source_path directory defined above if it is not already there (and it is somewhere your user can write).</p>
+<div id="cell-8" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>get_garden_party(source_path<span class="op">=</span>source_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="build-the-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="build-the-corpus">2. Build the corpus</h2>
+<p>You can currently build a Conc corpus from:</p>
+<ul>
+<li>a directory of text files or a .zip/.tar/.tar.gz containing text files (<a href="https://geoffford.nz/conc/api/corpus.html#corpus.build_from_files"><code>Corpus.build_from_files</code></a>)<br>
+</li>
+<li>a .csv file (or .csv.gz file) with a column containing your text (<a href="https://geoffford.nz/conc/api/corpus.html#corpus.build_from_csv"><code>Corpus.build_from_csv</code></a>)</li>
+</ul>
+<p>More source types will be added in the future, but lots of data can be wrangled into these formats.</p>
+<p>Both methods support importing metadata. See the documentation links above for more details.</p>
+<p>For information on the Conc corpus format, see the <a href="https://geoffford.nz/conc/explanations/anatomy.html">Anatomy of a Conc Corpus</a>.</p>
+<p>The following code imports the <a href="https://geoffford.nz/conc/api/corpus.html#corpus"><code>Corpus</code></a> class from <code>conc.corpus</code>.</p>
+<div id="cell-12" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> conc.corpus <span class="im">import</span> Corpus</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The following line creates a Corpus, gives it a name and description, and builds it from the Garden Party source files.</p>
+<p>Remember, a new directory for your corpus will be created in <code>save_path</code>. The name of that directory is a slugified version of the name you pass in. For the Garden Party Corpus, the directory garden-party.corpus will be created. The folder name can be changed later if you want. You can distribute your corpus by sharing the directory and its contents.</p>
+<p>The build process time depends on the size of your corpus. The build process produces a corpus format that is quick to load and use. In this case, the corpus is small and it is done in a couple of seconds even on a old, slow computer.</p>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>name <span class="op">=</span> <span class="st">'Garden Party Corpus'</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>description <span class="op">=</span> <span class="st">'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party'</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>source_file <span class="op">=</span> <span class="st">'garden-party-corpus.zip'</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> Corpus(name<span class="op">=</span>name, description<span class="op">=</span>description).build_from_files(source_path <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>source_path<span class="sc">}{</span>source_file<span class="sc">}</span><span class="ss">'</span>, save_path <span class="op">=</span> save_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To get information on the corpus, including various summary counts and information on the path of the corpus, you can use the <a href="https://geoffford.nz/conc/api/corpus.html#corpus.summary"><code>Corpus.summary</code></a> method.</p>
+<div id="cell-16" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>corpus.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="xsdkzcatbz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#xsdkzcatbz table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#xsdkzcatbz thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#xsdkzcatbz p { margin: 0 !important; padding: 0 !important; }
+ #xsdkzcatbz .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #xsdkzcatbz .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #xsdkzcatbz .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #xsdkzcatbz .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #xsdkzcatbz .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #xsdkzcatbz .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #xsdkzcatbz .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #xsdkzcatbz .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #xsdkzcatbz .gt_spanner_row { border-bottom-style: hidden !important; }
+ #xsdkzcatbz .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #xsdkzcatbz .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #xsdkzcatbz .gt_from_md> :first-child { margin-top: 0 !important; }
+ #xsdkzcatbz .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #xsdkzcatbz .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #xsdkzcatbz .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #xsdkzcatbz .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #xsdkzcatbz .gt_row_group_first td { border-top-width: 2px !important; }
+ #xsdkzcatbz .gt_row_group_first th { border-top-width: 2px !important; }
+ #xsdkzcatbz .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #xsdkzcatbz .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #xsdkzcatbz .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #xsdkzcatbz .gt_left { text-align: left !important; }
+ #xsdkzcatbz .gt_center { text-align: center !important; }
+ #xsdkzcatbz .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #xsdkzcatbz .gt_font_normal { font-weight: normal !important; }
+ #xsdkzcatbz .gt_font_bold { font-weight: bold !important; }
+ #xsdkzcatbz .gt_font_italic { font-style: italic !important; }
+ #xsdkzcatbz .gt_super { font-size: 65% !important; }
+ #xsdkzcatbz .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #xsdkzcatbz .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="2" class="gt_heading gt_title gt_font_normal">Corpus Summary</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"></th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Attribute" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Attribute</th>
+<th id="Value" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Name</td>
+<td class="gt_row gt_left">Garden Party Corpus</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Description</td>
+<td class="gt_row gt_left">A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Date Created</td>
+<td class="gt_row gt_left">2025-06-14 11:39:26</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Conc Version</td>
+<td class="gt_row gt_left">0.1.3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Corpus Path</td>
+<td class="gt_row gt_left">/home/geoff/data/conc-test-corpora//garden-party.corpus</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Document Count</td>
+<td class="gt_row gt_left">15</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Token Count</td>
+<td class="gt_row gt_left">74,664</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Word Token Count</td>
+<td class="gt_row gt_left">63,311</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Unique Tokens</td>
+<td class="gt_row gt_left">5,410</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Unique Word Tokens</td>
+<td class="gt_row gt_left">5,398</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="load-a-conc-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="load-a-conc-corpus">3. Load a Conc corpus</h2>
+<p>Here is how we can load the corpus we just build. We don’t need to pass in a name and description, we just need the path to the corpus.</p>
+<div id="cell-18" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> Corpus().load(corpus_path<span class="op">=</span><span class="ss">f'</span><span class="sc">{</span>save_path<span class="sc">}</span><span class="ss">garden-party.corpus'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s check our corpus information again. We could use the summary method again here, but we can also access this information using the <a href="https://geoffford.nz/conc/api/corpus.html#corpus.info"><code>Corpus.info</code></a> method. Here we include the <code>include_disk_usage</code> parameter to get additional information on how much disk space our corpus is using.</p>
+<div id="cell-20" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(corpus.info(include_disk_usage<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>┌────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Attribute                  ┆ Value                                                                                                                                                                                                                                             │
+╞════════════════════════════╪═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡
+│ Name                       ┆ Garden Party Corpus                                                                                                                                                                                                                               │
+│ Description                ┆ A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. │
+│                            ┆ https://github.com/ucdh/scraping-garden-party                                                                                                                                                                                                     │
+│ Date Created               ┆ 2025-06-14 11:39:26                                                                                                                                                                                                                               │
+│ Conc Version               ┆ 0.1.3                                                                                                                                                                                                                                             │
+│ Corpus Path                ┆ /home/geoff/data/conc-test-corpora/garden-party.corpus                                                                                                                                                                                            │
+│ Document Count             ┆ 15                                                                                                                                                                                                                                                │
+│ Token Count                ┆ 74,664                                                                                                                                                                                                                                            │
+│ Word Token Count           ┆ 63,311                                                                                                                                                                                                                                            │
+│ Unique Tokens              ┆ 5,410                                                                                                                                                                                                                                             │
+│ Unique Word Tokens         ┆ 5,398                                                                                                                                                                                                                                             │
+│ Corpus Metadata (Mb)       ┆ 0.001                                                                                                                                                                                                                                             │
+│ Document Metadata (Mb)     ┆ 0.001                                                                                                                                                                                                                                             │
+│ Tokens (Mb)                ┆ 0.259                                                                                                                                                                                                                                             │
+│ Vocab (Mb)                 ┆ 0.073                                                                                                                                                                                                                                             │
+│ Punctuation Positions (Mb) ┆ 0.028                                                                                                                                                                                                                                             │
+│ Space Positions (Mb)       ┆ 0.017                                                                                                                                                                                                                                             │
+└────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+</div>
+</div>
+</section>
+<section id="using-conc" class="level2">
+<h2 class="anchored" data-anchor-id="using-conc">4. Using Conc</h2>
+<p>To use the corpus we need to import the <a href="https://geoffford.nz/conc/api/conc.html#conc"><code>Conc</code></a> class from <code>conc.conc</code>.</p>
+<div id="cell-23" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> conc.conc <span class="im">import</span> Conc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The Conc class is the main interface for working with your corpus. It provides methods for a range of corpus analysis, including analysis of frequency, ngrams, concordances, collocates, and keyness. There are classes for all these different analyses, but the Conc class provides the most straightforward way to do analysis.</p>
+<p>Here we instantiate a <a href="https://geoffford.nz/conc/api/conc.html#conc"><code>Conc</code></a> object with the corpus just loaded.</p>
+<div id="cell-26" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>conc <span class="op">=</span> Conc(corpus<span class="op">=</span>corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below you will see how to generate Conc reports. I’ll add more notes on how to fully use these reports here soon, but for now - check out the code below, refer to the <a href="https://geoffford.nz/conc/api/conc.html">API documentation</a> for information on parameters and check out the <a href="https://geoffford.nz/conc/tutorials/recipes.html">Conc code recipes</a>.</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>conc.frequencies().display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="kewhxwynbw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#kewhxwynbw table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#kewhxwynbw thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#kewhxwynbw p { margin: 0 !important; padding: 0 !important; }
+ #kewhxwynbw .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #kewhxwynbw .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #kewhxwynbw .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #kewhxwynbw .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #kewhxwynbw .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #kewhxwynbw .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #kewhxwynbw .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #kewhxwynbw .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #kewhxwynbw .gt_spanner_row { border-bottom-style: hidden !important; }
+ #kewhxwynbw .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #kewhxwynbw .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #kewhxwynbw .gt_from_md> :first-child { margin-top: 0 !important; }
+ #kewhxwynbw .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #kewhxwynbw .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #kewhxwynbw .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #kewhxwynbw .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #kewhxwynbw .gt_row_group_first td { border-top-width: 2px !important; }
+ #kewhxwynbw .gt_row_group_first th { border-top-width: 2px !important; }
+ #kewhxwynbw .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #kewhxwynbw .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #kewhxwynbw .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #kewhxwynbw .gt_left { text-align: left !important; }
+ #kewhxwynbw .gt_center { text-align: center !important; }
+ #kewhxwynbw .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #kewhxwynbw .gt_font_normal { font-weight: normal !important; }
+ #kewhxwynbw .gt_font_bold { font-weight: bold !important; }
+ #kewhxwynbw .gt_font_italic { font-style: italic !important; }
+ #kewhxwynbw .gt_super { font-size: 65% !important; }
+ #kewhxwynbw .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #kewhxwynbw .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="4" class="gt_heading gt_title gt_font_normal">Frequencies</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Frequencies of word tokens, Garden Party Corpus</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="Token" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Token</th>
+<th id="Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency</th>
+<th id="Normalized-Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Normalized Frequency</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">the</td>
+<td class="gt_row gt_right">2,911</td>
+<td class="gt_row gt_right">459.79</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">and</td>
+<td class="gt_row gt_right">1,798</td>
+<td class="gt_row gt_right">283.99</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">“</td>
+<td class="gt_row gt_right">1,615</td>
+<td class="gt_row gt_right">255.09</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">”</td>
+<td class="gt_row gt_right">1,614</td>
+<td class="gt_row gt_right">254.93</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">a</td>
+<td class="gt_row gt_right">1,407</td>
+<td class="gt_row gt_right">222.24</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">to</td>
+<td class="gt_row gt_right">1,376</td>
+<td class="gt_row gt_right">217.34</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">she</td>
+<td class="gt_row gt_right">1,171</td>
+<td class="gt_row gt_right">184.96</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">was</td>
+<td class="gt_row gt_right">1,102</td>
+<td class="gt_row gt_right">174.06</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">it</td>
+<td class="gt_row gt_right">1,021</td>
+<td class="gt_row gt_right">161.27</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">her</td>
+<td class="gt_row gt_right">937</td>
+<td class="gt_row gt_right">148.00</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_left">of</td>
+<td class="gt_row gt_right">908</td>
+<td class="gt_row gt_right">143.42</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_left">i</td>
+<td class="gt_row gt_right">719</td>
+<td class="gt_row gt_right">113.57</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_left">he</td>
+<td class="gt_row gt_right">718</td>
+<td class="gt_row gt_right">113.41</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_left">in</td>
+<td class="gt_row gt_right">683</td>
+<td class="gt_row gt_right">107.88</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_left">that</td>
+<td class="gt_row gt_right">643</td>
+<td class="gt_row gt_right">101.56</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">16</td>
+<td class="gt_row gt_left">you</td>
+<td class="gt_row gt_right">642</td>
+<td class="gt_row gt_right">101.40</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_left">’s</td>
+<td class="gt_row gt_right">524</td>
+<td class="gt_row gt_right">82.77</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_left">n’t</td>
+<td class="gt_row gt_right">522</td>
+<td class="gt_row gt_right">82.45</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">19</td>
+<td class="gt_row gt_left">said</td>
+<td class="gt_row gt_right">514</td>
+<td class="gt_row gt_right">81.19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_left">on</td>
+<td class="gt_row gt_right">504</td>
+<td class="gt_row gt_right">79.61</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Report based on word tokens</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Normalized Frequency is per 10,000 tokens</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Total word tokens: 63,311</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Unique word tokens: 5,398</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Showing 20 rows</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Page 1 of 270</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<div id="cell-29" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>conc.ngram_frequencies(ngram_length <span class="op">=</span> <span class="dv">2</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="rsbucqcoxv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#rsbucqcoxv table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#rsbucqcoxv thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#rsbucqcoxv p { margin: 0 !important; padding: 0 !important; }
+ #rsbucqcoxv .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #rsbucqcoxv .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #rsbucqcoxv .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #rsbucqcoxv .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #rsbucqcoxv .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #rsbucqcoxv .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #rsbucqcoxv .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #rsbucqcoxv .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #rsbucqcoxv .gt_spanner_row { border-bottom-style: hidden !important; }
+ #rsbucqcoxv .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #rsbucqcoxv .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #rsbucqcoxv .gt_from_md> :first-child { margin-top: 0 !important; }
+ #rsbucqcoxv .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #rsbucqcoxv .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #rsbucqcoxv .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #rsbucqcoxv .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #rsbucqcoxv .gt_row_group_first td { border-top-width: 2px !important; }
+ #rsbucqcoxv .gt_row_group_first th { border-top-width: 2px !important; }
+ #rsbucqcoxv .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #rsbucqcoxv .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #rsbucqcoxv .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #rsbucqcoxv .gt_left { text-align: left !important; }
+ #rsbucqcoxv .gt_center { text-align: center !important; }
+ #rsbucqcoxv .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #rsbucqcoxv .gt_font_normal { font-weight: normal !important; }
+ #rsbucqcoxv .gt_font_bold { font-weight: bold !important; }
+ #rsbucqcoxv .gt_font_italic { font-style: italic !important; }
+ #rsbucqcoxv .gt_super { font-size: 65% !important; }
+ #rsbucqcoxv .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #rsbucqcoxv .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="4" class="gt_heading gt_title gt_font_normal">Ngram Frequencies</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Garden Party Corpus</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="Ngram" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Ngram</th>
+<th id="Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency</th>
+<th id="Normalized-Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Normalized Frequency</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">” said</td>
+<td class="gt_row gt_right">328</td>
+<td class="gt_row gt_right">51.81</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">” “</td>
+<td class="gt_row gt_right">326</td>
+<td class="gt_row gt_right">51.49</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">it was</td>
+<td class="gt_row gt_right">247</td>
+<td class="gt_row gt_right">39.01</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">in the</td>
+<td class="gt_row gt_right">214</td>
+<td class="gt_row gt_right">33.80</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">“ i</td>
+<td class="gt_row gt_right">197</td>
+<td class="gt_row gt_right">31.12</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">on the</td>
+<td class="gt_row gt_right">183</td>
+<td class="gt_row gt_right">28.90</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">of the</td>
+<td class="gt_row gt_right">156</td>
+<td class="gt_row gt_right">24.64</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">” she</td>
+<td class="gt_row gt_right">156</td>
+<td class="gt_row gt_right">24.64</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">to the</td>
+<td class="gt_row gt_right">139</td>
+<td class="gt_row gt_right">21.96</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">at the</td>
+<td class="gt_row gt_right">133</td>
+<td class="gt_row gt_right">21.01</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_left">she was</td>
+<td class="gt_row gt_right">132</td>
+<td class="gt_row gt_right">20.85</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_left">and the</td>
+<td class="gt_row gt_right">124</td>
+<td class="gt_row gt_right">19.59</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_left">it ’s</td>
+<td class="gt_row gt_right">120</td>
+<td class="gt_row gt_right">18.95</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_left">do n’t</td>
+<td class="gt_row gt_right">105</td>
+<td class="gt_row gt_right">16.58</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_left">they were</td>
+<td class="gt_row gt_right">104</td>
+<td class="gt_row gt_right">16.43</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">16</td>
+<td class="gt_row gt_left">” and</td>
+<td class="gt_row gt_right">102</td>
+<td class="gt_row gt_right">16.11</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_left">he was</td>
+<td class="gt_row gt_right">100</td>
+<td class="gt_row gt_right">15.80</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_left">she had</td>
+<td class="gt_row gt_right">95</td>
+<td class="gt_row gt_right">15.01</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">19</td>
+<td class="gt_row gt_left">” he</td>
+<td class="gt_row gt_right">91</td>
+<td class="gt_row gt_right">14.37</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_left">“ oh</td>
+<td class="gt_row gt_right">90</td>
+<td class="gt_row gt_right">14.22</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Report based on word tokens</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Ngram length: 2</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Ngrams containing punctuation tokens excluded</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Normalized Frequency is per 10,000 tokens</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Total unique ngrams: 25,568</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Total ngrams: 52,112</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Showing 20 rows</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Page 1 of 1279</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<div id="cell-30" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>conc.ngrams(<span class="st">'she was'</span>, ngram_length <span class="op">=</span> <span class="dv">3</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="plyyazdzan" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#plyyazdzan table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#plyyazdzan thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#plyyazdzan p { margin: 0 !important; padding: 0 !important; }
+ #plyyazdzan .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #plyyazdzan .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #plyyazdzan .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #plyyazdzan .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #plyyazdzan .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #plyyazdzan .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #plyyazdzan .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #plyyazdzan .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #plyyazdzan .gt_spanner_row { border-bottom-style: hidden !important; }
+ #plyyazdzan .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #plyyazdzan .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #plyyazdzan .gt_from_md> :first-child { margin-top: 0 !important; }
+ #plyyazdzan .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #plyyazdzan .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #plyyazdzan .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #plyyazdzan .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #plyyazdzan .gt_row_group_first td { border-top-width: 2px !important; }
+ #plyyazdzan .gt_row_group_first th { border-top-width: 2px !important; }
+ #plyyazdzan .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #plyyazdzan .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #plyyazdzan .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #plyyazdzan .gt_left { text-align: left !important; }
+ #plyyazdzan .gt_center { text-align: center !important; }
+ #plyyazdzan .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #plyyazdzan .gt_font_normal { font-weight: normal !important; }
+ #plyyazdzan .gt_font_bold { font-weight: bold !important; }
+ #plyyazdzan .gt_font_italic { font-style: italic !important; }
+ #plyyazdzan .gt_super { font-size: 65% !important; }
+ #plyyazdzan .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #plyyazdzan .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="4" class="gt_heading gt_title gt_font_normal">Ngrams for "she was"</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Garden Party Corpus</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="Ngram" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Ngram</th>
+<th id="Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency</th>
+<th id="Normalized-Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Normalized Frequency</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">she was going</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0.79</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">she was so</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0.79</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">she was a</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">0.63</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">she was still</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">she was as</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">she was n’t</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">she was never</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">she was at</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">she was gone</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.47</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">she was the</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_left">she was very</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_left">she was wearing</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_left">she was alone</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_left">she was here</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_left">she was quite</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">16</td>
+<td class="gt_row gt_left">she was an</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_left">she was born</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_left">she was feeling</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">19</td>
+<td class="gt_row gt_left">she was like</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_left">she was sitting</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.32</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Report based on word tokens</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Ngram length: 3, Token position: left</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Ngrams containing punctuation tokens excluded</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Normalized Frequency is per 10,000 tokens</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Total unique ngrams: 82</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Total ngrams: 122</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Showing 20 rows</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Page 1 of 5</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<div id="cell-31" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>conc.concordance(<span class="st">'quite'</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="wxjhumcpmw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#wxjhumcpmw table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#wxjhumcpmw thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#wxjhumcpmw p { margin: 0 !important; padding: 0 !important; }
+ #wxjhumcpmw .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #wxjhumcpmw .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #wxjhumcpmw .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #wxjhumcpmw .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #wxjhumcpmw .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #wxjhumcpmw .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #wxjhumcpmw .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #wxjhumcpmw .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #wxjhumcpmw .gt_spanner_row { border-bottom-style: hidden !important; }
+ #wxjhumcpmw .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #wxjhumcpmw .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #wxjhumcpmw .gt_from_md> :first-child { margin-top: 0 !important; }
+ #wxjhumcpmw .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #wxjhumcpmw .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #wxjhumcpmw .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #wxjhumcpmw .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #wxjhumcpmw .gt_row_group_first td { border-top-width: 2px !important; }
+ #wxjhumcpmw .gt_row_group_first th { border-top-width: 2px !important; }
+ #wxjhumcpmw .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #wxjhumcpmw .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #wxjhumcpmw .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #wxjhumcpmw .gt_left { text-align: left !important; }
+ #wxjhumcpmw .gt_center { text-align: center !important; }
+ #wxjhumcpmw .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #wxjhumcpmw .gt_font_normal { font-weight: normal !important; }
+ #wxjhumcpmw .gt_font_bold { font-weight: bold !important; }
+ #wxjhumcpmw .gt_font_italic { font-style: italic !important; }
+ #wxjhumcpmw .gt_super { font-size: 65% !important; }
+ #wxjhumcpmw .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #wxjhumcpmw .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="4" class="gt_heading gt_title gt_font_normal">Concordance for "quite"</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Garden Party Corpus, Context tokens: 5, Order: 1R2R3R</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Document-Id" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Document Id</th>
+<th id="Left" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Left</th>
+<th id="Node" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Node</th>
+<th id="Right" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Right</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">echoed , “ Oh ,</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">! ” and she was</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">, Jug ? ” “</td>
+<td class="gt_row gt_left">Quite</td>
+<td class="gt_row gt_left">, Con . ” “</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">? ” “ Oh ,</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">, quite , ” said</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">drawing - room . “</td>
+<td class="gt_row gt_left">Quite</td>
+<td class="gt_row gt_left">, ” said Josephine faintly</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">“ Oh , quite ,</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">, ” said Reggie ,</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_right">? ” “ Yes ,</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">. Oh , Laurie !</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_right">you think ? ” “</td>
+<td class="gt_row gt_left">Quite</td>
+<td class="gt_row gt_left">. ” “ Hans ,</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">match for the kettle in</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a dashing way . But</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">a piece . It was</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a gayme . ” Josephine</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">into a pool . “</td>
+<td class="gt_row gt_left">Quite</td>
+<td class="gt_row gt_left">a good floor , is</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">also explained why she had</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a queer , shy feeling</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">door . It gave her</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a shock again to see</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">as though she felt indeed</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a stranger . “ Now</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_right">for ages and ages ,</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">a term and a half</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">make that noise?—that Lottie looked</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">alarmed . “ I ’ll</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">desperately . “ It ’s</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">all right , dear boy</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">tie was crooked . Then</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">an old man — fat</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_right">) “ Oh , not</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">as bad as that ,</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">? Josephine and Constantia were</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">bewildered for the moment .</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_right">on their ears . And</td>
+<td class="gt_row gt_left">quite</td>
+<td class="gt_row gt_left">big girls — older than</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Total Concordance Lines: 75</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Total Documents: 14</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Showing 20 lines</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Page 1 of 4</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<div id="cell-32" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>conc.concordance_plot(<span class="st">'quite'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script>
+var eof_token = 5223;
+var page_size = 10;
+var append_info = true;
+var row_height = 60;
+var start_first_row_at = 30;
+var row_adjustment = 30;
+var default_font_size = 12;
+var subplot_height = 40;
+var plot_height = 610;
+var plot_x = 160;
+var label_x_right = 150;
+var docs = [{"doc_id":1,"positions":[130,1467],"count":3174},{"doc_id":2,"positions":[2740,4522,6422,6479,10377,10827,11523,11942,16574],"count":17017},{"doc_id":4,"positions":[386,1448,2054,2080,2548,3137,4049,4109,4404,5111,5207,5628,6508,6736,6833,7045,7466,7656],"count":9214},{"doc_id":5,"positions":[940,1244,1349,1711,1772,2040,2304,2527],"count":3202},{"doc_id":6,"positions":[696],"count":3178},{"doc_id":7,"positions":[2543],"count":4997},{"doc_id":8,"positions":[552,1655,1716,2317],"count":2407},{"doc_id":9,"positions":[3940,3942],"count":4393},{"doc_id":10,"positions":[757,776,872,1797,2027,2282,4596,4724,5063,5163,6977,7103],"count":7118},{"doc_id":11,"positions":[202,1469,2057,2442],"count":2779},{"doc_id":12,"positions":[267,694,882,1413],"count":2792},{"doc_id":13,"positions":[691,694,733,2340,3378,5171,5269],"count":5963},{"doc_id":14,"positions":[2254,3170],"count":3963},{"doc_id":15,"positions":[1587],"count":2879}];
+var tokens = {"97":"my","178":"not","181":"simply","233":"found","240":"’s","247":";","318":"of","347":"waited","351":"afternoon","379":"pool","400":"ages","456":"Quite","473":"getting","539":"Of","567":"able","571":"he","588":"He","592":"out","605":"him","612":"sorry","633":"does","639":"fast","677":"noise?—that","691":"this","693":"brightly","733":"do","748":"up","772":"and","830":"thing","838":"old","874":",","892":"his","918":"course","972":"until","991":"herself","1002":"in","1040":"man","1060":"chance","1086":"faint","1148":"grown","1175":"shock","1198":"talking","1229":"Then","1237":"courage","1271":"to","1287":"floor","1310":"bewildered","1311":"kettle","1348":"Oh","1356":"whether","1363":"her","1364":"dry","1418":"Mrs.","1451":"that","1462":"alarmed","1475":"warm","1487":"Constantia","1490":"again","1493":"term","1554":"I","1583":"gave","1674":"The","1742":"She","1796":"over","1814":"Con","1865":"beating","1885":"good","1900":"feel","1931":"calmly","1935":"what","1963":"right","1964":"young","1978":"band","2021":"There","2053":"forgot","2066":"best","2086":"somehow","2187":"plan","2239":"she","2241":"”","2259":"sounded","2289":"way","2409":"water","2440":"difficult","2462":"the","2470":"as","2492":"could","2537":"you","2573":"normal","2574":"know","2619":"It","2677":"go","2753":"?","2838":"indeed","2925":"....","3067":"keep","3102":"darling","3110":"fastened","3135":"sincere","3197":"looked","3226":"were","3247":"make","3281":"queer","3304":"so","3354":"was","3455":"it","3497":"be","3499":"ears","3542":"plainly","3564":"wild","3635":"discussed","3651":"lady","3658":"Fairfield","3684":"never","3761":"most","3763":"gayme","3775":"Alice","3785":"quite","3791":"expert","3835":"Yes","3844":"Lottie","3917":":","3989":"easy","4016":"crooked","4042":"a","4059":"see","4132":"And","4133":"seemed","4173":"too","4198":"bad","4242":"if","4270":"been","4283":"become","4292":"got","4295":"peaceful","4304":"respectful","4316":".","4358":"gown","4405":"unruffled","4423":"had","4429":"excusable","4563":"bush","4564":"felt","4578":"all","4581":"probability","4584":"after","4645":"did","4667":"—","4677":"understood","4728":"dashing","4748":"ca","4931":"follow","4950":"matter","4965":"but","4979":"room","4993":"really","5029":"simple","5048":"dagger","5063":"suddenly","5064":"A","5134":"Auntie","5141":"an","5176":"saw","5180":"seem","5205":"fiercely","5291":"dark","5295":"stranger","5296":"big","5464":"system","5468":"girls","5473":"for","5474":"whispering","5493":"“","5501":"Let","5509":"look","5588":"why","5608":"ready","5628":"close","5705":"though","5716":"n’t","5729":"by","5765":"they","5783":"small","5967":"!","5984":"used","5992":"said","6028":"Spanish","6133":"But","6213":"end","6265":"grandma"};
+var examples = [{"doc_id":1,"orth_indices":[[4578,1796,4316,456,5063,571,4423],[5493,1348,874,3785,3304,874,3102]]},{"doc_id":2,"orth_indices":[[1418,3658,3354,3785,4405,4316,5493],[972,5765,3226,3785,5628,4316,5493],[1451,3354,178,3785,1364,772,3110],[1674,2409,3354,3785,1475,4316,2619],[2239,233,3455,3785,2440,1271,3067],[4316,2241,3775,3785,5176,1935,2239],[677,3844,3197,3785,1462,4316,5493],[4316,2619,240,3785,3989,874,2241],[4242,691,3354,3785,4677,5729,2462]]},{"doc_id":4,"orth_indices":[[633,5716,5180,3785,3135,874,1002],[4316,2619,3354,3785,4042,3763,4316],[1674,6213,3354,3785,4295,874,1554],[4979,4316,5493,456,874,2241,5992],[3455,1271,3497,3785,5029,874,2241],[4423,3635,3455,3785,1931,4316,2619],[1487,874,5474,3785,5205,4316,5493],[2753,2619,240,3785,4429,4316,5501],[4316,1742,3354,3785,2573,1490,4316],[4581,874,4423,3785,4292,592,318],[539,918,5765,3785,4677,247,4965],[1554,733,5716,3785,2574,874,5134],[5493,2619,240,3785,4578,1963,874],[772,1487,3226,3785,1310,5473,2462],[1237,2239,5992,3785,693,1271,1487],[2239,4564,2838,3785,4042,5295,4316],[4270,567,1271,3785,3247,748,97],[2753,2241,5493,456,874,1814,4316]]},{"doc_id":5,"orth_indices":[[1198,4316,1742,3785,2053,1271,3497],[4316,1229,874,3785,5063,874,2470],[4016,4316,1229,3785,5141,838,1040],[379,4316,5493,456,4042,1885,1287],[5493,1348,874,3785,5967,2241,772],[1356,2239,3354,3785,1148,748,4584],[2619,1583,1363,3785,4042,1175,1490],[772,2239,4564,3785,612,5473,605]]},{"doc_id":6,"orth_indices":[[5464,2241,3354,3785,5029,874,772]]},{"doc_id":7,"orth_indices":[[3917,2239,2259,3785,1086,4316,5493]]},{"doc_id":8,"orth_indices":[[4423,4283,4993,3785,3791,874,2239],[5588,2239,4423,3785,4042,3281,874],[1742,4423,4292,3785,5984,1271,2462],[2462,1311,1002,3785,4042,4728,2289]]},{"doc_id":9,"orth_indices":[[5493,1348,874,3785,874,3785,874],[874,3785,874,3785,874,2241,5992]]},{"doc_id":10,"orth_indices":[[1356,3455,3354,3785,4304,318,4042],[6133,2239,4645,3785,4931,605,4316],[2462,1978,3354,3785,5783,4316,6133],[4316,2619,3354,3785,1475,4316,5064],[5493,2619,240,3785,1963,874,2241],[2753,2241,5493,456,4316,2241,5493],[4316,2021,874,3785,5729,1060,874],[2086,1451,4133,3785,2462,2066,2187],[874,2537,5509,3785,6028,4316,1554],[2925,2241,5493,456,2462,3761,2925],[5493,3835,874,3785,4316,1348,874],[4950,4316,588,3785,4677,4316,5493]]},{"doc_id":11,"orth_indices":[[2241,1554,1900,3785,3564,874,1554],[3499,4316,4132,3785,5296,5468,4667],[3651,3354,5716,3785,991,1451,351],[4042,5048,4316,456,2462,830,5967]]},{"doc_id":12,"orth_indices":[[1348,874,178,3785,2470,4198,2470],[772,400,874,3785,4042,1493,772],[874,5705,874,3785,181,874,1865],[347,4316,5493,456,1885,874,2241]]},{"doc_id":13,"orth_indices":[[4667,2241,5493,456,3304,5967,456],[456,3304,5967,456,3304,5967,2241],[2619,240,473,3785,5291,874,4173],[4748,5716,2677,3785,3304,639,874],[1451,3684,3354,3785,892,4667,892],[5992,4316,5493,456,1964,4316,2241],[1674,6213,3354,3785,4295,874,2241]]},{"doc_id":14,"orth_indices":[[4358,6265,3354,3785,5608,4316,5493],[5765,2492,4059,3785,3542,5291,4563]]},{"doc_id":15,"orth_indices":[[972,5063,874,3785,5729,1060,874]]}];
+
+    function filter_token_ids(token_ids) {
+        var centre_index = Math.floor(token_ids.length / 2);
+        var left_tokens = token_ids.slice(0, centre_index);
+        var right_tokens = token_ids.slice(centre_index);
+        if (left_tokens.includes(eof_token)) {
+            var eof_index_pos = left_tokens.lastIndexOf(eof_token);
+            if (eof_index_pos !== -1) {
+                left_tokens = left_tokens.slice(eof_index_pos + 1);
+            }
+        }
+        if (right_tokens.includes(eof_token)) {
+            var eof_index_pos = right_tokens.indexOf(eof_token);
+            if (eof_index_pos !== -1) {
+                right_tokens = right_tokens.slice(0, eof_index_pos);
+            }
+        }
+        token_ids = left_tokens.concat(right_tokens);
+        return token_ids;
+    }
+    function token_ids_to_str(token_ids) {
+        if (token_ids.includes(eof_token)) {
+            token_ids = filter_token_ids(token_ids);
+        }
+        const token_strs = [];
+        for (let i = 0; i < token_ids.length; i++) {
+            const token_id = token_ids[i];
+            if (tokens[token_id]) {
+                token_strs.push(tokens[token_id]);
+            } else {
+                token_strs.push(`Unknown Token ID: ${token_id}`);
+            }
+        }
+        return token_strs.join(' ');
+    }
+    function populatePlot(page, page_size) {
+        start = (page - 1) * page_size;
+        end = start + page_size;
+        const plot = document.getElementById('conc-concordance-plot');
+        const lines = plot.getElementsByClassName('conc-concordance-plot-line');
+        while (lines.length > 0) {
+            lines[0].remove();
+        }
+        const labels = plot.getElementsByClassName('label');
+        while (labels.length > 0) {
+            labels[0].remove();
+        }
+        const rects = plot.getElementsByTagName('rect');
+        for (let i = 0; i < rects.length; i++) {
+            rects[i].setAttribute('style', 'opacity:1;');
+        }
+        for (let i = start; i < end; i++) {
+            page_i = (i - start + 1)
+            if (i >= docs.length) {
+                const rect = document.getElementById(`rect-${page_i}`);
+                if (rect) {
+                    rect.setAttribute('style', 'opacity:0;');
+                }
+                continue;
+            }
+            const doc = docs[i];
+            const plot_y = (page_i * row_height) - row_adjustment;
+            const label_y = plot_y + (default_font_size * 1.4);
+            const label_y2 = plot_y + (default_font_size * 1.4 * 2);
+            const doc_positions_count = doc.positions.length;
+            const line_text = doc_positions_count === 1 ? '1 line' : `${doc_positions_count} lines`;
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('class', 'label');
+            label.setAttribute('x', label_x_right);
+            label.setAttribute('y', label_y);
+            label.setAttribute('font-size', default_font_size);
+            label.setAttribute('text-anchor', 'end');
+            label.textContent = `Doc ${doc.doc_id}`;
+            plot.appendChild(label);
+            const label2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label2.setAttribute('class', 'label');
+            label2.setAttribute('x', label_x_right);
+            label2.setAttribute('y', label_y2);
+            label2.setAttribute('font-size', default_font_size);
+            label2.setAttribute('text-anchor', 'end');
+            label2.textContent = line_text;
+            plot.appendChild(label2);
+            const positions = doc.positions;
+            const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
+            for (let j = 0; j < x_values.length; j++) {
+                const x_value = x_values[j];
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                line.setAttribute('class', 'conc-concordance-plot-line');
+                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line1.setAttribute('x1', plot_x + x_value);
+                line1.setAttribute('y1', plot_y);
+                line1.setAttribute('x2', plot_x + x_value);
+                line1.setAttribute('y2', plot_y + subplot_height);
+                line1.setAttribute('style', 'stroke-width:10;opacity:0;');
+                line.appendChild(line1);
+                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line2.setAttribute('x1', plot_x + x_value);
+                line2.setAttribute('y1', plot_y);
+                line2.setAttribute('x2', plot_x + x_value);
+                line2.setAttribute('y2', plot_y + subplot_height);
+                line2.setAttribute('style', 'stroke-width:2;');
+                line.appendChild(line2);
+                let anchor = 'middle';
+                let x_adjustment = 0;
+                if (x_value < 150) {
+                    anchor = 'start';
+                    x_adjustment = -30;
+                }
+                if (x_value > 650) {
+                    anchor = 'end';
+                    x_adjustment = 30;
+                }
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', plot_x + x_value + x_adjustment);
+                text.setAttribute('y', plot_y - 5);
+                text.setAttribute('text-anchor', anchor);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', 'black');
+                append = ''
+                if (append_info) {
+                    position_offset_1 = doc.positions[j] + 1;
+                    append = ` (token ${position_offset_1} of ${doc.count})`;
+                }
+                text.textContent = token_ids_to_str(examples[i].orth_indices[j]) + append;
+                line.appendChild(text);
+                plot.appendChild(line);
+            }
+
+        }
+    }
+
+    function tryInit() {
+    const targetNode = document.getElementById('conc-plot-wrapper');
+    if (targetNode && targetNode.querySelector('.conc-plot-footer')) {
+        vizInit();
+        return true;
+    }
+    return false;
+    }
+    function vizInit() {
+        current_page = 1;
+        const slider = document.getElementById('conc-concordance-plot-slider');
+        
+        populatePlot(current_page, page_size);
+        slider.addEventListener('input', function() {
+            const page = parseInt(this.value, 10);
+            populatePlot(page, page_size);
+            const page_number = document.getElementById('conc-concordance-plot-page-number');
+            page_number.textContent = `${page}`;
+        });
+    }
+    
+    
+</script>
+<style>
+    .conc-plot-wrapper {
+    background: #fff;
+    width:1000px;
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    line-height: 1.1;
+    margin: 20px 0 20px 0;
+    }
+    .conc-plot-wrapper h2 {
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    text-align:center;
+    font-weight: 600;
+    line-height: 2;
+    margin:0;
+    padding:0;
+    }
+    .conc-plot-wrapper h3 {
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    text-align:center;
+    font-weight: 300;
+    line-height: 1;
+    margin:0;
+    padding:0;
+    }
+    .conc-concordance-plot {
+    }
+    .conc-concordance-plot-summary {
+    margin: 20px 40px 10px 160px;
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    }
+    .conc-concordance-plot-controls {
+    height: 60px;
+    margin: 0 40px 20px 40px;
+    }
+    .conc-concordance-plot-controls input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    background: #ccc;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+    }
+    .conc-concordance-plot-controls label {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    color: #000;
+    display: block;
+    margin-bottom: 5px;
+    }
+    .conc-concordance-plot rect {
+    fill: #ccc;
+    width: 800px;
+    height: 40px;
+    }
+    .conc-concordance-plot .label {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    }
+    g.conc-concordance-plot-line {
+    cursor: pointer;
+    }
+    g.conc-concordance-plot-line line {
+    stroke:#666;
+    }
+    g.conc-concordance-plot-line:hover line {
+    stroke:#000;
+    }
+    g.conc-concordance-plot-line > text {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    display:none;
+    }
+    g.conc-concordance-plot-line:hover > text {
+    display:block;
+    }
+    g.conc-concordance-plot-line.highlight line {
+    }
+    .conc-plot-wrapper { font-size: 12px; }.conc-plot-wrapper h2 { font-size: 24px; }.conc-plot-wrapper h3, .conc-concordance-plot-summary { font-size: 15.0px; }.conc-concordance-plot-controls label { font-size: 12px; }</style><div class="conc-plot-wrapper" id="conc-plot-wrapper"><h2 class="anchored">Concordance Plot for "quite"</h2><h3 class="anchored">Garden Party Corpus</h3><svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="610" xmlns="http://www.w3.org/2000/svg"><rect id="rect-1" x="160" y="30" height="40" width="800"></rect><rect id="rect-2" x="160" y="90" height="40" width="800"></rect><rect id="rect-3" x="160" y="150" height="40" width="800"></rect><rect id="rect-4" x="160" y="210" height="40" width="800"></rect><rect id="rect-5" x="160" y="270" height="40" width="800"></rect><rect id="rect-6" x="160" y="330" height="40" width="800"></rect><rect id="rect-7" x="160" y="390" height="40" width="800"></rect><rect id="rect-8" x="160" y="450" height="40" width="800"></rect><rect id="rect-9" x="160" y="510" height="40" width="800"></rect><rect id="rect-10" x="160" y="570" height="40" width="800"></rect></svg><div class="conc-concordance-plot-summary">Total Documents: 14<br>Total Concordance Lines: 75</div><div class="conc-concordance-plot-controls"><label for="conc-concordance-plot-slider" id="conc-concordance-plot-slider-label">Page <span id="conc-concordance-plot-page-number">1</span> of 2</label>
+    <input type="range" min="1" max="2" value="1" step="1" class="slider" id="conc-concordance-plot-slider" autocomplete="off"></div>
+    <div class="conc-plot-footer"></div>
+    </div>
+    <script>
+
+
+    if (!tryInit()) {
+    // Only set up observer if not ready yet
+    const observer = new MutationObserver(function(mutationsList, observer) {
+        if (tryInit()) {
+        observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    }
+    </script>
+    
+</div>
+</div>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>conc.collocates(<span class="st">'quite'</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="geasxetfzv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#geasxetfzv table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#geasxetfzv thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#geasxetfzv p { margin: 0 !important; padding: 0 !important; }
+ #geasxetfzv .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #geasxetfzv .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #geasxetfzv .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #geasxetfzv .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #geasxetfzv .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #geasxetfzv .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #geasxetfzv .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #geasxetfzv .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #geasxetfzv .gt_spanner_row { border-bottom-style: hidden !important; }
+ #geasxetfzv .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #geasxetfzv .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #geasxetfzv .gt_from_md> :first-child { margin-top: 0 !important; }
+ #geasxetfzv .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #geasxetfzv .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #geasxetfzv .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #geasxetfzv .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #geasxetfzv .gt_row_group_first td { border-top-width: 2px !important; }
+ #geasxetfzv .gt_row_group_first th { border-top-width: 2px !important; }
+ #geasxetfzv .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #geasxetfzv .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #geasxetfzv .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #geasxetfzv .gt_left { text-align: left !important; }
+ #geasxetfzv .gt_center { text-align: center !important; }
+ #geasxetfzv .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #geasxetfzv .gt_font_normal { font-weight: normal !important; }
+ #geasxetfzv .gt_font_bold { font-weight: bold !important; }
+ #geasxetfzv .gt_font_italic { font-style: italic !important; }
+ #geasxetfzv .gt_super { font-size: 65% !important; }
+ #geasxetfzv .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #geasxetfzv .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="6" class="gt_heading gt_title gt_font_normal">Collocates of "quite"</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Garden Party Corpus</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="Token" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Token</th>
+<th id="Collocate-Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Collocate Frequency</th>
+<th id="Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency</th>
+<th id="Logdice" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Logdice</th>
+<th id="Log-Likelihood" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Log Likelihood</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">oh</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">149</td>
+<td class="gt_row gt_right">10.00</td>
+<td class="gt_row gt_right">8.99</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">”</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">1,614</td>
+<td class="gt_row gt_right">9.74</td>
+<td class="gt_row gt_right">23.91</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">said</td>
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_right">514</td>
+<td class="gt_row gt_right">9.61</td>
+<td class="gt_row gt_right">7.59</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">“</td>
+<td class="gt_row gt_right">40</td>
+<td class="gt_row gt_right">1,615</td>
+<td class="gt_row gt_right">9.60</td>
+<td class="gt_row gt_right">17.49</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">so</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">241</td>
+<td class="gt_row gt_right">9.28</td>
+<td class="gt_row gt_right">2.66</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">was</td>
+<td class="gt_row gt_right">22</td>
+<td class="gt_row gt_right">1,102</td>
+<td class="gt_row gt_right">9.26</td>
+<td class="gt_row gt_right">5.13</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">n’t</td>
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_right">522</td>
+<td class="gt_row gt_right">9.24</td>
+<td class="gt_row gt_right">3.07</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">it</td>
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_right">1,021</td>
+<td class="gt_row gt_right">9.22</td>
+<td class="gt_row gt_right">4.35</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">she</td>
+<td class="gt_row gt_right">22</td>
+<td class="gt_row gt_right">1,171</td>
+<td class="gt_row gt_right">9.18</td>
+<td class="gt_row gt_right">4.07</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">they</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">398</td>
+<td class="gt_row gt_right">8.92</td>
+<td class="gt_row gt_right">0.97</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_left">had</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">469</td>
+<td class="gt_row gt_right">8.91</td>
+<td class="gt_row gt_right">0.95</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_left">a</td>
+<td class="gt_row gt_right">21</td>
+<td class="gt_row gt_right">1,407</td>
+<td class="gt_row gt_right">8.86</td>
+<td class="gt_row gt_right">1.04</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_left">all</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">281</td>
+<td class="gt_row gt_right">8.85</td>
+<td class="gt_row gt_right">0.73</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_left">i</td>
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_right">719</td>
+<td class="gt_row gt_right">8.69</td>
+<td class="gt_row gt_right">0.24</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_left">that</td>
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">643</td>
+<td class="gt_row gt_right">8.68</td>
+<td class="gt_row gt_right">0.24</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">16</td>
+<td class="gt_row gt_left">—</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">501</td>
+<td class="gt_row gt_right">8.64</td>
+<td class="gt_row gt_right">0.18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_left">you</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">642</td>
+<td class="gt_row gt_right">8.51</td>
+<td class="gt_row gt_right">0.02</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_left">as</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">378</td>
+<td class="gt_row gt_right">8.50</td>
+<td class="gt_row gt_right">0.06</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">19</td>
+<td class="gt_row gt_left">the</td>
+<td class="gt_row gt_right">31</td>
+<td class="gt_row gt_right">2,911</td>
+<td class="gt_row gt_right">8.41</td>
+<td class="gt_row gt_right">0.38</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_left">’s</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">524</td>
+<td class="gt_row gt_right">8.36</td>
+<td class="gt_row gt_right">0.01</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="6" class="gt_sourcenote">Report based on word tokens</td>
+</tr>
+<tr class="even">
+<td colspan="6" class="gt_sourcenote">Context tokens left: 5, context tokens right: 5</td>
+</tr>
+<tr class="odd">
+<td colspan="6" class="gt_sourcenote">Filtered tokens by minimum collocation frequency (5)</td>
+</tr>
+<tr class="even">
+<td colspan="6" class="gt_sourcenote">Unique collocates: 22</td>
+</tr>
+<tr class="odd">
+<td colspan="6" class="gt_sourcenote">Showing 20 rows</td>
+</tr>
+<tr class="even">
+<td colspan="6" class="gt_sourcenote">Page 1 of 2</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<div id="cell-34" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>reference_corpus <span class="op">=</span> Corpus().load(corpus_path<span class="op">=</span><span class="ss">f'</span><span class="sc">{</span>save_path<span class="sc">}</span><span class="ss">brown.corpus'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-35" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>conc.set_reference_corpus(reference_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-36" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>conc.keywords(min_document_frequency <span class="op">=</span> <span class="dv">3</span>, min_document_frequency_reference <span class="op">=</span> <span class="dv">3</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="govqkyklsm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#govqkyklsm table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#govqkyklsm thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#govqkyklsm p { margin: 0 !important; padding: 0 !important; }
+ #govqkyklsm .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: 0 !important; margin-right: auto !important; color: #333333 !important; font-size: 16px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: auto !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #A8A8A8 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #A8A8A8 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #govqkyklsm .gt_title { color: #333333 !important; font-size: 125% !important; font-weight: initial !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #govqkyklsm .gt_subtitle { color: #333333 !important; font-size: 85% !important; font-weight: initial !important; padding-top: 3px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #govqkyklsm .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_col_heading { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #govqkyklsm .gt_column_spanner_outer { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: normal !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #govqkyklsm .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #govqkyklsm .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #govqkyklsm .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 5px !important; padding-bottom: 5px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #govqkyklsm .gt_spanner_row { border-bottom-style: hidden !important; }
+ #govqkyklsm .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #govqkyklsm .gt_empty_group_heading { padding: 0.5px !important; color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #govqkyklsm .gt_from_md> :first-child { margin-top: 0 !important; }
+ #govqkyklsm .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #govqkyklsm .gt_row { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #govqkyklsm .gt_stub { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #govqkyklsm .gt_stub_row_group { color: #333333 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #govqkyklsm .gt_row_group_first td { border-top-width: 2px !important; }
+ #govqkyklsm .gt_row_group_first th { border-top-width: 2px !important; }
+ #govqkyklsm .gt_striped { background-color: rgba(128,128,128,0.05) !important; }
+ #govqkyklsm .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_sourcenotes { color: #333333 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #govqkyklsm .gt_sourcenote { font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #govqkyklsm .gt_left { text-align: left !important; }
+ #govqkyklsm .gt_center { text-align: center !important; }
+ #govqkyklsm .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #govqkyklsm .gt_font_normal { font-weight: normal !important; }
+ #govqkyklsm .gt_font_bold { font-weight: bold !important; }
+ #govqkyklsm .gt_font_italic { font-style: italic !important; }
+ #govqkyklsm .gt_super { font-size: 65% !important; }
+ #govqkyklsm .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #govqkyklsm .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="9" class="gt_heading gt_title gt_font_normal">Keywords</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="9" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Target corpus: Garden Party Corpus, Reference corpus: Brown Corpus</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Rank</th>
+<th id="Token" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Token</th>
+<th id="Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency</th>
+<th id="Frequency-Reference" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Frequency Reference</th>
+<th id="Normalized-Frequency" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Normalized Frequency</th>
+<th id="Normalized-Frequency-Reference" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Normalized Frequency Reference</th>
+<th id="Relative-Risk" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Relative Risk</th>
+<th id="Log-Ratio" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Log Ratio</th>
+<th id="Log-Likelihood" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Log Likelihood</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">clasped</td>
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">2.05</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">67.09</td>
+<td class="gt_row gt_right">6.07</td>
+<td class="gt_row gt_right">57.79</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">bye</td>
+<td class="gt_row gt_right">25</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">3.95</td>
+<td class="gt_row gt_right">0.07</td>
+<td class="gt_row gt_right">55.29</td>
+<td class="gt_row gt_right">5.79</td>
+<td class="gt_row gt_right">107.37</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">velvet</td>
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">2.21</td>
+<td class="gt_row gt_right">0.05</td>
+<td class="gt_row gt_right">43.35</td>
+<td class="gt_row gt_right">5.44</td>
+<td class="gt_row gt_right">57.19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">morrow</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">1.26</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">41.28</td>
+<td class="gt_row gt_right">5.37</td>
+<td class="gt_row gt_right">32.32</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">wailed</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">1.26</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">41.28</td>
+<td class="gt_row gt_right">5.37</td>
+<td class="gt_row gt_right">32.32</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">shone</td>
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">2.05</td>
+<td class="gt_row gt_right">0.05</td>
+<td class="gt_row gt_right">40.25</td>
+<td class="gt_row gt_right">5.33</td>
+<td class="gt_row gt_right">52.21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">queer</td>
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">2.37</td>
+<td class="gt_row gt_right">0.06</td>
+<td class="gt_row gt_right">38.70</td>
+<td class="gt_row gt_right">5.27</td>
+<td class="gt_row gt_right">59.69</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">drawers</td>
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">1.58</td>
+<td class="gt_row gt_right">0.04</td>
+<td class="gt_row gt_right">38.70</td>
+<td class="gt_row gt_right">5.27</td>
+<td class="gt_row gt_right">39.79</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">dove</td>
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">1.58</td>
+<td class="gt_row gt_right">0.04</td>
+<td class="gt_row gt_right">38.70</td>
+<td class="gt_row gt_right">5.27</td>
+<td class="gt_row gt_right">39.79</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">gloves</td>
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">2.69</td>
+<td class="gt_row gt_right">0.07</td>
+<td class="gt_row gt_right">37.60</td>
+<td class="gt_row gt_right">5.23</td>
+<td class="gt_row gt_right">67.18</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_left">cried</td>
+<td class="gt_row gt_right">59</td>
+<td class="gt_row gt_right">26</td>
+<td class="gt_row gt_right">9.32</td>
+<td class="gt_row gt_right">0.27</td>
+<td class="gt_row gt_right">35.13</td>
+<td class="gt_row gt_right">5.13</td>
+<td class="gt_row gt_right">229.24</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">12</td>
+<td class="gt_row gt_left">veranda</td>
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">2.84</td>
+<td class="gt_row gt_right">0.08</td>
+<td class="gt_row gt_right">34.83</td>
+<td class="gt_row gt_right">5.12</td>
+<td class="gt_row gt_right">69.79</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">13</td>
+<td class="gt_row gt_left">fearfully</td>
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">1.42</td>
+<td class="gt_row gt_right">0.04</td>
+<td class="gt_row gt_right">34.83</td>
+<td class="gt_row gt_right">5.12</td>
+<td class="gt_row gt_right">34.89</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_left">stammered</td>
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">1.42</td>
+<td class="gt_row gt_right">0.04</td>
+<td class="gt_row gt_right">34.83</td>
+<td class="gt_row gt_right">5.12</td>
+<td class="gt_row gt_right">34.89</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">15</td>
+<td class="gt_row gt_left">faintly</td>
+<td class="gt_row gt_right">14</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">2.21</td>
+<td class="gt_row gt_right">0.07</td>
+<td class="gt_row gt_right">30.96</td>
+<td class="gt_row gt_right">4.95</td>
+<td class="gt_row gt_right">52.61</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">16</td>
+<td class="gt_row gt_left">bonnet</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">30.96</td>
+<td class="gt_row gt_right">4.95</td>
+<td class="gt_row gt_right">22.55</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">17</td>
+<td class="gt_row gt_left">exquisite</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">30.96</td>
+<td class="gt_row gt_right">4.95</td>
+<td class="gt_row gt_right">22.55</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_left">spider</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.03</td>
+<td class="gt_row gt_right">30.96</td>
+<td class="gt_row gt_right">4.95</td>
+<td class="gt_row gt_right">22.55</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">19</td>
+<td class="gt_row gt_left">darling</td>
+<td class="gt_row gt_right">36</td>
+<td class="gt_row gt_right">18</td>
+<td class="gt_row gt_right">5.69</td>
+<td class="gt_row gt_right">0.18</td>
+<td class="gt_row gt_right">30.96</td>
+<td class="gt_row gt_right">4.95</td>
+<td class="gt_row gt_right">135.27</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">20</td>
+<td class="gt_row gt_left">sandy</td>
+<td class="gt_row gt_right">11</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">1.74</td>
+<td class="gt_row gt_right">0.06</td>
+<td class="gt_row gt_right">28.38</td>
+<td class="gt_row gt_right">4.83</td>
+<td class="gt_row gt_right">40.33</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="9" class="gt_sourcenote">Report based on word tokens</td>
+</tr>
+<tr class="even">
+<td colspan="9" class="gt_sourcenote">Filtered tokens by minimum document frequency in target corpus (3), minimum document frequency in reference corpus (3)</td>
+</tr>
+<tr class="odd">
+<td colspan="9" class="gt_sourcenote">Normalized Frequency is per 10,000 tokens</td>
+</tr>
+<tr class="even">
+<td colspan="9" class="gt_sourcenote">Total word tokens in target corpus: 63,311</td>
+</tr>
+<tr class="odd">
+<td colspan="9" class="gt_sourcenote">Total word tokens in reference corpus: 980,144</td>
+</tr>
+<tr class="even">
+<td colspan="9" class="gt_sourcenote">Keywords: 1,459</td>
+</tr>
+<tr class="odd">
+<td colspan="9" class="gt_sourcenote">Showing 20 rows</td>
+</tr>
+<tr class="even">
+<td colspan="9" class="gt_sourcenote">Page 1 of 73</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/geoffford\.nz\/conc");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/polsci/conc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
