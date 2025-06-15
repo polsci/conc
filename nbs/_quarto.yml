@@ -32,7 +32,7 @@ format:
 
 website:
   twitter-card: true
-  favicon: conc.svg
+  favicon: conc-favicon.svg
   open-graph: true
   repo-actions: [issue]
   navbar:

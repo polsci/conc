@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-
  <title>ionicons-v5-h</title>
+
  <g class="layer" display="inline">
   <title>Layer 1</title>
-  <rect fill="none" height="100%" id="backgroundrect" width="100%" x="0" y="0"/>
+  <rect fill="#007fff" height="100%" id="backgroundrect" width="100%" x="0" y="0"/>
   <g class="currentLayer" id="svg_12">
    <title>Layer 1</title>
    <rect fill="none" height="80" id="svg_1" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="64" y="64"/>
