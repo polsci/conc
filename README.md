@@ -6,15 +6,19 @@
 ## Introduction to Conc
 
 Conc is a Python library that brings corpus linguistic analysis to
-[Jupyter notebooks](https://docs.jupyter.org/en/latest/). A staple of
-data science, [Jupyter notebooks are a great model for presenting
-analysis](https://docs.jupyter.org/en/latest/#what-is-a-notebook)
-through an interactive form that combines code, reporting and discussion
-that allows other researchers to reproduce and interact with your
-analysis. Conc aims to allow researchers to analyse large corpora in
-efficient ways using standard hardware, with the ability to produce
-clear, publication-ready reports and extend analysis where required
-using standard Python libraries.
+[Jupyter notebooks](https://docs.jupyter.org/en/latest/). Conc aims to
+allow researchers to analyse large corpora in efficient ways using
+standard hardware, with the ability to produce clear, publication-ready
+reports and extend analysis where required using standard Python
+libraries.
+
+A staple of data science, [Jupyter notebooks allow researchers to
+present their analysis in an interactive form that combines code,
+reporting and
+discussion](https://docs.jupyter.org/en/latest/#what-is-a-notebook).
+They are an ideal format for collaborating with other researchers during
+research or to share analysis in a way others can reproduce and interact
+with.
 
 Conc uses [spaCy](https://spacy.io/) for tokenising texts. SpaCy
 functionality to annotate texts will be supported soon.
@@ -26,7 +30,7 @@ functionality to annotate texts will be supported soon.
   [Scipy](https://scipy.org/), [Polars](https://pola.rs),
   [Plotly](https://plotly.com/python/))
 - use fast code libraries (i.e. Conc uses [Polars vs
-  Pandas](https://pola.rs/posts/benchmarks/) and fast data structures
+  Pandas](https://pola.rs/posts/benchmarks/)) and fast data structures
   (e.g. Numpy arrays, columnar data stores)  
 - provide clear and complete information when reporting results  
 - pre-compute time-intensive and repeatedly used views of the data  
@@ -34,9 +38,10 @@ functionality to annotate texts will be supported soon.
 - cache specific anaysis during a session to reduce computation for
   repeated calls  
 - [document corpus representations so that they can be worked with
-  directly](https://geoffford.nz/conc/anatomy.html)  
-- allow researchers to work with Conc results and extend analysis using
-  other Python libraries (e.g. output Pandas dataframes)  
+  directly](https://geoffford.nz/conc/explanations/anatomy.html)  
+- [allow researchers to work with Conc results and extend analysis using
+  other Python libraries (e.g. output Pandas
+  dataframes)](https://geoffford.nz/conc/tutorials/recipes.html)  
 - make use of meta-data to allow within-corpus comparisons and to
   provide context for analysis
 
