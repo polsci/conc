@@ -167,7 +167,7 @@ def _init_build_process(self:Corpus,
 
 	self.conc_version = __version__
 	self.slug = slugify(self.name, stopwords=['corpus'])
-	self.corpus_path = f'{save_path}/{self.slug}.corpus'
+	self.corpus_path = os.path.join(save_path, f'{self.slug}.corpus')
 
 	if not os.path.isdir(self.corpus_path):
 		os.makedirs(self.corpus_path)
