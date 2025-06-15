@@ -3,6 +3,7 @@ _proc/
 test-corpora/
 pending/
 conc-build-process/
+tests/.nox
 
 *.bak
 .gitattributes
