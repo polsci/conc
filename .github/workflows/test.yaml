@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps: 
-      # start changes from default CI
+      # start changes from default CI https://github.com/AnswerDotAI/workflows/blob/master/nbdev-ci/action.yml
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
