@@ -88,6 +88,10 @@ section > h3 {
   padding-right: 0;
 }
 
+.sidebar-info {
+margin-bottom:1.5rem;
+}
+
 .sidebar-info img {
   width: 35px;margin-right:3px;float:left;
 }
