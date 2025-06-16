@@ -24,7 +24,7 @@ Conc uses [spaCy](https://spacy.io/) for tokenising texts. SpaCy
 functionality to annotate texts will be supported soon.
 
 Conc uses well-supported Python libraries for processing data and
-priorities the fastest code libraries and data structures. The library
+prioritises the fastest code libraries and data structures. The library
 produces clear reports with important information to interpret result by
 default. Conc makes it easy to extend analysis using other libraries or
 software. [Conc’s corpus format is
@@ -88,23 +88,15 @@ versions of Conc.
 
 ## Development Status
 
-Conc is in active development. It is currently
-[released](https://pypi.org/project/conc/) for beta testing.
+Conc is in active development. It is currently \[released\]\[pypi\] for
+beta testing. See the \[CHANGELOG\]\[changelog\] for notes on releases
+and the [Roadmap](https://geoffford.nz/development/roadmap.html) for
+planned updates.
 
-Although this is a Beta release, I’m currently using it for research and
-postgraduate teaching. I’m keen to support new users. If you have any
-questions, hurdles using Conc or feature requests, [create an
-issue](https://github.com/polsci/conc/issues/new).
-
-The Github site may be ahead of the Pypi version, so for latest
-functionality install from Github (see below). The Github code is
-pre-release and may change. For the latest release, install from Pypi
-(`pip install conc`). The [documentation](https://geoffford.nz/conc/)
-reflects the most recent functionality. See the
-[CHANGELOG](https://github.com/polsci/conc/blob/main/CHANGELOG.md) for
-notes on releases and the
-[Roadmap](https://geoffford.nz/development/roadmap.html) for planned
-updates.
+Although this is a Beta release, I’m currently using Conc for research
+and postgraduate teaching. I’m keen to support new users. If you have
+any questions, encounter hurdles using Conc or have feature requests,
+\[create an issue\]\[issue\].
 
 ## Installation
 
@@ -123,8 +115,7 @@ details](https://geoffford.nz/conc/tutorials/install.html#pre-2013-cpu-install-p
 
 ### 1. Install via pip
 
-You can install Conc from [pypi](https://pypi.org/project/conc/) using
-this command:
+You can install Conc from \[pypi\]\[pypi\] using this command:
 
 ``` sh
 $ pip install conc
@@ -155,7 +146,7 @@ Conc](https://geoffford.nz/conc/tutorials/start.html) tutorial, which
 demonstrates how to build a corpus and output Conc reports. There are
 also [simple code
 recipes](https://geoffford.nz/conc/tutorials/recipes.html) for common
-Conc taks.
+Conc tasks.
 
 ### Conc Documentation
 
@@ -165,12 +156,13 @@ demonstrating how to create reports for analysis, explanation of Conc
 functionality and its Corpus format, and a reference to Conc’s classes
 and methods. Here are links to the documentation site sections:
 
-- [Tutorials](https://geoffford.nz/conc/tutorials) (Tutorials to get you
-  started with Conc)  
-- [Explanations](https://geoffford.nz/conc/explanations) (How Conc
-  works, working with Conc corpus formats and results using other Python
-  libraries)  
-- [Conc API](https://geoffford.nz/conc/api) (Detailed documentation of
-  Conc classes and functions)  
-- [Development](https://geoffford.nz/conc/development) (Information on
-  Conc development, including a Roadmap and Developer’s Guide)
+- [Tutorials](https://geoffford.nz/conc/tutorials) to get you started
+  with Conc  
+- The [Explanations](https://geoffford.nz/conc/explanations) section
+  includes information on how Conc works, how to work with the Conc
+  corpus format and Conc results with other Python libraries  
+- The [Conc API Reference](https://geoffford.nz/conc/api) provides
+  detailed documentation of Conc classes and functions  
+- The [Development](https://geoffford.nz/conc/development) section gives
+  information on Conc development, including a Roadmap and Developer’s
+  Guide
