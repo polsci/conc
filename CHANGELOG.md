@@ -1,6 +1,6 @@
 # Change log
 
-Based on https://keepachangelog.com/en/1.1.0/
+This document is based on https://keepachangelog.com/en/1.1.0/
 
 ## [0.1.3] - 2025-06-13 - concordance plot improvements
 
