@@ -5,12 +5,12 @@
 
 ## Introduction to Conc
 
-Conc is a Python library that brings corpus linguistic analysis to
-[Jupyter notebooks](https://docs.jupyter.org/en/latest/). Conc aims to
-allow researchers to analyse large corpora in efficient ways using
-standard hardware, with the ability to produce clear, publication-ready
-reports and extend analysis where required using standard Python
-libraries.
+Conc is a Python library that brings tools for corpus linguistic
+analysis to [Jupyter notebooks](https://docs.jupyter.org/en/latest/).
+Conc aims to allow researchers to analyse large corpora in efficient
+ways using standard hardware, with the ability to produce clear,
+publication-ready reports and extend analysis where required using
+standard Python libraries.
 
 A staple of data science, [Jupyter notebooks allow researchers to
 present their analysis in an interactive form that combines code,
@@ -23,51 +23,37 @@ with.
 Conc uses [spaCy](https://spacy.io/) for tokenising texts. SpaCy
 functionality to annotate texts will be supported soon.
 
-### Conc Principles
+Conc uses well-supported Python libraries for processing data and
+priorities the fastest code libraries and data structures. The library
+produces clear reports with important information to interpret result by
+default. Conc makes it easy to extend analysis using other libraries or
+software. [Conc’s corpus format is
+well-documented](https://geoffford.nz/conc/explanations/anatomy.html)
+and there are [code examples to help you work with Conc results and data
+structures outside of
+Conc](https://geoffford.nz/conc/tutorials/recipes.html) if you want to
+extend your analysis.
 
-- use standard Python libraries for data processing, analysis and
-  visualisation (i.e. [Numpy](https://numpy.org/),
-  [Scipy](https://scipy.org/), [Polars](https://pola.rs),
-  [Plotly](https://plotly.com/python/))
-- use fast code libraries (i.e. Conc uses [Polars vs
-  Pandas](https://pola.rs/posts/benchmarks/)) and fast data structures
-  (e.g. Numpy arrays, columnar data stores)  
-- provide clear and complete information when reporting results  
-- pre-compute time-intensive and repeatedly used views of the data  
-- work with smaller slices of the data where possible  
-- cache specific anaysis during a session to reduce computation for
-  repeated calls  
-- [document corpus representations so that they can be worked with
-  directly](https://geoffford.nz/conc/explanations/anatomy.html)  
-- [allow researchers to work with Conc results and extend analysis using
-  other Python libraries (e.g. output Pandas
-  dataframes)](https://geoffford.nz/conc/tutorials/recipes.html)  
-- make use of meta-data to allow within-corpus comparisons and to
-  provide context for analysis
+Conc’s documentation site has more information on Conc, [why it was
+developed and the principles guiding Conc’s
+development](https://geoffford.nz/conc/explanations/why.html).
 
 ## Table of Contents
 
 - [Acknowledgements](#acknowledgements)  
 - [Development Status](#development-status)  
-- [Installation](#installation)
-  - [Install via pip](#install-via-pip)  
-  - [Install a spaCy model for
-    tokenization](#install-a-spacy-model-for-tokenization)  
-  - [Install optional dependencies](#install-optional-dependencies)  
-  - [Pre-2013 CPU? Install Polars with support for older
-    machines](#pre-2013-cpu-install-polars-with-support-for-older-machines)  
+- [Installation](#installation)  
 - [Using Conc](#using-conc)
-  - [Getting Started](https://geoffford.nz/conc/tutorials/start.html)  
-  - [Conc Documentation](#conc-documentation)
-    - [Tutorials](https://geoffford.nz/conc/tutorials) (Tutorials to get
-      you started with Conc)  
-    - [Explanations](https://geoffford.nz/conc/explanations) (How Conc
-      works, working with Conc corpus formats and results using other
-      Python libraries)  
-    - [Conc API](https://geoffford.nz/conc/api) (Detailed documentation
-      of Conc classes and functions)  
-    - [Development](https://geoffford.nz/conc/development) (Information
-      on Conc development, including a Roadmap and Developer’s Guide)
+
+### Direct links to Conc documentation
+
+- [Getting Started](https://geoffford.nz/conc/tutorials/start.html)  
+- [Tutorials](https://geoffford.nz/conc/tutorials) (Tutorials to get you
+  started with Conc)  
+- [Documentation](https://geoffford.nz/conc/)
+  ([Explanations](https://geoffford.nz/conc/explanations), [Conc API
+  Reference](https://geoffford.nz/conc/api), information on
+  [Development](https://geoffford.nz/conc/development))
 
 ## Acknowledgements
 
@@ -122,7 +108,20 @@ updates.
 
 ## Installation
 
-### Install via pip
+Installing Conc is simple. Below is the essential information if you
+want to use Conc. The [installation
+page](https://geoffford.nz/conc/tutorials/install.html) has more
+information. You can also [install the development
+version](https://geoffford.nz/conc/tutorials/install.html#install-the-development-version)
+of Conc, which may include new functionality and bug fixes. If you want
+to download sample corpora you will need to [install optional
+dependencies](https://geoffford.nz/conc/tutorials/install.html#install-optional-dependencies).
+If you have an older computer with a pre-2013 CPU, you will probably
+need to install a version of Polars compiled for older machines, see the
+[install page for
+details](https://geoffford.nz/conc/tutorials/install.html#pre-2013-cpu-install-polars-with-support-for-older-machines).
+
+### 1. Install via pip
 
 You can install Conc from [pypi](https://pypi.org/project/conc/) using
 this command:
@@ -133,57 +132,19 @@ $ pip install conc
 
 Add the `-U` flag to upgrade if you are already running Conc.
 
-To install the latest development version of Conc, which may be ahead of
-the version on Pypi, you can install from the
-[repository](https://github.com/polsci/conc):
+### 2. Install a spaCy model for tokenization
+
+Conc uses a SpaCy language model for tokenization. After installing
+Conc, install a model. If you are working with English-language texts,
+install SpaCy’s small English model (which is Conc’s default) like this:
 
 ``` sh
-$ pip install git+https://github.com/polsci/conc.git
-```
-
-### Install a spaCy model for tokenization
-
-The first releases of Conc require a SpaCy language model for
-tokenization. After installing Conc, install a model. Here’s an example
-of how to install SpaCy’s small English model, which is Conc’s default
-language model:
-
-``` sh
-python -m spacy download en_core_web_sm
+$ python -m spacy download en_core_web_sm
 ```
 
 If you are working with a different language or want to use a different
 ‘en’ model, check the [SpaCy models
 documentation](https://spacy.io/models/) for the relevant model name.
-
-### Install optional dependencies
-
-Conc has some optional dependencies you can install to download source
-texts to create sample corpora. These are primarily intended for
-creating corpora for development. To minimize Conc’s requirements these
-are not installed by default. If you want to get sample corpora to test
-out Conc’s functionality you can install these with the following
-command.
-
-``` sh
-$ pip install nltk requests datasets
-```
-
-### Pre-2013 CPU? Install Polars with support for older machines
-
-Polars is optimized for modern CPUs with support for AVX2 instructions.
-If you get kernel crashes running Conc on an older machine (probably
-pre-2013), this is likely to be an issue with Polars. Polars has an
-[alternate installation option to support older
-machines](https://docs.pola.rs/user-guide/installation/), which installs
-a Polars build compiled without AVX2 support. Replace the standard
-Polars package with the legacy-support package to use Conc on older
-machines.
-
-``` sh
-$ pip uninstall polars
-$ pip install polars-lts-cpu
-```
 
 ## Using Conc
 
