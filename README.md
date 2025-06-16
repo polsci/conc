@@ -115,7 +115,8 @@ details](https://geoffford.nz/conc/tutorials/install.html#pre-2013-cpu-install-p
 
 ### 1. Install via pip
 
-You can install Conc from \[pypi\]\[pypi\] using this command:
+Conc is tested with Python 3.10+. You can install Conc from
+[pypi](https://pypi.org/project/conc) using this command:
 
 ``` sh
 $ pip install conc
