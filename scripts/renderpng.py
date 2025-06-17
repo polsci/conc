@@ -4,6 +4,9 @@
 # looks for cells with #renderpng in the notebook files and renders the following output
 # when adding to cell - recommended to #| hide that cell
 # add the class after the #renderpng comment to specify a specific target class (e.g. gt_table or conc-plot-wrapper)
+# to get this functionality working i've made sure nbconvert is setup with latest dependencies for rendering (see docs)
+# also installed playwright - not adding this to dependencies as this is not relevant for tests - just generating the docs
+# may change that later
 
 import argparse
 import subprocess
