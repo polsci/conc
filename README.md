@@ -12,8 +12,9 @@ ways using standard hardware, with the ability to produce clear,
 publication-ready reports and extend analysis where required using
 standard Python libraries.
 
-<img src="50_conc-5.png" data-fig-align="left"
-alt="Example Concordance" />
+<img
+src="https://raw.githubusercontent.com/polsci/conc/refs/heads/master/nbs/50_conc-5.png"
+data-fig-align="left" alt="Example Concordance" />
 
 A staple of data science, [Jupyter notebooks allow researchers to
 present their analysis in an interactive form that combines code,
