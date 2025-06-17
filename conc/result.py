@@ -29,52 +29,10 @@ class Result:
 		self.description = description
 		self.summary_data = summary_data
 		self.formatted_data = formatted_data
+		
 
 
 # %% ../nbs/api/76_result.ipynb 5
-@patch
-def display(self: Result
-			   ):
-	""" Print analysis result output from conc in a nice table format using the great_tables library """
-	
-	columns_with_integers = []
-	columns_with_decimals = []
-	if type(self.df) == pl.LazyFrame:
-		self.df = self.df.collect()
-
-	if self.df.select(pl.len()).item() > 0:
-
-		self.df.columns = [col.replace('_', ' ').title() for col in self.df.columns]
-
-		for col in self.df.columns:
-			if self.df[col].dtype in [pl.Float64, pl.Float32]:
-				columns_with_decimals.append(col)
-			elif col != 'Token Id' and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
-				columns_with_integers.append(col)
-
-	gt = GT(self.df).tab_options(table_margin_left = 0)
-	if self.title != '' or self.description != '':
-		gt = gt.tab_header(self.title, self.description)
-
-	if len(columns_with_decimals) > 0:
-		gt = gt.fmt_number(columns_with_decimals, decimals=2)
-
-	if len(columns_with_integers) > 0:
-		gt = gt.fmt_integer(columns_with_integers, use_seps=True, sep_mark=',')
-
-	for value in self.formatted_data:
-		gt = gt.tab_source_note(value)
-
-	if self.type == 'concordance':
-		if 'Left' in self.df.columns:
-			gt = gt.cols_align(align='right', columns=['Left'])
-		if 'Keyword' in self.df.columns:
-			gt = gt.cols_align(align='center', columns=['Keyword'])
-	gt.show()
-
-
-
-# %% ../nbs/api/76_result.ipynb 6
 @patch
 def to_frame(self: Result,
 			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning
@@ -83,3 +41,58 @@ def to_frame(self: Result,
 	if collect_if_lazy and type(self.df) == pl.LazyFrame:
 		self.df = self.df.collect()
 	return self.df
+
+# %% ../nbs/api/76_result.ipynb 6
+@patch
+def _prepare(self:Result
+			 ):
+	""" Prepare the result for display """
+
+	if hasattr(self, '_gt'):
+		pass
+	else:
+		columns_with_integers = []
+		columns_with_decimals = []
+		
+		self.df = self.to_frame(collect_if_lazy=True)
+
+		if self.df.select(pl.len()).item() > 0:
+
+			self.df.columns = [col.replace('_', ' ').title() for col in self.df.columns]
+
+			for col in self.df.columns:
+				if self.df[col].dtype in [pl.Float64, pl.Float32]:
+					columns_with_decimals.append(col)
+				elif col != 'Token Id' and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
+					columns_with_integers.append(col)
+
+		self._gt = GT(self.df).tab_options(table_margin_left = 0)
+		if self.title != '' or self.description != '':
+			self._gt = self._gt.tab_header(self.title, self.description)
+
+		if len(columns_with_decimals) > 0:
+			self._gt = self._gt.fmt_number(columns_with_decimals, decimals=2)
+
+		if len(columns_with_integers) > 0:
+			self._gt = self._gt.fmt_integer(columns_with_integers, use_seps=True, sep_mark=',')
+
+		for value in self.formatted_data:
+			self._gt = self._gt.tab_source_note(value)
+
+		if self.type == 'concordance':
+			if 'Left' in self.df.columns:
+				self._gt = self._gt.cols_align(align='right', columns=['Left'])
+			if 'Keyword' in self.df.columns:
+				self._gt = self._gt.cols_align(align='center', columns=['Keyword'])
+
+
+# %% ../nbs/api/76_result.ipynb 7
+@patch
+def display(self: Result
+			   ):
+	""" Print analysis result output from conc in a nice table format using the great_tables library """
+	
+	self._prepare()
+	self._gt.show()
+
+

@@ -35,7 +35,7 @@ class Conc:
 		self.keyness_ = None
 		self.collocates_ = Collocates(corpus)
 
-# %% ../nbs/api/50_conc.ipynb 12
+# %% ../nbs/api/50_conc.ipynb 13
 @patch
 def frequencies(self: Conc,
 				case_sensitive:bool=False, # frequencies for tokens with or without case preserved 
@@ -63,7 +63,7 @@ def frequencies(self: Conc,
 										restrict_tokens_text=restrict_tokens_text,
 										exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/api/50_conc.ipynb 15
+# %% ../nbs/api/50_conc.ipynb 17
 @patch
 def ngrams(self: Conc, 
 		   token_str: str, # token string to get ngrams for 
@@ -88,7 +88,7 @@ def ngrams(self: Conc,
 							exclude_punctuation=exclude_punctuation,
 							use_cache=use_cache)
 
-# %% ../nbs/api/50_conc.ipynb 18
+# %% ../nbs/api/50_conc.ipynb 20
 @patch
 def ngram_frequencies(self: Conc, 
                 ngram_length:int=2, # length of ngram
@@ -106,7 +106,7 @@ def ngram_frequencies(self: Conc,
                                     page_current=page_current,
                                     exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/api/50_conc.ipynb 21
+# %% ../nbs/api/50_conc.ipynb 23
 @patch
 def concordance(self: Conc, 
 				token_str: str, # token string to get concordance for 
@@ -125,7 +125,7 @@ def concordance(self: Conc,
 									  show_all_columns=show_all_columns, 
 									  use_cache=use_cache)
 
-# %% ../nbs/api/50_conc.ipynb 24
+# %% ../nbs/api/50_conc.ipynb 26
 @patch
 def concordance_plot(self: Conc,
 				token_str: str, # token string for concordance plot
@@ -137,7 +137,7 @@ def concordance_plot(self: Conc,
 												page_size=page_size,
 												append_info=append_info)
 
-# %% ../nbs/api/50_conc.ipynb 26
+# %% ../nbs/api/50_conc.ipynb 28
 @patch
 def set_reference_corpus(self: Conc, 
                     corpus: Corpus  # Reference corpus
@@ -145,7 +145,7 @@ def set_reference_corpus(self: Conc,
     """ Set a reference corpus for keyness analysis. """
     self.keyness_ = Keyness(self.corpus, corpus)
 
-# %% ../nbs/api/50_conc.ipynb 28
+# %% ../nbs/api/50_conc.ipynb 30
 @patch
 def keywords(self: Conc,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
@@ -193,7 +193,7 @@ def keywords(self: Conc,
 									restrict_tokens_text=restrict_tokens_text,
 									exclude_punctuation=exclude_punctuation)
 
-# %% ../nbs/api/50_conc.ipynb 31
+# %% ../nbs/api/50_conc.ipynb 33
 @patch
 def collocates(self: Conc, 
 				token_str:str, # Token to search for
