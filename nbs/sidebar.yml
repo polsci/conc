@@ -2,6 +2,7 @@ website:
   sidebar:
     contents:
       - index.ipynb
+      - tmp.html
       - section: api
         contents:
           - api/45_corpus.ipynb
@@ -18,15 +19,19 @@ website:
         href: api/index.qmd
       - section: development
         contents:
+          - development/30_releases.ipynb
           - development/40_roadmap.ipynb
           - development/50_developer_guide.ipynb
         href: development/index.qmd
       - section: explanations
         contents:
+          - explanations/15_why.ipynb
           - explanations/40_anatomy.ipynb
           - explanations/90_performance.ipynb
         href: explanations/index.qmd
       - section: tutorials
         contents:
           - tutorials/10_start.ipynb
+          - tutorials/20_recipes.ipynb
+          - tutorials/30_install.ipynb
         href: tutorials/index.qmd
