@@ -96,3 +96,13 @@ def display(self: Result
 	self._gt.show()
 
 
+
+# %% ../nbs/api/76_result.ipynb 8
+@patch
+def to_html(self: Result,
+			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning
+			 ):
+	""" Return result output from conc as a dataframe """
+	
+	self._prepare()
+	return self._gt.as_raw_html()

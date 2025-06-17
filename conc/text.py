@@ -92,19 +92,33 @@ def display_metadata(self:Text,
 
 # %% ../nbs/api/78_text.ipynb 15
 @patch
+def get_metadata(self:Text,
+                ):
+    """ Output the metadata for a text """
+
+    return Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, [])
+
+# %% ../nbs/api/78_text.ipynb 16
+@patch
 def display(self:Text,
 			show_metadata: bool = True, # whether to display Metadata for the text
 			max_tokens: int|None = None # maximum length of text to display in tokens, if None, display all
 				):
 	""" Output a text """
-	style = '<style>.conc-text {white-space: pre-wrap;}</style>\n'
+	style = '''
+	<style>
+	.conc-text-wrapper { background: #fff; color: #000; border: 1px solid #000;border-radius: 0.5em;width: max-content;padding: 0.3em; min-width: 400px;} 
+	.conc-text {margin:0.3em; white-space: pre-wrap; font-family: Georgia, Cambria, "Times New Roman", Times, serif;font-size: 1.3em; width: max-content;}
+  </style>
+	'''
+	metadata = ''
 	if show_metadata:
-		self.display_metadata()
+		metadata = self.get_metadata().to_html()
 
 	text_string = self.as_string(max_tokens = max_tokens)
 
 	if max_tokens is not None and self.tokens.size > max_tokens:
-		text_string += f'… [{max_tokens} of {self.tokens.size} tokens]'
+		text_string += f'…\n[{max_tokens} of {self.tokens.size} tokens]'
 
-	display(HTML(style + self._div(text_string, class_str = 'conc-text')))
+	display(HTML(style + self._div(metadata + self._div(text_string, class_str = 'conc-text'), class_str = 'conc-text-wrapper')))
 
