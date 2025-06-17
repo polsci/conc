@@ -12,6 +12,9 @@ ways using standard hardware, with the ability to produce clear,
 publication-ready reports and extend analysis where required using
 standard Python libraries.
 
+<img src="50_conc-5.png" data-fig-align="left"
+alt="Example Concordance" />
+
 A staple of data science, [Jupyter notebooks allow researchers to
 present their analysis in an interactive form that combines code,
 reporting and
@@ -88,15 +91,16 @@ versions of Conc.
 
 ## Development Status
 
-Conc is in active development. It is currently \[released\]\[pypi\] for
-beta testing. See the \[CHANGELOG\]\[changelog\] for notes on releases
-and the [Roadmap](https://geoffford.nz/development/roadmap.html) for
-planned updates.
+Conc is in active development. It is currently
+[released](https://pypi.org/project/conc) for beta testing. See the
+[CHANGELOG](CHANGELOG.md) for notes on releases and the
+[Roadmap](https://geoffford.nz/development/roadmap.html) for planned
+updates.
 
 Although this is a Beta release, I’m currently using Conc for research
 and postgraduate teaching. I’m keen to support new users. If you have
 any questions, encounter hurdles using Conc or have feature requests,
-\[create an issue\]\[issue\].
+[create an issue](https://github.com/polsci/conc/issues/new).
 
 ## Installation
 
