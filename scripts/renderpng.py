@@ -7,6 +7,9 @@
 # to get this functionality working i've made sure nbconvert is setup with latest dependencies for rendering (see docs)
 # also installed playwright - not adding this to dependencies as this is not relevant for tests - just generating the docs
 # may change that later
+#pip install nbconvert[webpdf]
+#playwright install chromium
+#jupyter nbconvert --to webpdf 00_nb.ipynb
 
 import argparse
 import subprocess
