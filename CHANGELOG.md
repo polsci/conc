@@ -1,6 +1,25 @@
 # Change log
 
-This document is based on https://keepachangelog.com/en/1.1.0/
+This document is based on https://keepachangelog.com/en/1.1.0/ and classifies changes as
+Added, Changed, Deprecated, Removed, Fixed, or Security
+
+This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
+
+## [0.1.4] - 2025-06-18 - documentation and test improvements, Result/Text class updates
+
+### Added
+
+- added tutorials, recipes, install page and other documentation
+- nox-based pre-release test script for Pythons 3.10+
+- renderpng.py in scripts to render screenshots for docs
+- added Result.to_html method to support Text revisions and more flexible output options
+
+### Changed
+
+- restructured and updated documentation 
+- minor code changes related to documentation clarity (e.g. formatting of corpus_path values from build)
+- improved Text class HTML output, new functionality in Text to support this
+- simplified Result class internal structure for more flexible output
 
 ## [0.1.3] - 2025-06-13 - concordance plot improvements
 
