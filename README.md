@@ -63,10 +63,6 @@ development](https://geoffford.nz/conc/explanations/why.html).
 
 Conc is developed by [Dr Geoff Ford](https://geoffford.nz/).
 
-Conc originated in my PhD research, which included development of a
-web-based corpus browser to handle analysis of large corpora. I’ve been
-developing Conc through my subsequent research.
-
 Work to create this Python library has been made possible by
 funding/support from:
 
