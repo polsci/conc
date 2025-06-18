@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <title>ionicons-v5-h</title>
+
+ <g class="layer" display="inline">
+  <title>Layer 1</title>
+  <rect fill="#007fff" height="100%" id="backgroundrect" width="100%" x="0" y="0"/>
+  <g class="currentLayer" id="svg_12">
+   <title>Layer 1</title>
+   <rect fill="none" height="80" id="svg_1" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="64" y="64"/>
+   <rect fill="none" height="80" id="svg_2" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="216" y="64"/>
+   <rect fill="none" height="80" id="svg_3" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="368" y="64"/>
+   <rect fill="none" height="80" id="svg_4" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="64" y="216"/>
+   <rect fill="none" height="80" id="svg_5" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="216" y="216"/>
+   <rect fill="none" height="80" id="svg_6" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" transform="matrix(1, 0, 0, 1, 0, 0)" width="80" x="368" y="216"/>
+   <rect fill="none" height="80" id="svg_7" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="64" y="368"/>
+   <rect fill="none" height="80" id="svg_8" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="216" y="368"/>
+   <rect fill="none" height="80" id="svg_9" rx="40" ry="40" stroke="#fff" stroke-miterlimit="10" stroke-width="32px" width="80" x="368" y="368"/>
+   <path d="m220,255.5c0,-16.85 14.99,-30.5 33.5,-30.5c18.51,0 33.5,13.65 33.5,30.5c0,16.85 -14.99,30.5 -33.5,30.5c-18.51,0 -33.5,-13.65 -33.5,-30.5z" fill="#ffffff" fill-rule="nonzero" id="svg_10" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+   <path d="m219,103.5c0,-15.75 15.66,-28.5 35,-28.5c19.34,0 35,12.75 35,28.5c0,15.75 -15.66,28.5 -35,28.5c-19.34,0 -35,-12.75 -35,-28.5z" fill="#ffffff" fill-rule="nonzero" id="svg_11" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+   <path d="m220,406.5c0,-16.3 14.99,-29.5 33.5,-29.5c18.51,0 33.5,13.2 33.5,29.5c0,16.3 -14.99,29.5 -33.5,29.5c-18.51,0 -33.5,-13.2 -33.5,-29.5z" fill="#ffffff" fill-rule="nonzero" id="svg_13"/>
+  </g>
+ </g>
+</svg>
