@@ -45,7 +45,10 @@ NOT_DOC_TOKEN = -1
 INDEX_HEADER_LENGTH = 100
 
 # %% ../nbs/api/45_corpus.ipynb 10
-PUNCTUATION_STRINGS = ''.join(set(list(string.punctuation) + [chr(i) for i in range(sys.maxunicode + 1) if unicodedata.category(chr(i)).startswith("P")]))
+PUNCTUATION_STRINGS = ''.join(set(list(string.punctuation) + 
+                                [chr(i) for i in range(sys.maxunicode + 1) if unicodedata.category(chr(i)).startswith("P")] + 
+                                [chr(i) for i in range(sys.maxunicode + 1) if unicodedata.category(chr(i)).startswith("Sc")]
+								))
 
 # %% ../nbs/api/45_corpus.ipynb 15
 class Corpus:
