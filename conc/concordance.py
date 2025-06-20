@@ -152,7 +152,7 @@ def concordance(self: Concordance,
 	#offsets_arr = np.array(self.corpus.offsets,dtype=np.uint64) # FIX
 	#document_ids = np.searchsorted(offsets_arr, concordance_result_df['index'], side = 'right') - 1 
 	document_ids = self.corpus.get_tokens_by_index('token2doc_index')[np.array(concordance_result_df['index'])] # REFACTORED to remove offsets functionality
-	concordance_result_df = concordance_result_df.with_columns(pl.Series(name="document_id", values=document_ids))
+	concordance_result_df = concordance_result_df.with_columns(pl.Series(name="doc_id", values=document_ids))
 	concordance_result_df = concordance_result_df.sort(['sort0','sort1','sort2'])
 		
 	# slicing this further to get only the required page of results and then populating with left, keyword, right strings
@@ -181,7 +181,7 @@ def concordance(self: Concordance,
 	formatted_data = [f'Total Concordance Lines: {total_count}', f'Total Documents: {total_docs}', f'Showing {min(page_size, total_count)} lines', f'Page {page_current} of {total_pages}']
 
 	if show_all_columns == False:
-		concordance_view_df = concordance_view_df[['document_id', 'left', 'node', 'right']]
+		concordance_view_df = concordance_view_df[['doc_id', 'left', 'node', 'right']]
 	
 	logger.info(f'Concordance report time: {(time.time() - start_time):.5f} seconds')
 

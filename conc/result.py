@@ -63,7 +63,7 @@ def _prepare(self:Result
 			for col in self.df.columns:
 				if self.df[col].dtype in [pl.Float64, pl.Float32]:
 					columns_with_decimals.append(col)
-				elif col != 'Token Id' and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
+				elif not col.endswith('Id') and self.df[col].dtype in [pl.Int64, pl.Int32, pl.Int16, pl.Int8, pl.UInt64, pl.UInt32, pl.UInt16, pl.UInt8]:
 					columns_with_integers.append(col)
 
 		self._gt = GT(self.df).tab_options(table_margin_left = 0)
@@ -82,8 +82,8 @@ def _prepare(self:Result
 		if self.type == 'concordance':
 			if 'Left' in self.df.columns:
 				self._gt = self._gt.cols_align(align='right', columns=['Left'])
-			if 'Keyword' in self.df.columns:
-				self._gt = self._gt.cols_align(align='center', columns=['Keyword'])
+			if 'Node' in self.df.columns:
+				self._gt = self._gt.cols_align(align='center', columns=['Node'])
 
 
 # %% ../nbs/api/76_result.ipynb 7
