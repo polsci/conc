@@ -11,6 +11,7 @@ import math
 from fastcore.basics import patch
 import msgspec
 from IPython.display import display, HTML
+import hashlib
 
 # %% auto 0
 __all__ = ['Concordance']
@@ -290,6 +291,7 @@ def _get_concordance_plot_style(
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
+	plot_id: str = '' # ID to use for the plot elements
 	) -> str:
 	""" Get the JavaScript for the concordance plot. """
 
@@ -474,6 +476,9 @@ def concordance_plot(self: Concordance,
 	if len(token_positions[0]) == 0:
 		print("No matches found.")
 		return
+	
+	fn_string = f'{self.corpus.slug}{str(page_size)}{str(append_info)}{token_str}'
+	plot_html_id = hashlib.md5(fn_string.encode('utf-8')).hexdigest()
 
 	lines_df = self.corpus.tokens.with_row_index('position').filter(
 		pl.col('position').is_in(token_positions[0])
@@ -574,7 +579,7 @@ def concordance_plot(self: Concordance,
 	html += self._get_concordance_plot_style(default_font_size=default_font_size)
 	#html += '</head><body>'
 
-	html += '<div class="conc-plot-wrapper" id="conc-plot-wrapper">'
+	html += f'<div class="conc-plot-wrapper" id="conc-plot-wrapper">'
 	html += f'<h2>Concordance Plot for &quot;{token_str}&quot;</h2>'
 	html += f'<h3>{self.corpus.name}</h3>'
 	html += f'<svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
