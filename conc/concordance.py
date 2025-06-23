@@ -296,7 +296,7 @@ def _get_concordance_plot_script(
 	""" Get the JavaScript for the concordance plot. """
 
 	html_script = '''
-	function filter_token_ids(token_ids) {
+	function filter_token_ids(token_ids, plot_id) {
 		const data = window[plot_id];
 		var centre_index = Math.floor(token_ids.length / 2);
 		var left_tokens = token_ids.slice(0, centre_index);
@@ -336,7 +336,6 @@ def _get_concordance_plot_script(
 		const data = window[plot_id];
 		start = (page - 1) * page_size;
 		end = start + page_size;
-		console.log(plot_id)
 		const plot = document.getElementById(plot_id).querySelector('.conc-concordance-plot');
 		const lines = plot.getElementsByClassName('conc-concordance-plot-line');
 		while (lines.length > 0) {
@@ -384,7 +383,6 @@ def _get_concordance_plot_script(
 			const positions = doc.positions;
 			const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
 			for (let j = 0; j < x_values.length; j++) {
-				console.log(`x_values[${j}]: ${x_values[j]}`);
 				const x_value = x_values[j];
 				const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 				line.setAttribute('class', 'conc-concordance-plot-line');
@@ -444,13 +442,9 @@ def _get_concordance_plot_script(
 		current_page = 1;
 		const plot = document.getElementById(plot_id);
 		const slider = plot.querySelector('.conc-concordance-plot-slider');
-		console.log(plot_id)
-		console.log(plot)
 		populatePlot(current_page, data['page_size'], plot_id);
 		slider.addEventListener('input', function() {
 			const page = parseInt(this.value, 10);
-			console.log(plot_id)
-			console.log(plot)
 			populatePlot(page, data['page_size'], plot_id);
 			const page_number = plot.querySelector('.conc-concordance-plot-page-number');
 			page_number.textContent = `${page}`;
@@ -626,7 +620,7 @@ def concordance_plot(self: Concordance,
 	}
 	</script>
 	'''
-	html += '</body></html>'
+	#html += '</body></html>'
 
 	# may add rust based minify-html here in future
 
