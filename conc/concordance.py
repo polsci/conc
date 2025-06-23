@@ -297,17 +297,18 @@ def _get_concordance_plot_script(
 
 	html_script = '''
 	function filter_token_ids(token_ids) {
+		const data = window[plot_id];
 		var centre_index = Math.floor(token_ids.length / 2);
 		var left_tokens = token_ids.slice(0, centre_index);
 		var right_tokens = token_ids.slice(centre_index);
-		if (left_tokens.includes(eof_token)) {
-			var eof_index_pos = left_tokens.lastIndexOf(eof_token);
+		if (left_tokens.includes(data['eof_token'])) {
+			var eof_index_pos = left_tokens.lastIndexOf(data['eof_token']);
 			if (eof_index_pos !== -1) {
 				left_tokens = left_tokens.slice(eof_index_pos + 1);
 			}
 		}
-		if (right_tokens.includes(eof_token)) {
-			var eof_index_pos = right_tokens.indexOf(eof_token);
+		if (right_tokens.includes(data['eof_token'])) {
+			var eof_index_pos = right_tokens.indexOf(data['eof_token']);
 			if (eof_index_pos !== -1) {
 				right_tokens = right_tokens.slice(0, eof_index_pos);
 			}
@@ -315,25 +316,28 @@ def _get_concordance_plot_script(
 		token_ids = left_tokens.concat(right_tokens);
 		return token_ids;
 	}
-	function token_ids_to_str(token_ids) {
-		if (token_ids.includes(eof_token)) {
-			token_ids = filter_token_ids(token_ids);
+	function token_ids_to_str(token_ids, plot_id) {
+		const data = window[plot_id];
+		if (token_ids.includes(data['eof_token'])) {
+			token_ids = filter_token_ids(token_ids, plot_id);
 		}
 		const token_strs = [];
 		for (let i = 0; i < token_ids.length; i++) {
 			const token_id = token_ids[i];
-			if (tokens[token_id]) {
-				token_strs.push(tokens[token_id]);
+			if (data['tokens'][token_id]) { 
+				token_strs.push(data['tokens'][token_id]); 
 			} else {
 				token_strs.push(`Unknown Token ID: ${token_id}`);
 			}
 		}
 		return token_strs.join(' ');
 	}
-	function populatePlot(page, page_size) {
+	function populatePlot(page, page_size, plot_id) {
+		const data = window[plot_id];
 		start = (page - 1) * page_size;
 		end = start + page_size;
-		const plot = document.getElementById('conc-concordance-plot');
+		console.log(plot_id)
+		const plot = document.getElementById(plot_id).querySelector('.conc-concordance-plot');
 		const lines = plot.getElementsByClassName('conc-concordance-plot-line');
 		while (lines.length > 0) {
 			lines[0].remove();
@@ -348,53 +352,54 @@ def _get_concordance_plot_script(
 		}
 		for (let i = start; i < end; i++) {
 			page_i = (i - start + 1)
-			if (i >= docs.length) {
-				const rect = document.getElementById(`rect-${page_i}`);
+			if (i >= data['docs'].length) { 
+				const rect = plot.querySelector(`.rect-${page_i}`);
 				if (rect) {
 					rect.setAttribute('style', 'opacity:0;');
 				}
 				continue;
 			}
-			const doc = docs[i];
-			const plot_y = (page_i * row_height) - row_adjustment;
-			const label_y = plot_y + (default_font_size * 1.4);
-			const label_y2 = plot_y + (default_font_size * 1.4 * 2);
+			const doc = data['docs'][i]; 
+			const plot_y = (page_i * data['row_height']) - data['row_adjustment'];
+			const label_y = plot_y + (data['default_font_size'] * 1.4);
+			const label_y2 = plot_y + (data['default_font_size'] * 1.4 * 2);
 			const doc_positions_count = doc.positions.length;
 			const line_text = doc_positions_count === 1 ? '1 line' : `${doc_positions_count} lines`;
 			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 			label.setAttribute('class', 'label');
-			label.setAttribute('x', label_x_right);
+			label.setAttribute('x', data['label_x_right']);
 			label.setAttribute('y', label_y);
-			label.setAttribute('font-size', default_font_size);
+			label.setAttribute('font-size', data['default_font_size']);
 			label.setAttribute('text-anchor', 'end');
 			label.textContent = `Doc ${doc.doc_id}`;
 			plot.appendChild(label);
 			const label2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 			label2.setAttribute('class', 'label');
-			label2.setAttribute('x', label_x_right);
+			label2.setAttribute('x', data['label_x_right']);
 			label2.setAttribute('y', label_y2);
-			label2.setAttribute('font-size', default_font_size);
+			label2.setAttribute('font-size', data['default_font_size']);
 			label2.setAttribute('text-anchor', 'end');
 			label2.textContent = line_text;
 			plot.appendChild(label2);
 			const positions = doc.positions;
 			const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
 			for (let j = 0; j < x_values.length; j++) {
+				console.log(`x_values[${j}]: ${x_values[j]}`);
 				const x_value = x_values[j];
 				const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 				line.setAttribute('class', 'conc-concordance-plot-line');
 				const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-				line1.setAttribute('x1', plot_x + x_value);
+				line1.setAttribute('x1', data['plot_x'] + x_value);
 				line1.setAttribute('y1', plot_y);
-				line1.setAttribute('x2', plot_x + x_value);
-				line1.setAttribute('y2', plot_y + subplot_height);
+				line1.setAttribute('x2', data['plot_x'] + x_value);
+				line1.setAttribute('y2', plot_y + data['subplot_height']);
 				line1.setAttribute('style', 'stroke-width:10;opacity:0;');
 				line.appendChild(line1);
 				const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-				line2.setAttribute('x1', plot_x + x_value);
+				line2.setAttribute('x1', data['plot_x'] + x_value);
 				line2.setAttribute('y1', plot_y);
-				line2.setAttribute('x2', plot_x + x_value);
-				line2.setAttribute('y2', plot_y + subplot_height);
+				line2.setAttribute('x2', data['plot_x'] + x_value);
+				line2.setAttribute('y2', plot_y + data['subplot_height']);
 				line2.setAttribute('style', 'stroke-width:2;');
 				line.appendChild(line2);
 				let anchor = 'middle';
@@ -408,17 +413,17 @@ def _get_concordance_plot_script(
 					x_adjustment = 30;
 				}
 				const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-				text.setAttribute('x', plot_x + x_value + x_adjustment);
+				text.setAttribute('x', data['plot_x'] + x_value + x_adjustment);
 				text.setAttribute('y', plot_y - 5);
 				text.setAttribute('text-anchor', anchor);
 				text.setAttribute('font-size', '12');
 				text.setAttribute('fill', 'black');
 				append = ''
-				if (append_info) {
+				if (data['append_info']) {
 					position_offset_1 = doc.positions[j] + 1;
 					append = ` (token ${position_offset_1} of ${doc.count})`;
 				}
-				text.textContent = token_ids_to_str(examples[i].orth_indices[j]) + append;
+				text.textContent = token_ids_to_str(data['examples'][i].orth_indices[j], plot_id) + append;
 				line.appendChild(text);
 				plot.appendChild(line);
 			}
@@ -426,23 +431,28 @@ def _get_concordance_plot_script(
 		}
 	}
 
-	function tryInit() {
-	const targetNode = document.getElementById('conc-plot-wrapper');
+	function tryInit(plot_id) {
+	const targetNode = document.getElementById(plot_id);
 	if (targetNode && targetNode.querySelector('.conc-plot-footer')) {
-		vizInit();
+		vizInit(plot_id);
 		return true;
 	}
 	return false;
 	}
-	function vizInit() {
+	function vizInit(plot_id) {
+		const data = window[plot_id];
 		current_page = 1;
-		const slider = document.getElementById('conc-concordance-plot-slider');
-		
-		populatePlot(current_page, page_size);
+		const plot = document.getElementById(plot_id);
+		const slider = plot.querySelector('.conc-concordance-plot-slider');
+		console.log(plot_id)
+		console.log(plot)
+		populatePlot(current_page, data['page_size'], plot_id);
 		slider.addEventListener('input', function() {
 			const page = parseInt(this.value, 10);
-			populatePlot(page, page_size);
-			const page_number = document.getElementById('conc-concordance-plot-page-number');
+			console.log(plot_id)
+			console.log(plot)
+			populatePlot(page, data['page_size'], plot_id);
+			const page_number = plot.querySelector('.conc-concordance-plot-page-number');
 			page_number.textContent = `${page}`;
 		});
 	}
@@ -476,9 +486,9 @@ def concordance_plot(self: Concordance,
 	if len(token_positions[0]) == 0:
 		print("No matches found.")
 		return
-	
-	fn_string = f'{self.corpus.slug}{str(page_size)}{str(append_info)}{token_str}'
-	plot_html_id = hashlib.md5(fn_string.encode('utf-8')).hexdigest()
+
+	fn_string = f'{self.corpus.slug}{str(page_size)}{str(append_info)}{token_str}{time.strftime("%Y%m%d%H%M%S")}'
+	plot_id = 'concplot_' + hashlib.md5(fn_string.encode('utf-8')).hexdigest()
 
 	lines_df = self.corpus.tokens.with_row_index('position').filter(
 		pl.col('position').is_in(token_positions[0])
@@ -560,51 +570,57 @@ def concordance_plot(self: Concordance,
 	# '''
 
 	html += '<script>\n'
-	html += f'var eof_token = {self.corpus.EOF_TOKEN};\n'
-	html += f'var page_size = {page_size};\n'
-	html += f'var append_info = {"true" if append_info else "false"};\n'
-	html += f'var row_height = {row_height};\n'
-	html += f'var start_first_row_at = {start_first_row_at};\n'
-	html += f'var row_adjustment = {row_adjustment};\n'
-	html += f'var default_font_size = {default_font_size};\n'
-	html += f'var subplot_height = {subplot_height};\n'
-	html += f'var plot_height = {plot_height};\n'
-	html += f'var plot_x = {plot_x};\n'
-	html += f'var label_x_right = {label_x_right};\n'
-	html += 'var docs = ' + msgspec.json.encode([row for row in docs_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
-	html += 'var tokens = ' + msgspec.json.encode({row['token_id']: row['token'] for row in unique_df.collect().iter_rows(named=True)}).decode("utf-8") + ';\n'
-	html += 'var examples = ' + msgspec.json.encode([row for row in examples_df.collect().iter_rows(named=True)]).decode("utf-8") + ';\n'
-	html += f'{(self._get_concordance_plot_script())}\n'
+	html += f'var {plot_id}' + ' = {\n'
+	html += f'eof_token: {self.corpus.EOF_TOKEN},\n'
+	html += f'page_size: {page_size},\n'
+	html += f'append_info: {("true" if append_info else "false")},\n'
+	html += f'row_height: {row_height},\n'
+	html += f'start_first_row_at: {start_first_row_at},\n'
+	html += f'row_adjustment: {row_adjustment},\n'
+	html += f'default_font_size: {default_font_size},\n'
+	html += f'subplot_height: {subplot_height},\n'
+	html += f'plot_height: {plot_height},\n'
+	html += f'plot_x: {plot_x},\n'
+	html += f'label_x_right: {label_x_right},\n'
+	html += 'docs: ' + msgspec.json.encode([row for row in docs_df.collect().iter_rows(named=True)]).decode("utf-8") + ',\n'
+	html += 'tokens: ' + msgspec.json.encode({row['token_id']: row['token'] for row in unique_df.collect().iter_rows(named=True)}).decode("utf-8") + ',\n'
+	html += 'examples: ' + msgspec.json.encode([row for row in examples_df.collect().iter_rows(named=True)]).decode("utf-8") + '\n'
+	html += '}\n\n'
+	html += f'{(self._get_concordance_plot_script(plot_id))}\n'
 	html += '</script>\n'
 	html += self._get_concordance_plot_style(default_font_size=default_font_size)
 	#html += '</head><body>'
 
-	html += f'<div class="conc-plot-wrapper" id="conc-plot-wrapper">'
+	html += f'<div class="conc-plot-wrapper" id="{plot_id}">'
 	html += f'<h2>Concordance Plot for &quot;{token_str}&quot;</h2>'
 	html += f'<h3>{self.corpus.name}</h3>'
-	html += f'<svg class="conc-concordance-plot" id="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
+	html += f'<svg class="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
 	# tmp
 	row_adjustment = row_height - start_first_row_at
 	n_plots_this_page = page_size
 	for i in range(1, page_size + 1):
-		html += f'<rect id="rect-{i}" x="{plot_x}" y="{((i * row_height) - row_adjustment)}" height="40" width="800" />'
+		html += f'<rect class="rect-{i}" x="{plot_x}" y="{((i * row_height) - row_adjustment)}" height="40" width="800" />'
 	html += '</svg>'
 	html += f'<div class="conc-concordance-plot-summary">Total Documents: {num_docs}<br>Total Concordance Lines: {concordance_lines}</div>'
-	html += f'''<div class="conc-concordance-plot-controls"><label for="conc-concordance-plot-slider" id="conc-concordance-plot-slider-label">Page <span id="conc-concordance-plot-page-number">1</span> of {num_pages}</label>
-	<input type="range" min="1" max="{num_pages}" value="1" step="1" class="slider" id="conc-concordance-plot-slider" autocomplete="off"></div>
+	html += f'''<div class="conc-concordance-plot-controls"><label for="{plot_id}-slider" class="conc-concordance-plot-slider-label">Page <span class="conc-concordance-plot-page-number">1</span> of {num_pages}</label>
+	<input type="range" min="1" max="{num_pages}" value="1" step="1" class="slider conc-concordance-plot-slider" id="{plot_id}-slider" autocomplete="off"></div>
 	<div class="conc-plot-footer"></div>
 	</div>'''
 
+	html += '<script>\n'
+	html += 'if (!tryInit("' + plot_id + '")) {\n'
 	html += '''
-	<script>
-
-
-	if (!tryInit()) {
 	// Only set up observer if not ready yet
 	const observer = new MutationObserver(function(mutationsList, observer) {
-		if (tryInit()) {
+	'''
+	html += '''
+		'''
+	html += 'if (tryInit("' + plot_id + '")) {\n'
+		
+	html += '''
 		observer.disconnect();
 		}
+
 	});
 	observer.observe(document.body, { childList: true, subtree: true });
 	}
