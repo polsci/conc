@@ -91,7 +91,7 @@ def _get_ngrams(self:Ngrams,
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
-		   ngram_length:int = 2, # length of ngram
+		   ngram_length:int|None = 2, # length of ngram, if set to None it will use the number of tokens in the token_str + 1
 		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
 		   normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 		   page_size:int = PAGE_SIZE, # number of results to display per results page 
@@ -106,6 +106,9 @@ def ngrams(self: Ngrams,
 		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
 
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
+
+	if ngram_length is None:
+		ngram_length = len(token_sequence[0]) + 1
 
 	start_time = time.time()
 	use_cache = False
@@ -170,7 +173,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/71_ngrams.ipynb 21
+# %% ../nbs/api/71_ngrams.ipynb 22
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
