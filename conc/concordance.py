@@ -10,7 +10,6 @@ import polars as pl
 import math
 from fastcore.basics import patch
 import msgspec
-from IPython.display import display, HTML
 import hashlib
 
 # %% auto 0
@@ -19,6 +18,7 @@ __all__ = ['Concordance']
 # %% ../nbs/api/72_concordance.ipynb 4
 from .corpus import Corpus
 from .result import Result
+from .plot import Plot
 from .core import logger, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR
 
 # %% ../nbs/api/72_concordance.ipynb 8
@@ -630,9 +630,4 @@ def concordance_plot(self: Concordance,
 
 	# may add rust based minify-html here in future
 
-	# leaving for debug option in future
-	# with open('tmp.html', 'w', encoding='utf8') as f:
-	# 	f.write(html)
-
-	display(HTML(html))
-	#return html	
+	return Plot(type='concordance plot', html=html)
