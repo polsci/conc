@@ -120,7 +120,7 @@ Conc is tested with Python 3.10+. You can install Conc from
 [pypi](https://pypi.org/project/conc) using this command:
 
 ``` sh
-$ pip install conc
+pip install conc
 ```
 
 Add the `-U` flag to upgrade if you are already running Conc.
@@ -132,7 +132,7 @@ Conc, install a model. If you are working with English-language texts,
 install SpaCy’s small English model (which is Conc’s default) like this:
 
 ``` sh
-$ python -m spacy download en_core_web_sm
+python -m spacy download en_core_web_sm
 ```
 
 If you are working with a different language or want to use a different
