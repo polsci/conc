@@ -466,8 +466,8 @@ def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
 				page_size: int = 10, # number of plots per page
 				append_info: bool = True # append token position info to the concordance line preview screens visible when hover over the plot lines
-				):
-	"""Display a concordance plot."""
+				) -> Plot: # concordance plot object, add .display() to view in notebook
+	"""Create a concordance plot."""
 
 	# may make these configurable in function call in the future - but would need to ensure these don't have to passed to styles
 	row_height = 60

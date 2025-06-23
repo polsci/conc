@@ -12,6 +12,7 @@ __all__ = ['Conc']
 
 # %% ../nbs/api/50_conc.ipynb 4
 from .result import Result
+from .plot import Plot
 from .core import PAGE_SIZE, logger
 from .corpus import Corpus
 from .frequency import Frequency
@@ -131,8 +132,8 @@ def concordance_plot(self: Conc,
 				token_str: str, # token string for concordance plot
 				page_size: int = 10, # number of plots per page
 				append_info: bool = True # append token position info to the concordance line preview screens visible when hover over the plot lines
-				):
-	"""Display a concordance plot."""
+				) -> Plot: # concordance plot object, add .display() to view in notebook
+	"""Create a concordance plot."""
 	return self.concordance_.concordance_plot(token_str=token_str,
 												page_size=page_size,
 												append_info=append_info)
