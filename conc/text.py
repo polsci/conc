@@ -21,11 +21,13 @@ class Text:
 	def __init__(self,
 			  tokens:np.ndarray, # list of token strs
 			  has_spaces: np.ndarray, # whether token strs followed by space
-			  metadata: dict = {} # metadata for doc as a dict
+			  metadata: dict = {}, # metadata for doc as a dict
+			  doc_df: pl.DataFrame = None # if provided can be used for enhanced display (e.g. keyword highlighting)
 			  ): 
 		self.tokens = tokens
 		self.has_spaces = has_spaces
 		self.metadata = metadata
+		self.doc_df = doc_df
 
 # %% ../nbs/api/78_text.ipynb 8
 @patch
@@ -48,13 +50,35 @@ def _div(self:Text,
 
 # %% ../nbs/api/78_text.ipynb 10
 @patch
+def corpus_position_to_doc_position(self:Text,
+                                      corpus:Corpus, # corpus object
+                                      pos:int # position in corpus
+                                      ) -> int:
+    """ Convert corpus position to document position """
+
+    doc_pos = self.doc_df.with_row_index('doc_position').filter((pl.col('position') == pos) & (pl.col('not_space') == 1)).select(pl.col('doc_position')).collect().item()
+    return doc_pos
+
+
+# %% ../nbs/api/78_text.ipynb 11
+@patch
 def as_string(self:Text,
-              max_tokens: int|None = None # maximum length of text to display in tokens, if None, display all
+              max_tokens: int|None = None, # maximum length of text to display in tokens, if None, display all
+              highlighted_token_range: tuple|None = None # range of tokens to highlight, note: these token ids are positions within the corpus, not the text itself
         ):
     """ Return the text as a string """
 
     interleaved = np.empty((self.tokens.size + self.has_spaces.size,), dtype=self.tokens.dtype)
-    interleaved[0::2] = self.tokens
+    
+    if self.doc_df is not None and highlighted_token_range is not None:
+        doc_pos_start = self.corpus_position_to_doc_position(self.doc_df, highlighted_token_range[0])
+        doc_pos_end = self.corpus_position_to_doc_position(self.doc_df, highlighted_token_range[1])
+        tokens_with_highlight = self.tokens.copy()
+        tokens_with_highlight[doc_pos_start] = f'<span class="highlight">{tokens_with_highlight[doc_pos_start]}'
+        tokens_with_highlight[doc_pos_end] = f'{tokens_with_highlight[doc_pos_end]}</span>'
+        interleaved[0::2] = self.tokens
+    else:
+        interleaved[0::2] = self.tokens
     interleaved[1::2] = np.where(self.has_spaces, ' ', '')
 
     if max_tokens is not None and self.tokens.size > max_tokens:
@@ -63,7 +87,7 @@ def as_string(self:Text,
 
     return ''.join(list(interleaved))
 
-# %% ../nbs/api/78_text.ipynb 11
+# %% ../nbs/api/78_text.ipynb 12
 @patch
 def as_tokens(self:Text,
         ):
@@ -71,17 +95,17 @@ def as_tokens(self:Text,
 
     return list(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 12
+# %% ../nbs/api/78_text.ipynb 13
 @patch
 def __str__(self:Text):
     return self.as_string()
 
-# %% ../nbs/api/78_text.ipynb 13
+# %% ../nbs/api/78_text.ipynb 14
 @patch
 def tokens_count(self:Text):
     return len(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 14
+# %% ../nbs/api/78_text.ipynb 15
 @patch
 def display_metadata(self:Text,
                 ):
@@ -90,7 +114,7 @@ def display_metadata(self:Text,
     Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
 
 
-# %% ../nbs/api/78_text.ipynb 15
+# %% ../nbs/api/78_text.ipynb 16
 @patch
 def get_metadata(self:Text,
                 ):
@@ -98,7 +122,7 @@ def get_metadata(self:Text,
 
     return Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, [])
 
-# %% ../nbs/api/78_text.ipynb 16
+# %% ../nbs/api/78_text.ipynb 17
 @patch
 def display(self:Text,
 			show_metadata: bool = True, # whether to display Metadata for the text

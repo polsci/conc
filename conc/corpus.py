@@ -977,6 +977,7 @@ def tokenize(self: Corpus,
 @patch
 def _get_text(self:Corpus,
         doc_id: int, # the id of the document
+        return_df: bool = True # returns the df with 
         ):
     """ Get tokens, space definitions and metadata for a text in the corpus """
     
@@ -985,13 +986,16 @@ def _get_text(self:Corpus,
 
     doc_tokens = self.tokens.with_row_index('position').filter(pl.col('token2doc_index') == doc_id).with_columns(pl.lit(1).alias('not_space'))
     doc_space_tokens = self.spaces.filter(pl.col('token2doc_index') == doc_id).with_columns(pl.lit(0).alias('not_space'))
-    doc_tokens = pl.concat([doc_tokens, doc_space_tokens]).sort('position', 'not_space').drop('position').drop('not_space')
+    doc_tokens_df = pl.concat([doc_tokens, doc_space_tokens]).sort('position', 'not_space') #.drop('position').drop('not_space') # here - creating as df for return_df
 
-    doc_tokens = doc_tokens.select(['orth_index', 'has_spaces']).collect()
+    doc_tokens = doc_tokens_df.select(['orth_index', 'has_spaces']).collect()
     tokens = self.token_ids_to_tokens(doc_tokens.select(pl.col('orth_index')).to_numpy().flatten())
     has_spaces = doc_tokens.select(pl.col('has_spaces')).to_numpy().flatten()
     metadata = self.metadata.with_row_index(offset = 1, name = 'document_id').filter(pl.col('document_id') == doc_id).collect()
-    return tokens, has_spaces, metadata
+    if return_df == True:
+        return tokens, has_spaces, metadata, doc_tokens_df
+    else:
+        return tokens, has_spaces, metadata
 
 # %% ../nbs/api/45_corpus.ipynb 88
 @patch
