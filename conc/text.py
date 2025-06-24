@@ -76,7 +76,7 @@ def as_string(self:Text,
         tokens_with_highlight = self.tokens.copy()
         tokens_with_highlight[doc_pos_start] = f'<span class="highlight">{tokens_with_highlight[doc_pos_start]}'
         tokens_with_highlight[doc_pos_end] = f'{tokens_with_highlight[doc_pos_end]}</span>'
-        interleaved[0::2] = self.tokens
+        interleaved[0::2] = tokens_with_highlight
     else:
         interleaved[0::2] = self.tokens
     interleaved[1::2] = np.where(self.has_spaces, ' ', '')
