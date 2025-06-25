@@ -91,6 +91,8 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 	from nltk.corpus import gutenberg
 	from nltk.corpus import reuters
 	from nltk.corpus import brown
+	import gzip
+	import shutil
 
 	def clean_text(text):
 		# to match words/punc that followed by /tags
@@ -101,29 +103,50 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 		os.makedirs(source_path, exist_ok=True)
 	if not os.path.exists(f'{source_path}/brown'):
 		os.makedirs(f'{source_path}/brown', exist_ok=True)
-	brown_path = os.path.join(source_path, 'brown.csv.gz')
+	brown_path = os.path.join(source_path, 'brown.csv')
 	corpus_data = []
 	for fileid in brown.fileids():
-		corpus_data.append([fileid, clean_text(brown.raw(fileid))])
+		corpus_data.append([fileid, clean_text(brown.raw(fileid)), ', '.join(brown.categories(fileid))])
 		with open(f'{source_path}/brown/{fileid}.txt', 'w', encoding='utf-8') as f:
 			f.write(clean_text(brown.raw(fileid)))
-	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
+	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str), ('category', str)))
 	df.write_csv(brown_path)
 
-	gutenberg_path = os.path.join(source_path, 'gutenberg.csv.gz')
+	with open(brown_path, 'rb') as f_in:
+		with gzip.open(f'{brown_path}.gz', 'wb') as f_out:
+			shutil.copyfileobj(f_in, f_out)
+
+	if os.path.exists(brown_path):
+		os.remove(brown_path)
+
+	gutenberg_path = os.path.join(source_path, 'gutenberg.csv')
 	corpus_data = []
 	for fileid in gutenberg.fileids():
 		corpus_data.append([fileid, clean_text(gutenberg.raw(fileid))])
 	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
 	df.write_csv(gutenberg_path)
 
-	reuters_path = os.path.join(source_path, 'reuters.csv.gz')
+	with open(gutenberg_path, 'rb') as f_in:
+		with gzip.open(f'{gutenberg_path}.gz', 'wb') as f_out:
+			shutil.copyfileobj(f_in, f_out)
+
+	if os.path.exists(gutenberg_path):
+		os.remove(gutenberg_path)
+
+	reuters_path = os.path.join(source_path, 'reuters.csv')
 	corpus_data = []
 	for fileid in reuters.fileids():
 		fileid_name = fileid.split('/')[1]
-		corpus_data.append([fileid_name, clean_text(reuters.raw(fileid))])
-	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str)))
+		corpus_data.append([fileid_name, clean_text(reuters.raw(fileid)), ', '.join(reuters.categories(fileid))])
+	df = pl.DataFrame(corpus_data, orient='row', schema=(('source', str), ('text', str), ('categories', str)))
 	df.write_csv(reuters_path)
+
+	with open(reuters_path, 'rb') as f_in:
+		with gzip.open(f'{reuters_path}.gz', 'wb') as f_out:
+			shutil.copyfileobj(f_in, f_out)
+
+	if os.path.exists(reuters_path):
+		os.remove(reuters_path)
 
 
 # %% ../nbs/api/52_corpora.ipynb 20
@@ -188,11 +211,11 @@ def build_sample_corpora(
 	"""Build all test corpora from source files."""
 
 	corpora = {}
-	corpora['toy'] = {'name': 'Toy Corpus', 'slug': 'toy', 'description': 'Toy corpus is a very small dataset for testing and library development. ', 'extension': '.csv.gz'}
-	corpora['brown'] = {'name': 'Brown Corpus', 'slug': 'brown', 'description': 'A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['reuters'] = {'name': 'Reuters Corpus', 'slug': 'reuters', 'description': 'Reuters corpus (Reuters-21578, Distribution 1.0). "The copyright for the text of newswire articles and Reuters annotations in the Reuters-21578 collection resides with Reuters Ltd. Reuters Ltd. and Carnegie Group, Inc. have agreed to allow the free distribution of this data *for research purposes only*. If you publish results based on this data set, please acknowledge its use, refer to the data set by the name (Reuters-21578, Distribution 1.0), and inform your readers of the current location of the data set." https://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['gutenberg'] = {'name': 'Gutenberg Corpus', 'slug': 'gutenberg', 'description': 'Project Gutenberg Selections NLTK Corpus. Source: https://gutenberg.org/. Public domain. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz'}
-	corpora['garden-party-corpus'] = {'name': 'Garden Party Corpus', 'slug': 'garden-party', 'description': 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party', 'extension': '.zip'}
+	corpora['toy'] = {'name': 'Toy Corpus', 'slug': 'toy', 'description': 'Toy corpus is a very small dataset for testing and library development. ', 'extension': '.csv.gz', 'metadata_columns': ['source', 'category', 'species']}
+	corpora['brown'] = {'name': 'Brown Corpus', 'slug': 'brown', 'description': 'A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz', 'metadata_columns': ['source', 'category']}
+	corpora['reuters'] = {'name': 'Reuters Corpus', 'slug': 'reuters', 'description': 'Reuters corpus (Reuters-21578, Distribution 1.0). "The copyright for the text of newswire articles and Reuters annotations in the Reuters-21578 collection resides with Reuters Ltd. Reuters Ltd. and Carnegie Group, Inc. have agreed to allow the free distribution of this data *for research purposes only*. If you publish results based on this data set, please acknowledge its use, refer to the data set by the name (Reuters-21578, Distribution 1.0), and inform your readers of the current location of the data set." https://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz', 'metadata_columns': ['source', 'categories']}
+	corpora['gutenberg'] = {'name': 'Gutenberg Corpus', 'slug': 'gutenberg', 'description': 'Project Gutenberg Selections NLTK Corpus. Source: https://gutenberg.org/. Public domain. This version downloaded via NLTK https://www.nltk.org/nltk_data/.', 'extension': '.csv.gz', 'metadata_columns': ['source']}
+	corpora['garden-party-corpus'] = {'name': 'Garden Party Corpus', 'slug': 'garden-party', 'description': 'A corpus of short stories from The Garden Party: and Other Stories by Katherine Mansfield. Texts downloaded from Project Gutenberg https://gutenberg.org/ and are in the public domain. The text files contain the short story without the title. https://github.com/ucdh/scraping-garden-party', 'extension': '.zip', 'metadata_columns': None}
 
 	if not os.path.exists(source_path):
 		os.makedirs(source_path)
@@ -218,7 +241,7 @@ def build_sample_corpora(
 		except FileNotFoundError:
 
 			if 'csv' in corpus_details['extension']:
-				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_csv(source_path = f'{source_path}{corpus_name}.csv.gz', text_column='text', metadata_columns=['source'], save_path = save_path)
+				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_csv(source_path = f'{source_path}{corpus_name}.csv.gz', text_column='text', metadata_columns=corpus_details['metadata_columns'], save_path = save_path)
 			else:
 				corpus = Corpus(name = corpus_details['name'], description = corpus_details['description']).build_from_files(source_path = f'{source_path}{corpus_name}{corpus_details["extension"]}', save_path = save_path)
 		except Exception as e:
