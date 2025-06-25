@@ -150,7 +150,8 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 
 
 # %% ../nbs/api/52_corpora.ipynb 20
-def get_garden_party(source_path: str #path to location of sources for building corpora
+def get_garden_party(source_path: str, #path to location of sources for building corpora
+					 create_archive_variations: bool = False # create .tar and .tar.gz files for dev/testing (leave False if you just want the zip)
 					):
 	""" Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
 
@@ -168,25 +169,37 @@ def get_garden_party(source_path: str #path to location of sources for building 
 	r = requests.get(path)
 	with open(f'{source_path}/garden-party-corpus.zip', 'wb') as f:
 		f.write(r.content)
-	# converting to .tar and tar.gz files for testing
-	import zipfile
-	with zipfile.ZipFile(f'{source_path}/garden-party-corpus.zip', 'r') as z:
-		z.extractall(f'{source_path}/garden-party-corpus')
-	import shutil # make tar.gz
-	shutil.make_archive(f'{source_path}/garden-party-corpus', 'gztar', f'{source_path}/garden-party-corpus')
-	shutil.move(f'{source_path}/garden-party-corpus.tar.gz', f'{source_path}/garden-party-corpus.tar.gz')
-	shutil.make_archive(f'{source_path}/garden-party-corpus', 'tar', f'{source_path}/garden-party-corpus')
-	shutil.move(f'{source_path}/garden-party-corpus.tar', f'{source_path}/garden-party-corpus.tar')
-	shutil.rmtree(f'{source_path}/garden-party-corpus')
+
+	if create_archive_variations: 	# converting to .tar and tar.gz files for testing
+		import zipfile
+		with zipfile.ZipFile(f'{source_path}/garden-party-corpus.zip', 'r') as z:
+			z.extractall(f'{source_path}/garden-party-corpus')
+		import shutil # make tar.gz
+		shutil.make_archive(f'{source_path}/garden-party-corpus', 'gztar', f'{source_path}/garden-party-corpus')
+		#shutil.move(f'{source_path}/garden-party-corpus.tar.gz', f'{source_path}/garden-party-corpus.tar.gz')
+		shutil.make_archive(f'{source_path}/garden-party-corpus', 'tar', f'{source_path}/garden-party-corpus')
+		#shutil.move(f'{source_path}/garden-party-corpus.tar', f'{source_path}/garden-party-corpus.tar')
+		shutil.rmtree(f'{source_path}/garden-party-corpus')
 	
 
 # %% ../nbs/api/52_corpora.ipynb 24
 def get_large_dataset(source_path: str #path to location of sources for building corpora
-                    ):
-    """ Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
-    df = pl.read_parquet('hf://datasets/Eugleo/us-congressional-speeches-subset/data/train-*.parquet')
-    df.sample(1000000).select(['speech_id', 'date', 'speaker', 'chamber', 'state', 'text']).write_csv(f'{source_path}/us-congressional-speeches-subset-1m.csv.gz')
-    del df
+					):
+	""" Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
+	import gzip
+	import shutil
+	
+	path = f'{source_path}/us-congressional-speeches-subset-1m.csv'
+	df = pl.read_parquet('hf://datasets/Eugleo/us-congressional-speeches-subset/data/train-*.parquet')
+	df.sample(1000000).select(['speech_id', 'date', 'speaker', 'chamber', 'state', 'text']).write_csv(path)
+	del df
+
+	with open(path, 'rb') as f_in:
+		with gzip.open(f'{path}.gz', 'wb') as f_out:
+			shutil.copyfileobj(f_in, f_out)
+
+	if os.path.exists(path):
+		os.remove(path)
 
 
 # %% ../nbs/api/52_corpora.ipynb 27
@@ -194,11 +207,22 @@ def create_large_dataset_sizes(source_path: str, #path to location of sources fo
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
 	""" Create datasets of different sizes from data source retrieved by get_large_dataset for testing. """
+	import gzip
+	import shutil
+
 	for max_i in sizes:
 		max_i_label = int(max_i / 1000)
+		path = f'{source_path}/us-congressional-speeches-subset-{max_i_label}k.csv'
 		df = pl.read_csv(f'{source_path}/us-congressional-speeches-subset-1m.csv.gz')
-		df.sample(max_i).write_csv(f'{source_path}/us-congressional-speeches-subset-{max_i_label}k.csv.gz')
+		df.sample(max_i).write_csv(path)
 		logger.info(f'Creating dataset of {max_i_label}k rows')
+
+		with open(path, 'rb') as f_in:
+			with gzip.open(f'{path}.gz', 'wb') as f_out:
+				shutil.copyfileobj(f_in, f_out)
+
+		if os.path.exists(path):
+			os.remove(path)
 
 
 # %% ../nbs/api/52_corpora.ipynb 30
