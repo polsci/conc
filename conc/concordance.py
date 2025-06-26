@@ -122,7 +122,8 @@ def concordance(self: Concordance,
 		total_count = len(concordance_df)
 		total_docs = len(np.unique(self.corpus.get_tokens_by_index('token2doc_index')[np.array(token_positions[0])])) # REFACTORED - was using old self.corpus.token2doc_index
 
-		self.corpus.results_cache[cache_id] = [positional_columns, concordance_df, total_count, total_docs, sort_columns]
+		if use_cache == True:
+			self.corpus.results_cache[cache_id] = [positional_columns, concordance_df, total_count, total_docs, sort_columns]
 
 	# working out relevant slice to populate 
 	resultset_start = page_size*(page_current-1)
@@ -133,6 +134,7 @@ def concordance(self: Concordance,
 	end_order = concordance_df['sort0'][resultset_end]
 	start_order_pos = concordance_df.filter(pl.col("sort0") == start_order).head(1)['row'].item()
 	end_order_pos = concordance_df.filter(pl.col("sort0") == end_order).tail(1)['row'].item()
+	logger.info(f'Concordance resultset start: {resultset_start}, end: {resultset_end}, start order: {start_order}, end order: {end_order}, start order pos: {start_order_pos}, end order pos: {end_order_pos}')
 	
 	# populating a smaller chunk of the concordance report - as only need to retrieve/sort a subset
 	concordance_result_df = concordance_df.slice(start_order_pos, end_order_pos - start_order_pos + 1)
@@ -157,7 +159,8 @@ def concordance(self: Concordance,
 	concordance_result_df = concordance_result_df.sort(['sort0','sort1','sort2'])
 		
 	# slicing this further to get only the required page of results and then populating with left, keyword, right strings
-	concordance_view_df = concordance_result_df.slice(start_order_pos - resultset_start, page_size)
+	logger.info(f'Concordance resultset slice: {start_order_pos} to {end_order_pos}, page size: {page_size}, slicing at {resultset_start - start_order_pos} for {page_size} rows')
+	concordance_view_df = concordance_result_df.slice(resultset_start - start_order_pos, page_size)
 
 	concordance_left = []
 	concordance_right = []
@@ -189,7 +192,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/72_concordance.ipynb 23
+# %% ../nbs/api/72_concordance.ipynb 24
 @patch
 def _get_concordance_plot_style(
 	self: Concordance,
@@ -287,7 +290,7 @@ def _get_concordance_plot_style(
 	return html_styles
 
 
-# %% ../nbs/api/72_concordance.ipynb 24
+# %% ../nbs/api/72_concordance.ipynb 25
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
@@ -454,7 +457,7 @@ def _get_concordance_plot_script(
 	'''
 	return html_script
 
-# %% ../nbs/api/72_concordance.ipynb 25
+# %% ../nbs/api/72_concordance.ipynb 26
 @patch
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
