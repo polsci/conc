@@ -54,10 +54,24 @@ def _get_ngrams(self:Ngrams,
 	if ngram_token_position == 'RIGHT':
 		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = -1, exclude_punctuation = False, convert_eof = False)
 		ngrams = ngrams[::-1, :] # reversing order as retrieved right to left
+	elif ngram_token_position == 'LEFT':
+		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = 1, exclude_punctuation = False, convert_eof = False)
+	elif ngram_token_position == 'MIDDLE':
+		length_per_side = math.ceil((ngram_length - sequence_len) / 2)
+		if length_per_side * 2 + sequence_len != ngram_length:
+			logger.warning(f'Ngram length {ngram_length} does not make sense with the provided tokens and ngram_token_position MIDDLE. Adjusting ngram_length.')
+
+		logger.debug(f'Tokens per side for middle token position: {length_per_side}, with ngram length {ngram_length} and sequence length {sequence_len}')
+		right_tokens= self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = sequence_len + length_per_side, position_offset = 0, position_offset_step = 1, exclude_punctuation = False, convert_eof = False)
+		left_tokens = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = length_per_side, position_offset = -1, position_offset_step = -1, exclude_punctuation = False, convert_eof = False)
+		left_tokens = left_tokens[::-1, :] # reversing order as retrieved right to left
+		# combining so that has shape (ngram_length, len(token_positions[0]))
+		ngrams = np.concatenate((left_tokens, right_tokens), axis=0)
+
+	logger.debug(f'Ngrams shape after retrieval {ngrams.shape}')
+
 	# elif ngram_token_position == 'MIDDLE': # further development needed - in roadmap
 	# 	ngram_range = range(-1 * ngram_length + sequence_len + 1, sequence_len + 1)
-	else:
-		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = 1, exclude_punctuation = False, convert_eof = False)
 
 	# old retrieval method - aligning with collocates context retrieval
 	# ngrams = []
@@ -108,7 +122,10 @@ def ngrams(self: Ngrams,
 	token_sequence, index_id = self.corpus.tokenize(token_str, simple_indexing=True)
 
 	if ngram_length is None:
-		ngram_length = len(token_sequence[0]) + 1
+		if ngram_token_position == 'MIDDLE':
+			ngram_length = len(token_sequence[0]) + 2
+		else:
+			ngram_length = len(token_sequence[0]) + 1
 
 	start_time = time.time()
 	use_cache = False
@@ -129,11 +146,18 @@ def ngrams(self: Ngrams,
 		logger.info('Generating ngrams results')
 		ngrams = self._get_ngrams(token_sequence, index_id, token_positions, ngram_length = ngram_length, ngram_token_position = ngram_token_position, exclude_punctuation=exclude_punctuation)
 		total_count = ngrams.shape[1]
+		if ngram_token_position == 'MIDDLE':
+			expected_ngram_length = len(token_sequence[0]) +  (2 * (math.ceil((ngram_length - len(token_sequence[0])) / 2)))
+			if expected_ngram_length != ngram_length:
+				logger.warning(f'Adjusting ngram length from {ngram_length} to {expected_ngram_length}')
+				ngram_length = expected_ngram_length
 		schema = [f'token_{i+1}' for i in range(ngram_length)]
 		ngrams_report = pl.DataFrame(ngrams.T, schema=schema).to_struct(name = 'ngram_token_ids').value_counts(sort=True).rename({"count": "frequency"})
 		ngrams_report = ngrams_report.with_row_index(name='rank', offset=1)
 		total_unique = len(ngrams_report)
-		self.corpus.results_cache[cache_id] = (ngrams_report, total_unique, total_count)
+		
+		if use_cache == True:
+			self.corpus.results_cache[cache_id] = (ngrams_report, total_unique, total_count)
 	
 	count_tokens, tokens_descriptor, total_descriptor = self.corpus.get_token_count_text(exclude_punctuation)
 
@@ -173,7 +197,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/71_ngrams.ipynb 22
+# %% ../nbs/api/71_ngrams.ipynb 23
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
