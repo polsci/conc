@@ -34,7 +34,8 @@ class Concordance:
 @patch
 def _get_concordance_sort(self:Concordance, 
 						 token_positions: list[np.ndarray], # token index to get sort columns for
-						 sort_columns: list # sort columns to use
+						 sort_columns: list, # sort columns to use
+						 ignore_punctuation: bool = True # whether to use punctuation tokens for sorts or skip
 						 ) -> tuple[np.ndarray, np.ndarray]: # token ids for first sort column and corresponding sort order
 	""" Get the first sort column for a concordance. """
 
@@ -42,12 +43,79 @@ def _get_concordance_sort(self:Concordance,
 	index = 'orth_index'
 	seq = np.array(token_positions[0]+sort_columns[0])
 	sort_column_ids = self.corpus.get_tokens_by_index('orth_index')[seq]
+	if ignore_punctuation:
+		sort_column_ids_punct_mask = np.isin(sort_column_ids, self.corpus.punct_tokens)
+		next_column = 1
+		while np.any(sort_column_ids_punct_mask):
+			logger.debug(f'Punct token correction for {np.sum(sort_column_ids_punct_mask)} tokens, pass {next_column}')
+			sort_column_ids[sort_column_ids_punct_mask] = self.corpus.get_tokens_by_index('orth_index')[np.array(token_positions[0]+sort_columns[0]+next_column)][sort_column_ids_punct_mask]
+			next_column += 1
+			sort_column_ids_punct_mask = np.isin(sort_column_ids, self.corpus.punct_tokens)
+
 	sort_column_order = self.corpus.token_ids_to_sort_order(sort_column_ids)
 	logger.info(f'Concordance sort column ({sort_column_ids.shape[0]}) retrieval time: {(time.time() - start_time):.5f} seconds')
 	return sort_column_ids, sort_column_order
 
 
-# %% ../nbs/api/72_concordance.ipynb 14
+# %% ../nbs/api/72_concordance.ipynb 16
+@patch
+def _build_concordance_result_with_sort(self:Concordance,
+						sequence_length: int, # length of the sequence to concordance
+						concordance_result_df: pl.DataFrame, # polars DataFrame with initial concordance columns
+						concordance_columns: list[pl.Series], # list of concordance columns - each column is a series of token ids
+						concordance_range: range, # range of concordance columns to use - these are positions of concordance columns
+						sort_columns: list, # list of sort columns for concordance
+						ignore_punctuation:bool = False # whether to ignore punctuation tokens in sort columns
+						) -> list: # concordance result df with token ids and sort columns
+	""" Build sort columns from concordance columns. """
+
+	# # add on sort columns
+	# for i, sort_column in enumerate(sort_columns):
+	# 	if sort_column not in concordance_range:
+	# 		logger.error(f'Sort column {sort_column} not in concordance range {concordance_range}')
+	# 		raise ValueError(f'Sort column {sort_column} not in concordance range {concordance_range}')
+	# 	sort_column_index = concordance_range.index(sort_column)
+	# 	concordance_columns.append(concordance_columns[sort_column_index].alias(f'sort{i}'))
+
+	concordance_result_df = concordance_result_df.with_columns(concordance_columns)
+
+	if ignore_punctuation:
+		# get all positive integers from sort_columns
+		sort_columns_positive = [col for col in sort_columns if col > 0]
+		sort_columns_negative = [col for col in sort_columns if col < 0]
+		if len(sort_columns_positive) > 0:
+			right_tokens = np.array(concordance_result_df.select([f'{i}' for i in concordance_range if i > 0 and i not in list(range(sequence_length))]).to_numpy())
+			right_tokens = right_tokens.T
+			logger.debug(f"Context tokens collected: {right_tokens.shape}")
+			right_tokens = np.where(np.isin(right_tokens, self.corpus.punct_tokens), 0, right_tokens)
+			right_tokens = self.corpus._shift_zeroes_to_end(right_tokens)
+			logger.debug(f"Right tokens shape: {right_tokens.shape}")
+			for i, sort_column in enumerate(sort_columns_positive):
+				logger.debug(f"Adding left sort column sort{sort_columns.index(sort_column)} based on column {sort_column}")
+				concordance_result_df = concordance_result_df.with_columns(
+					# because only have positive columns after sequence the first position in right_tokens is sequence_length - so need to adjust sort_column by sequence_length
+					pl.Series(self.corpus.token_ids_to_sort_order(right_tokens[sort_column-sequence_length])).alias(f'sort{sort_columns.index(sort_column)}'),
+					pl.Series(self.corpus.token_ids_to_tokens(right_tokens[sort_column-sequence_length])).alias(f'sort_debug_{sort_columns.index(sort_column)}')
+				)
+		if len(sort_columns_negative) > 0:
+			left_tokens = np.array(concordance_result_df.select([f'{i}' for i in concordance_range if i < 0]).to_numpy())
+			left_tokens = left_tokens.T
+			logger.debug(f"Context tokens collected: {left_tokens.shape}")
+			left_tokens = np.where(np.isin(left_tokens, self.corpus.punct_tokens), 0, left_tokens)
+			left_tokens = self.corpus._shift_zeroes_to_start(left_tokens)
+			logger.debug(f"Left tokens shape: {left_tokens.shape}")
+			for i, sort_column in enumerate(sort_columns_negative):
+				logger.debug(f"Adding left sort column sort{sort_columns.index(sort_column)} based on column {sort_column}")
+				concordance_result_df = concordance_result_df.with_columns(
+					# because only have negative columns before sequence first position - can use sort_column direct
+					pl.Series(self.corpus.token_ids_to_sort_order(left_tokens[sort_column])).alias(f'sort{sort_columns.index(sort_column)}'),
+					pl.Series(self.corpus.token_ids_to_tokens(left_tokens[sort_column])).alias(f'sort_debug_{sort_columns.index(sort_column)}')
+				)
+
+	return concordance_result_df
+
+
+# %% ../nbs/api/72_concordance.ipynb 17
 @patch
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
@@ -56,7 +124,8 @@ def concordance(self: Concordance,
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
-				use_cache:bool = True # retrieve the results from cache if available (currently ignored)
+				use_cache:bool = True, # retrieve the results from cache if available (currently ignored)
+				ignore_punctuation:bool = False, # whether to ignore punctuation in the concordance sort
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 
@@ -113,7 +182,7 @@ def concordance(self: Concordance,
 			sort_columns = [sequence_len + 1 - 1,sequence_len + 2 - 1,sequence_len + 3 - 1]
 
 		# getting first sort column here
-		sort_column_ids, sort_column_order = self._get_concordance_sort(token_positions, sort_columns)
+		sort_column_ids, sort_column_order = self._get_concordance_sort(token_positions, sort_columns, ignore_punctuation=ignore_punctuation)
 		
 		concordance_df = pl.DataFrame([pl.Series(name='index', values=token_positions[0]), pl.Series(name='sort0', values=sort_column_order), pl.Series(name=str(sort_columns[0]), values=sort_column_ids)])
 		concordance_df = concordance_df.sort('sort0')
@@ -149,9 +218,11 @@ def concordance(self: Concordance,
 			column_name = 'sort'+str(sort_columns.index(pos))
 			if column_name != 'sort0':
 				concordance_columns.append(pl.Series(name=column_name, values=self.corpus.token_ids_to_sort_order(tokens)))
+
+	concordance_result_df = self._build_concordance_result_with_sort(sequence_len, concordance_result_df, concordance_columns, concordance_range, sort_columns, ignore_punctuation)
+
 	logger.info(f'Concordance results ({len(concordance_columns[0])}) retrieval time: {(time.time() - results_start_time):.5f} seconds')
 
-	concordance_result_df = concordance_result_df.with_columns(concordance_columns)
 	#offsets_arr = np.array(self.corpus.offsets,dtype=np.uint64) # FIX
 	#document_ids = np.searchsorted(offsets_arr, concordance_result_df['index'], side = 'right') - 1 
 	document_ids = self.corpus.get_tokens_by_index('token2doc_index')[np.array(concordance_result_df['index'])] # REFACTORED to remove offsets functionality
@@ -192,7 +263,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/72_concordance.ipynb 24
+# %% ../nbs/api/72_concordance.ipynb 29
 @patch
 def _get_concordance_plot_style(
 	self: Concordance,
@@ -290,7 +361,7 @@ def _get_concordance_plot_style(
 	return html_styles
 
 
-# %% ../nbs/api/72_concordance.ipynb 25
+# %% ../nbs/api/72_concordance.ipynb 30
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
@@ -457,7 +528,7 @@ def _get_concordance_plot_script(
 	'''
 	return html_script
 
-# %% ../nbs/api/72_concordance.ipynb 26
+# %% ../nbs/api/72_concordance.ipynb 31
 @patch
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot

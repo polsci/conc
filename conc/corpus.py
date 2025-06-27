@@ -1014,39 +1014,59 @@ def get_tokens_by_index(self: Corpus,
 				) -> np.ndarray:
 	""" Get tokens for a given index. """
 
+	logger.debug(f'Getting tokens for index: {index}')
+	start_time = time.time()
 	if index not in ['orth_index', 'lower_index', 'token2doc_index']:
 		raise ValueError("Index must be one of 'orth_index', 'lower_index', 'token2doc_index'")
 
-	if index not in self.results_cache:
-		self.results_cache[index] = self.tokens.select(pl.col(index)).collect(engine='streaming').to_numpy().flatten()
-	
-	return self.results_cache[index]
+	cache_key = index
+	if exclude_punctuation:
+		cache_key += '-nopuncts'
+	if cache_key in self.results_cache:
+		logger.info(f'Tokens for index {index} with exclude_punctuation {exclude_punctuation} already cached, returning cached result in {(time.time() - start_time):.3f} seconds')
+		return self.results_cache[cache_key]
+	else:
+		if index not in self.results_cache: # in case build -nopuncts first - get both sorted
+			self.results_cache[index] = self.tokens.select(pl.col(index)).collect(engine='streaming').to_numpy().flatten()
+		if exclude_punctuation == False:
+			logger.info(f'Got tokens for index {index} with exclude_punctuation {exclude_punctuation} in {(time.time() - start_time):.3f} seconds')
+			return self.results_cache[index]
+		else:
+			if 'puncts' not in self.results_cache:
+				self.results_cache['puncts'] = self.puncts.select(pl.col('position')).collect(engine='streaming').to_numpy().flatten()
+			self.results_cache[cache_key] = np.delete(self.results_cache[index], self.results_cache['puncts'])
+			self.results_cache[f'{cache_key}-positions'] = np.delete(np.arange(len(self.results_cache[index])), self.results_cache['puncts'])
+			#self.results_cache[f'{index}-nopuncts'] = self.tokens.with_row_index('position').select(pl.col('position'), pl.col(index)).join(self.puncts.select('position'), on='position', how='anti').drop('position').collect(engine='streaming').to_numpy().flatten()
+			logger.info(f'Got tokens for index {index} with exclude_punctuation {exclude_punctuation} in {(time.time() - start_time):.3f} seconds')
+			return self.results_cache[cache_key]
 
 
-# %% ../nbs/api/45_corpus.ipynb 93
+# %% ../nbs/api/45_corpus.ipynb 95
 @patch
 def get_ngrams_by_index(self: Corpus, 
 				ngram_length:int, # length of ngrams to get
-				index:str  # index to get tokens from, e.g. 'orth_index' 'lower_index'
+				index:str,  # index to get tokens from, e.g. 'orth_index' 'lower_index'
+				exclude_punctuation: bool = False # exclude punctuation tokens from the result (unused currently)
 				) -> np.ndarray:
 	""" Get ngrams for a given index and ngram length. """
 
 	if index not in ['orth_index', 'lower_index']:
 		raise ValueError("Index must be either 'orth_index' or 'lower_index'")
 
-	if (index, ngram_length) not in self.ngram_index:
+	if (index, ngram_length, exclude_punctuation) not in self.ngram_index:
 		slices = []
-		[slices.append(np.roll(self.get_tokens_by_index(index), shift)) for shift in -np.arange(ngram_length)]
+		[slices.append(np.roll(self.get_tokens_by_index(index, exclude_punctuation), shift)) for shift in -np.arange(ngram_length)]
 		seq = np.vstack(slices).T
-		self.ngram_index[(index, ngram_length)] = seq
+		self.ngram_index[(index, ngram_length, exclude_punctuation)] = seq
 
-	return self.ngram_index[(index, ngram_length)]
+	return self.ngram_index[(index, ngram_length, exclude_punctuation)]
 
-# %% ../nbs/api/45_corpus.ipynb 96
+# %% ../nbs/api/45_corpus.ipynb 98
 @patch
 def get_token_positions(self: Corpus, 
 					token_sequence: list[np.ndarray], # token sequence to get index for 
-					index_id: int # index to search (i.e. ORTH, LOWER)
+					index_id: int, # index to search (i.e. ORTH, LOWER)
+					exclude_punctuation: bool = False # exclude punctuation tokens from the result (unused currently)
 					) -> np.ndarray: # positions of token sequence
 	""" Get the positions of a token sequence in the corpus. """
 	
@@ -1063,23 +1083,23 @@ def get_token_positions(self: Corpus,
 		index = 'lower_index'
 
 	if variants_len == 1:
-		results.append(np.where(np.all(self.get_ngrams_by_index(ngram_length = sequence_len, index = index) == token_sequence[0], axis=1))[0])
+		results.append(np.where(np.all(self.get_ngrams_by_index(ngram_length = sequence_len, index = index, exclude_punctuation = exclude_punctuation) == token_sequence[0], axis=1))[0])
 	else:
 		condition_list = []
 		choice_list = variants_len * [True]
 		for seq in token_sequence:
-			condition_list.append(self.get_ngrams_by_index(ngram_length = sequence_len, index = index) == seq)
+			condition_list.append(self.get_ngrams_by_index(ngram_length = sequence_len, index = index, exclude_punctuation = exclude_punctuation) == seq)
 		results.append(np.where(np.all(np.select(condition_list, choice_list),axis=1))[0])
 
 	logger.info(f'Token indexing ({len(results[0])}) time: {(time.time() - start_time):.5f} seconds')
 	return results
 
-# %% ../nbs/api/45_corpus.ipynb 99
+# %% ../nbs/api/45_corpus.ipynb 101
 @patch
 def _shift_zeroes_to_end(self:Corpus,
 						arr:np.ndarray # Numpy array of collocate frequencies to process
 						):
-	""" Move 0 value positions for punctuation and space removal """
+	""" Move 0 value positions for punctuation and space removal, zeroes get moved to the end of each column. """
 	result = np.empty_like(arr)
 	for col in range(arr.shape[1]):
 		col_data = arr[:, col]
@@ -1088,7 +1108,22 @@ def _shift_zeroes_to_end(self:Corpus,
 		result[mask.sum():, col] = 0
 	return result
 
-# %% ../nbs/api/45_corpus.ipynb 100
+# %% ../nbs/api/45_corpus.ipynb 102
+@patch
+def _shift_zeroes_to_start(self:Corpus,
+						arr:np.ndarray # Numpy array of collocate frequencies to process
+						):
+	""" Move 0 value positions for punctuation and space removal to the start of each column """
+	result = np.empty_like(arr)
+	for col in range(arr.shape[1]):
+		col_data = arr[:, col]
+		mask = col_data != 0
+		n_zeros = (~mask).sum()
+		result[:n_zeros, col] = 0
+		result[n_zeros:, col] = col_data[mask]
+	return result
+
+# %% ../nbs/api/45_corpus.ipynb 103
 @patch
 def _zero_after_value(self:Corpus,
 					  arr:np.ndarray, # Numpy array of collocate frequencies to process
@@ -1104,7 +1139,7 @@ def _zero_after_value(self:Corpus,
 			arr[first_idx:, col] = 0
 	return arr
 
-# %% ../nbs/api/45_corpus.ipynb 101
+# %% ../nbs/api/45_corpus.ipynb 104
 @patch
 def get_tokens_in_context(self:Corpus,
 							   token_positions:np.ndarray, # Numpy array of token positions in the corpus
@@ -1136,7 +1171,8 @@ def get_tokens_in_context(self:Corpus,
 		position_offset += position_offset_step
 		if len(context_tokens_arr) >= context_length: 
 			context_tokens = np.array(context_tokens_arr, dtype = token_positions[0].dtype)
-			logger.info(f"Context tokens collected: {context_tokens.shape}")
+			# shape = (context_length, len(token_positions[0]))
+			logger.debug(f"Context tokens collected: {context_tokens.shape}")
 			if len_tokens_for_removal > 0: # cleaning punctuation and check if need more iterations
 				context_tokens = np.where(np.isin(context_tokens, tokens_for_removal), 0, context_tokens)
 			counts = np.count_nonzero(context_tokens, axis=0)
@@ -1156,7 +1192,7 @@ def get_tokens_in_context(self:Corpus,
 
 	return context_tokens
 
-# %% ../nbs/api/45_corpus.ipynb 102
+# %% ../nbs/api/45_corpus.ipynb 105
 def build_test_corpora(
 		source_path:str, # path to folder with corpora
 		save_path:str, # path to save corpora
