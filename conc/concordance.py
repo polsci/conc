@@ -125,7 +125,7 @@ def concordance(self: Concordance,
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
 				use_cache:bool = True, # retrieve the results from cache if available (currently ignored)
-				ignore_punctuation:bool = False, # whether to ignore punctuation in the concordance sort
+				ignore_punctuation:bool = False, # whether to ignore punctuation in the concordance sort (experimental - undergoing testing)
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 
