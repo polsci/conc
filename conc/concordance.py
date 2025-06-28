@@ -47,10 +47,15 @@ def _get_concordance_sort(self:Concordance,
 		sort_column_ids_punct_mask = np.isin(sort_column_ids, self.corpus.punct_tokens)
 		next_column = 1
 		while np.any(sort_column_ids_punct_mask):
-			logger.debug(f'Punct token correction for {np.sum(sort_column_ids_punct_mask)} tokens, pass {next_column}')
+			sum = np.sum(sort_column_ids_punct_mask)
+			logger.debug(f'Punct token correction for {sum} tokens, pass {next_column}')
 			sort_column_ids[sort_column_ids_punct_mask] = self.corpus.get_tokens_by_index('orth_index')[np.array(token_positions[0]+sort_columns[0]+next_column)][sort_column_ids_punct_mask]
 			next_column += 1
 			sort_column_ids_punct_mask = np.isin(sort_column_ids, self.corpus.punct_tokens)
+			if next_column > len(sort_columns):
+				sum = np.sum(sort_column_ids_punct_mask)
+				logger.warning(f'Concordance sort column retrieval reached maximum columns, sorts not found = {sum}')
+				break
 
 	sort_column_order = self.corpus.token_ids_to_sort_order(sort_column_ids)
 	logger.info(f'Concordance sort column ({sort_column_ids.shape[0]}) retrieval time: {(time.time() - start_time):.5f} seconds')
@@ -263,7 +268,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/72_concordance.ipynb 29
+# %% ../nbs/api/72_concordance.ipynb 31
 @patch
 def _get_concordance_plot_style(
 	self: Concordance,
@@ -361,7 +366,7 @@ def _get_concordance_plot_style(
 	return html_styles
 
 
-# %% ../nbs/api/72_concordance.ipynb 30
+# %% ../nbs/api/72_concordance.ipynb 32
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
@@ -528,7 +533,7 @@ def _get_concordance_plot_script(
 	'''
 	return html_script
 
-# %% ../nbs/api/72_concordance.ipynb 31
+# %% ../nbs/api/72_concordance.ipynb 33
 @patch
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
