@@ -662,7 +662,7 @@ def concordance_plot(self: Concordance,
 	html += f'<div class="conc-plot-wrapper" id="{plot_id}">'
 	html += f'<h2>Concordance Plot for &quot;{token_str}&quot;</h2>'
 	html += f'<h3>{self.corpus.name}</h3>'
-	html += f'<svg class="conc-concordance-plot" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
+	html += f'<svg class="conc-concordance-plot" viewBox="0 0 1000 {plot_height}" width="1000" height="{plot_height}" xmlns="http://www.w3.org/2000/svg">'
 	# tmp
 	row_adjustment = row_height - start_first_row_at
 	n_plots_this_page = page_size
