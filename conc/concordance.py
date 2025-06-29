@@ -499,8 +499,10 @@ def _get_concordance_plot_script(
 				if (data['append_info']) {
 					position_offset_1 = doc.positions[j] + 1;
 					append = ` (token ${position_offset_1} of ${doc.count})`;
+					line.setAttribute('data-offset', '${position_offset_1}');
 				}
 				text.textContent = token_ids_to_str(data['examples'][i].orth_indices[j], plot_id) + append;
+				line.setAttribute('data-doc', '${doc.doc_id}');
 				line.appendChild(text);
 				plot.appendChild(line);
 			}
