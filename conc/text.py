@@ -51,7 +51,6 @@ def _div(self:Text,
 # %% ../nbs/api/78_text.ipynb 10
 @patch
 def corpus_position_to_doc_position(self:Text,
-                                      corpus:Corpus, # corpus object
                                       pos:int # position in corpus
                                       ) -> int:
     """ Convert corpus position to document position """
@@ -63,7 +62,6 @@ def corpus_position_to_doc_position(self:Text,
 # %% ../nbs/api/78_text.ipynb 11
 @patch
 def doc_position_to_corpus_position(self:Text,
-                                      corpus:Corpus, # corpus object
                                       pos:int # position in corpus
                                       ) -> int:
     """ Convert doc position to corpus position """
@@ -82,8 +80,8 @@ def as_string(self:Text,
     interleaved = np.empty((self.tokens.size + self.has_spaces.size,), dtype=self.tokens.dtype)
     
     if self.doc_df is not None and highlighted_token_range is not None:
-        doc_pos_start = self.corpus_position_to_doc_position(self.doc_df, highlighted_token_range[0])
-        doc_pos_end = self.corpus_position_to_doc_position(self.doc_df, highlighted_token_range[1])
+        doc_pos_start = self.corpus_position_to_doc_position(highlighted_token_range[0])
+        doc_pos_end = self.corpus_position_to_doc_position(highlighted_token_range[1])
         tokens_with_highlight = self.tokens.copy()
         tokens_with_highlight[doc_pos_start] = f'<span class="highlight">{tokens_with_highlight[doc_pos_start]}'
         tokens_with_highlight[doc_pos_end] = f'{tokens_with_highlight[doc_pos_end]}</span>'
