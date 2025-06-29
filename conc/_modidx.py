@@ -135,5 +135,7 @@ d = { 'settings': { 'branch': 'main',
                                                                                'conc/text.py'),
                            'conc.text.Text.display': ('api/text.html#text.display', 'conc/text.py'),
                            'conc.text.Text.display_metadata': ('api/text.html#text.display_metadata', 'conc/text.py'),
+                           'conc.text.Text.doc_position_to_corpus_position': ( 'api/text.html#text.doc_position_to_corpus_position',
+                                                                               'conc/text.py'),
                            'conc.text.Text.get_metadata': ('api/text.html#text.get_metadata', 'conc/text.py'),
                            'conc.text.Text.tokens_count': ('api/text.html#text.tokens_count', 'conc/text.py')}}}

@@ -62,6 +62,17 @@ def corpus_position_to_doc_position(self:Text,
 
 # %% ../nbs/api/78_text.ipynb 11
 @patch
+def doc_position_to_corpus_position(self:Text,
+                                      corpus:Corpus, # corpus object
+                                      pos:int # position in corpus
+                                      ) -> int:
+    """ Convert doc position to corpus position """
+
+    corpus_pos = self.doc_df.with_row_index('doc_position').filter((pl.col('doc_position') == pos) & (pl.col('not_space') == 1)).select(pl.col('position')).collect().item()
+    return corpus_pos
+
+# %% ../nbs/api/78_text.ipynb 12
+@patch
 def as_string(self:Text,
               max_tokens: int|None = None, # maximum length of text to display in tokens, if None, display all
               highlighted_token_range: tuple|None = None # range of tokens to highlight, note: these token ids are positions within the corpus, not the text itself
@@ -87,7 +98,7 @@ def as_string(self:Text,
 
     return ''.join(list(interleaved))
 
-# %% ../nbs/api/78_text.ipynb 12
+# %% ../nbs/api/78_text.ipynb 13
 @patch
 def as_tokens(self:Text,
         ):
@@ -95,17 +106,17 @@ def as_tokens(self:Text,
 
     return list(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 13
+# %% ../nbs/api/78_text.ipynb 14
 @patch
 def __str__(self:Text):
     return self.as_string()
 
-# %% ../nbs/api/78_text.ipynb 14
+# %% ../nbs/api/78_text.ipynb 15
 @patch
 def tokens_count(self:Text):
     return len(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 15
+# %% ../nbs/api/78_text.ipynb 16
 @patch
 def display_metadata(self:Text,
                 ):
@@ -114,7 +125,7 @@ def display_metadata(self:Text,
     Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
 
 
-# %% ../nbs/api/78_text.ipynb 16
+# %% ../nbs/api/78_text.ipynb 17
 @patch
 def get_metadata(self:Text,
                 ):
@@ -122,7 +133,7 @@ def get_metadata(self:Text,
 
     return Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, [])
 
-# %% ../nbs/api/78_text.ipynb 17
+# %% ../nbs/api/78_text.ipynb 18
 @patch
 def display(self:Text,
 			show_metadata: bool = True, # whether to display Metadata for the text

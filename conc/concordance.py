@@ -54,7 +54,8 @@ def _get_concordance_sort(self:Concordance,
 			sort_column_ids_punct_mask = np.isin(sort_column_ids, self.corpus.punct_tokens)
 			if next_column > len(sort_columns):
 				sum = np.sum(sort_column_ids_punct_mask)
-				logger.warning(f'Concordance sort column retrieval reached maximum columns, sorts not found = {sum}')
+				if sum > 0:
+					logger.warning(f'Concordance sort column retrieval reached maximum columns with sorts for {sum} lines not found, breaking as reached iteration limit')
 				break
 
 	sort_column_order = self.corpus.token_ids_to_sort_order(sort_column_ids)
