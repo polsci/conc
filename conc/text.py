@@ -66,7 +66,7 @@ def doc_position_to_corpus_position(self:Text,
                                       ) -> int:
     """ Convert doc position to corpus position """
 
-    corpus_pos = self.doc_df.with_row_index('doc_position').filter((pl.col('doc_position') == pos) & (pl.col('not_space') == 1)).select(pl.col('position')).collect().item()
+    corpus_pos = self.doc_df.filter(pl.col('not_space') == 1).with_row_index('doc_position').filter((pl.col('doc_position') == pos)).select(pl.col('position')).collect().item()
     return corpus_pos
 
 # %% ../nbs/api/78_text.ipynb 12
