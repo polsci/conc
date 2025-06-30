@@ -5,6 +5,33 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.5] - 2025-06-30 - improved concordance sorting, new features to support release of [ConText](https://github.com/polsci/ConText)
+
+### Added
+
+- Corpus.report - allows accessing Corpus summary as a Result object
+- added Plot class
+- added functionality for auto-calculating ngram_length based on input
+- highlighting in text output
+- added flag to allow/prevent multiple formats for sample corpora sources
+- added MIDDLE ngram_token_position
+- support for ignoring punctuation in concordance sorts
+- support for scaling of concordance plot
+- doc_position_to_corpus_position in Text to allow translating positions
+
+### Changed
+
+- expanded punctuation list to unicode tokens to allow better punctuation token detection
+- improve formatting of concordances and other tables
+- improved plot rendering to allow multiple concordance plots per page
+- revised sample corpora processes to ensure archives compressed, metadata used
+- prevented possible many iterations when scanning for sort tokens
+- passing doc/offset in svg element attributes (support for ConText clickable plots)
+
+### Fixed
+
+- fix to prevent negative start indexes and associated weirdness
+
 ## [0.1.4] - 2025-06-18 - documentation and test improvements, Result/Text class updates
 
 ### Added
