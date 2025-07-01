@@ -71,7 +71,7 @@ def _build_concordance_result_with_sort(self:Concordance,
 						concordance_columns: list[pl.Series], # list of concordance columns - each column is a series of token ids
 						concordance_range: range, # range of concordance columns to use - these are positions of concordance columns
 						sort_columns: list, # list of sort columns for concordance
-						ignore_punctuation:bool = False # whether to ignore punctuation tokens in sort columns
+						ignore_punctuation:bool = True # whether to ignore punctuation tokens in sort columns
 						) -> list: # concordance result df with token ids and sort columns
 	""" Build sort columns from concordance columns. """
 
@@ -131,7 +131,7 @@ def concordance(self: Concordance,
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
 				use_cache:bool = True, # retrieve the results from cache if available (currently ignored)
-				ignore_punctuation:bool = False, # whether to ignore punctuation in the concordance sort (experimental - undergoing testing)
+				ignore_punctuation:bool = True, # whether to ignore punctuation in the concordance sort
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 
