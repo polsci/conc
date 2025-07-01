@@ -8,6 +8,8 @@ from fastcore.basics import patch
 import numpy as np
 from IPython.display import display, HTML
 import polars as pl
+import textwrap
+import re
 
 # %% auto 0
 __all__ = ['Text']
@@ -29,7 +31,7 @@ class Text:
 		self.metadata = metadata
 		self.doc_df = doc_df
 
-# %% ../nbs/api/78_text.ipynb 8
+# %% ../nbs/api/78_text.ipynb 9
 @patch
 def _nl2br(self:Text,
            text:str # document text
@@ -37,7 +39,7 @@ def _nl2br(self:Text,
     text = text.replace('\r\n', '\n').replace('\r', '\n')
     return text.replace('\n', '<br>\n')
 
-# %% ../nbs/api/78_text.ipynb 9
+# %% ../nbs/api/78_text.ipynb 10
 @patch
 def _div(self:Text,
          text:str, # document text
@@ -48,7 +50,7 @@ def _div(self:Text,
         class_str = f' class="{class_str}"'
     return f'<div{class_str}>{text}</div>'
 
-# %% ../nbs/api/78_text.ipynb 10
+# %% ../nbs/api/78_text.ipynb 11
 @patch
 def corpus_position_to_doc_position(self:Text,
                                       pos:int # position in corpus
@@ -59,7 +61,7 @@ def corpus_position_to_doc_position(self:Text,
     return doc_pos
 
 
-# %% ../nbs/api/78_text.ipynb 11
+# %% ../nbs/api/78_text.ipynb 12
 @patch
 def doc_position_to_corpus_position(self:Text,
                                       pos:int # position in corpus
@@ -69,7 +71,7 @@ def doc_position_to_corpus_position(self:Text,
     corpus_pos = self.doc_df.filter(pl.col('not_space') == 1).with_row_index('doc_position').filter((pl.col('doc_position') == pos)).select(pl.col('position')).collect().item()
     return corpus_pos
 
-# %% ../nbs/api/78_text.ipynb 12
+# %% ../nbs/api/78_text.ipynb 13
 @patch
 def as_string(self:Text,
               max_tokens: int|None = None, # maximum length of text to display in tokens, if None, display all
@@ -96,7 +98,7 @@ def as_string(self:Text,
 
     return ''.join(list(interleaved))
 
-# %% ../nbs/api/78_text.ipynb 13
+# %% ../nbs/api/78_text.ipynb 14
 @patch
 def as_tokens(self:Text,
         ):
@@ -104,17 +106,17 @@ def as_tokens(self:Text,
 
     return list(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 14
+# %% ../nbs/api/78_text.ipynb 15
 @patch
 def __str__(self:Text):
     return self.as_string()
 
-# %% ../nbs/api/78_text.ipynb 15
+# %% ../nbs/api/78_text.ipynb 16
 @patch
 def tokens_count(self:Text):
     return len(self.tokens)
 
-# %% ../nbs/api/78_text.ipynb 16
+# %% ../nbs/api/78_text.ipynb 17
 @patch
 def display_metadata(self:Text,
                 ):
@@ -123,7 +125,7 @@ def display_metadata(self:Text,
     Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, []).display()
 
 
-# %% ../nbs/api/78_text.ipynb 17
+# %% ../nbs/api/78_text.ipynb 18
 @patch
 def get_metadata(self:Text,
                 ):
@@ -131,13 +133,21 @@ def get_metadata(self:Text,
 
     return Result('metadata', self.metadata.transpose(include_header = True, header_name = 'attribute', column_names = ['value']), 'Metadata', '', {}, [])
 
-# %% ../nbs/api/78_text.ipynb 18
+# %% ../nbs/api/78_text.ipynb 19
 @patch
 def display(self:Text,
 			show_metadata: bool = True, # whether to display Metadata for the text
-			max_tokens: int|None = None # maximum length of text to display in tokens, if None, display all
+			max_tokens: int|None = None, # maximum length of text to display in tokens, if None, display all
+			output_html: bool = True, # whether to display text with HTML formatting
+			textwrap_width: int|None = None, # maximum length of text to display in characters, if None, no wrapping
+			textwrap_args: dict|None = None, # additional args to pass to textwrap.fill
+			reflow_paragraphs: bool = False, # whether to reflow paragraphs individually before text wrapping is applied
+			paragraph_delimiter_regex: str = r'(\s*\n\s*){1,}\n', # regex to split paragraphs for reflow_paragraphs (default looks for whitespace ending with a newline that contains at least one other newline)
 				):
 	""" Output a text """
+
+	# TODO - add font size, font family and style overrides
+
 	style = '''
 	<style>
 	.conc-text-wrapper { background: #fff; color: #000; border: 1px solid #000;border-radius: 0.5em;width: max-content;padding: 0.3em; min-width: 400px;} 
@@ -153,5 +163,21 @@ def display(self:Text,
 	if max_tokens is not None and self.tokens.size > max_tokens:
 		text_string += f'…\n[{max_tokens} of {self.tokens.size} tokens]'
 
-	display(HTML(style + self._div(metadata + self._div(text_string, class_str = 'conc-text'), class_str = 'conc-text-wrapper')))
+	if reflow_paragraphs:
+		text_string_chunks = re.split(paragraph_delimiter_regex, text_string)
+	else:
+		text_string_chunks = [text_string]
+
+	if textwrap_width is not None:
+		for i, chunk in enumerate(text_string_chunks):
+			text_string_chunks[i] = textwrap.fill(chunk, width = textwrap_width, **(textwrap_args or {}))
+	elif reflow_paragraphs:
+		text_string_chunks = [re.sub(r'\s+', ' ', chunk.strip()) for chunk in text_string_chunks]
+	
+	text_string = '\n'.join(text_string_chunks)
+
+	if output_html:
+		display(HTML(style + self._div(metadata + self._div(text_string, class_str = 'conc-text'), class_str = 'conc-text-wrapper')))
+	else:
+		print(text_string)
 
