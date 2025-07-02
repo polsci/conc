@@ -5,7 +5,7 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
-## [0.1.6] - concordance filtering based on context words, improved display of texts
+## [0.1.6] - 2025-07-02 - concordance filtering based on context words, improved display of texts
 
 ### Added
 
