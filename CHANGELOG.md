@@ -5,6 +5,16 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [available in next release] - updating defaults for concordances, control display of texts
+
+### Added
+
+- new parameters to control reflow and wrapping of text via Text class (or Corpus.text)
+
+### Changed
+
+- tweaks to documentation (recipes) for new functionality in 0.1.5 and 0.1.6
+
 ## [0.1.5] - 2025-06-30 - improved concordance sorting, new features to support release of [ConText](https://github.com/polsci/ConText)
 
 ### Added
