@@ -112,12 +112,14 @@ def ngram_frequencies(self: Conc,
 def concordance(self: Conc, 
 				token_str: str, # token string to get concordance for 
 				context_length:int = 5, # number of words to show on left and right of token string
-				order:str='1R2R3R', # order of sort columns
+				order:str='1R2R3R', # order of sort columns - one of 1L2L3L, 3L2L1L, 2L1L1R, 1L1R2R, 1R2R3R (default if ommitted), LEFT, RIGHT
 				page_size:int=PAGE_SIZE, # number of results to display per results page
 				page_current:int=1, # current page of results
 				show_all_columns:bool = False, # df with all columns or just essentials
 				use_cache:bool = True, # retrieve the results from cache if available (currently ignored)
 				ignore_punctuation:bool = True, # whether to ignore punctuation in the concordance sort
+				filter_context_str:str|None = None, # if a string is provided, the concordance lines will be filtered to show lines with contexts containing this string
+				filter_context_length:int|tuple[int, int]=5, # ignored if filter_context_str is None, otherwise this is the context window size per side in tokens - if an int (e.g. 5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right)
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 	return self.concordance_.concordance(token_str = token_str, 
@@ -126,7 +128,10 @@ def concordance(self: Conc,
 									  page_current=page_current, 
 									  show_all_columns=show_all_columns, 
 									  use_cache=use_cache,
-									  ignore_punctuation=ignore_punctuation)
+									  ignore_punctuation=ignore_punctuation,
+									  filter_context_str=filter_context_str,
+									  filter_context_length=filter_context_length
+									  )
 
 # %% ../nbs/api/50_conc.ipynb 26
 @patch

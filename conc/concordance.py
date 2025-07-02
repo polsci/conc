@@ -123,6 +123,77 @@ def _build_concordance_result_with_sort(self:Concordance,
 
 # %% ../nbs/api/72_concordance.ipynb 17
 @patch
+def _col_contains_sequence(self:Concordance,
+						  haystack: np.ndarray,  # 2d array of token ids in order of token positions 
+						  needle: np.ndarray # token sequence (from tokenize) to search for in each column of haystack
+						  ) -> np.ndarray: # mask to process token positions by to filter results
+	""" Get a mask of columns in haystack that contain sequence needle. """
+	n = len(needle)
+	result = []
+	for row in haystack.T:
+		if any((row[i:i+n] == needle).all() for i in range(len(row) - n + 1)):
+			result.append(True)
+		else:
+			result.append(False)
+	return np.array(result)
+
+
+
+# %% ../nbs/api/72_concordance.ipynb 18
+@patch
+def _concordance_filter_context(self:Concordance,
+						filter_context_str:str|None, # if a string is provided, the concordance lines will be filtered to show lines containing this string
+						filter_context_length:int|tuple[int, int], # Ignored if filter_context_str is None, otherwise this is the context window size per side in tokens - if an int (e.g. 5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right)
+						ignore_punctuation: bool, # whether to ignore punctuation tokens in context filtering
+						sequence_len: int, # length of the token sequence being concordanced, used to determine the relevant context to retrieve
+						token_positions: list, # token positions to filter by context string
+						formatted_data: list[str], # list of formatted strings to return to user to clarify results
+						) -> tuple[list[np.ndarray], list[str]]: # token positions and formatted data
+								
+	""" Filter concordance results by context string. """
+
+	logger.debug(f'Filtering concordance results for context string: {filter_context_str}')
+
+	context_token_sequence, context_index_id = self.corpus.tokenize(filter_context_str, simple_indexing=True)
+	if 0 in context_token_sequence[0]:
+		token_positions[0] = [] # there will be no results as the context token contains a token not present in the corpus
+		logger.warning(f'Context string provided "{filter_context_str}" contains at least one token not present in the corpus, therefore there are no concordance lines')
+	else:
+		# if any of context_length, context_left, context_right are None - set them to 0
+		if type(filter_context_length) == int:
+			if filter_context_length < 1:
+				raise ValueError('Context length must be greater than 0')
+			context_left = filter_context_length
+			context_right = filter_context_length
+		elif type(filter_context_length) == tuple:
+			if len(filter_context_length) != 2:
+				raise ValueError('Context length must be an int or a tuple of two ints (context_left, context_right).')
+			elif type(filter_context_length[0]) != int or type(filter_context_length[1]) != int:
+				raise ValueError('Context length must be an int or a tuple of two ints (context_left, context_right).')
+			elif filter_context_length[0] < 1 and filter_context_length[1] < 1:
+				raise ValueError('If setting context lengths independently, at least one context length must be greater than 0')
+			else:
+				context_left, context_right = filter_context_length
+
+		# on to filtering
+		context_index_column = 'lower_index'
+		combined_tokens = np.empty((0, len(token_positions[0])), dtype=np.int32)
+		if context_left > 0:
+			combined_tokens = self.corpus.get_tokens_in_context(token_positions=token_positions, index=context_index_column, context_length=context_left, position_offset=-1, position_offset_step = -1, exclude_punctuation=ignore_punctuation, convert_eof = True)
+		if context_right > 0:
+			combined_tokens = np.concatenate([combined_tokens, self.corpus.get_tokens_in_context(token_positions=token_positions, index=context_index_column, context_length=context_right, position_offset=sequence_len, position_offset_step = 1, exclude_punctuation=ignore_punctuation, convert_eof = True)])
+		logger.debug(f'Context tokens collected for left {context_left} and right {context_right}, shape: {combined_tokens.shape}')
+		valid_positions = self._col_contains_sequence(combined_tokens, context_token_sequence[0])
+		logger.debug(f'Length of token positions prior to filtering: {len(token_positions[0])}')
+		token_positions[0] = token_positions[0][valid_positions]
+		logger.debug(f'Length of token positions prior to filtering: {len(token_positions[0])}')
+
+		formatted_data.append(f'Concordance lines restricted to those containing "{filter_context_str}" in span {context_left} tokens to left, {context_right} tokens to right')
+
+	return token_positions, formatted_data
+
+# %% ../nbs/api/72_concordance.ipynb 19
+@patch
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
 				context_length:int = 5, # number of words to show on left and right of token string
@@ -132,6 +203,8 @@ def concordance(self: Concordance,
 				show_all_columns:bool = False, # df with all columns or just essentials
 				use_cache:bool = True, # retrieve the results from cache if available (currently ignored)
 				ignore_punctuation:bool = True, # whether to ignore punctuation in the concordance sort
+				filter_context_str:str|None = None, # if a string is provided, the concordance lines will be filtered to show lines with contexts containing this string
+				filter_context_length:int|tuple[int, int]=5, # ignored if filter_context_str is None, otherwise this is the context window size per side in tokens - if an int (e.g. 5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right)
 				) -> Result: # concordance report results
 	""" Report concordance for a token string. """
 
@@ -155,6 +228,7 @@ def concordance(self: Concordance,
 	positional_columns = [str(x) for x in concordance_range]
 
 	index = 'orth_index'
+	formatted_data = []
 
 	use_cache = False # forcing off for now
 
@@ -171,9 +245,12 @@ def concordance(self: Concordance,
 		logger.info('Processing concordance results')
 		token_positions = self.corpus.get_token_positions(token_sequence, index_id)
 
+		if filter_context_str is not None: # filtering based on context
+			token_positions, formatted_data = self._concordance_filter_context(filter_context_str=filter_context_str, filter_context_length=filter_context_length, ignore_punctuation = ignore_punctuation, sequence_len=sequence_len, token_positions=token_positions, formatted_data=formatted_data)
+
 		if len(token_positions[0]) == 0:
 			logger.info('No tokens found')
-			return Result(type = 'concordance', df=pl.DataFrame(), title=f'Concordance for "{token_str}"', description=f'No matches', summary_data={}, formatted_data=[])
+			return Result(type = 'concordance', df=pl.DataFrame(), title=f'Concordance for "{token_str}"', description=f'No matches', summary_data={}, formatted_data=formatted_data)
 
 		if order == '1L2L3L':
 			sort_columns = [-1,-2,-3]
@@ -189,7 +266,7 @@ def concordance(self: Concordance,
 
 		# getting first sort column here
 		sort_column_ids, sort_column_order = self._get_concordance_sort(token_positions, sort_columns, ignore_punctuation=ignore_punctuation)
-		
+
 		concordance_df = pl.DataFrame([pl.Series(name='index', values=token_positions[0]), pl.Series(name='sort0', values=sort_column_order), pl.Series(name=str(sort_columns[0]), values=sort_column_ids)])
 		concordance_df = concordance_df.sort('sort0')
 		concordance_df = concordance_df.with_row_index('row')
@@ -259,7 +336,7 @@ def concordance(self: Concordance,
 
 	total_pages = math.ceil(total_count/page_size)
 	summary_data = {'total_count': total_count, 'total_docs': total_docs, 'page': page_current, 'total_pages': total_pages}
-	formatted_data = [f'Total Concordance Lines: {total_count}', f'Total Documents: {total_docs}', f'Showing {min(page_size, total_count)} lines', f'Page {page_current} of {total_pages}']
+	formatted_data += [f'Total Concordance Lines: {total_count}', f'Total Documents: {total_docs}', f'Showing {min(page_size, total_count)} lines', f'Page {page_current} of {total_pages}']
 
 	if show_all_columns == False:
 		concordance_view_df = concordance_view_df[['doc_id', 'left', 'node', 'right']]
@@ -269,7 +346,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/72_concordance.ipynb 31
+# %% ../nbs/api/72_concordance.ipynb 35
 @patch
 def _get_concordance_plot_style(
 	self: Concordance,
@@ -367,7 +444,7 @@ def _get_concordance_plot_style(
 	return html_styles
 
 
-# %% ../nbs/api/72_concordance.ipynb 32
+# %% ../nbs/api/72_concordance.ipynb 36
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
@@ -537,7 +614,7 @@ def _get_concordance_plot_script(
 	'''
 	return html_script
 
-# %% ../nbs/api/72_concordance.ipynb 33
+# %% ../nbs/api/72_concordance.ipynb 37
 @patch
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
