@@ -5,15 +5,17 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
-## [available in next release] - updating defaults for concordances, control display of texts
+## [0.1.6] - concordance filtering based on context words, improved display of texts
 
 ### Added
 
+- added concordancing functionality to allow specifying a context word within a specific span
 - new parameters to control reflow and wrapping of text via Text class (or Corpus.text)
 
 ### Changed
 
 - tweaks to documentation (recipes) for new functionality in 0.1.5 and 0.1.6
+- using ignore punctuation True as default for concordance, so concordance sort defaults to word token sorting
 
 ## [0.1.5] - 2025-06-30 - improved concordance sorting, new features to support release of [ConText](https://github.com/polsci/ConText)
 
