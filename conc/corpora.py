@@ -12,8 +12,8 @@ import msgspec
 from fastcore.script import call_parse
 
 # %% auto 0
-__all__ = ['list_corpora', 'create_toy_corpus_sources', 'show_toy_corpus', 'get_nltk_corpus_sources', 'get_garden_party',
-           'get_large_dataset', 'create_large_dataset_sizes', 'build_sample_corpora']
+__all__ = ['list_corpora', 'create_toy_corpus_sources', 'show_toy_corpus', 'get_nltk_corpus_sources', 'parse_bnc_to_csv',
+           'get_garden_party', 'get_large_dataset', 'create_large_dataset_sizes', 'build_sample_corpora']
 
 # %% ../nbs/api/52_corpora.ipynb 4
 from .core import CorpusMetadata, logger
@@ -150,6 +150,38 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 
 
 # %% ../nbs/api/52_corpora.ipynb 20
+def parse_bnc_to_csv(source_path:str, # path to location of sources for building corpora, this is like to be a path ending with 'Texts'
+					 save_path:str, # path to save the csv
+					 output_filename:str = 'bnc.csv.gz' # name of the output file e.g. bnc.csv.gz or bnc-baby.csv.gz
+					):
+	""" Converts BNC XML files, available via the British National Corpus, XML edition and the British National Corpus, Baby edition to a compressed CSV. """
+
+	try:
+		import nltk
+	except ImportError as e:
+		raise ImportError('This function requires NLTK. To minimise requirements this is not installed by default. You can install NLTK with "pip install nltk"')
+
+	from nltk.corpus.reader.bnc import BNCCorpusReader
+	import gzip
+	import csv
+
+	if not os.path.exists(source_path):
+		os.makedirs(source_path, exist_ok=True)
+	output_path = os.path.join(save_path, output_filename)
+	corpus = BNCCorpusReader(root=source_path, fileids=r'.*\.xml')
+
+	with gzip.open(output_path, 'wt', encoding='utf-8') as csvfile:
+		writer = csv.writer(csvfile)
+		writer.writerow(['source', 'text'])
+
+		for fileid in corpus.fileids():
+			text = ''
+			for sent in corpus.sents(fileids=fileid, strip_space=False, stem=False):
+				text += ''.join(sent) + '\n'
+			writer.writerow([fileid, text])
+
+
+# %% ../nbs/api/52_corpora.ipynb 25
 def get_garden_party(source_path: str, #path to location of sources for building corpora
 					 create_archive_variations: bool = False # create .tar and .tar.gz files for dev/testing (leave False if you just want the zip)
 					):
@@ -176,13 +208,11 @@ def get_garden_party(source_path: str, #path to location of sources for building
 			z.extractall(f'{source_path}/garden-party-corpus')
 		import shutil # make tar.gz
 		shutil.make_archive(f'{source_path}/garden-party-corpus', 'gztar', f'{source_path}/garden-party-corpus')
-		#shutil.move(f'{source_path}/garden-party-corpus.tar.gz', f'{source_path}/garden-party-corpus.tar.gz')
 		shutil.make_archive(f'{source_path}/garden-party-corpus', 'tar', f'{source_path}/garden-party-corpus')
-		#shutil.move(f'{source_path}/garden-party-corpus.tar', f'{source_path}/garden-party-corpus.tar')
 		shutil.rmtree(f'{source_path}/garden-party-corpus')
 	
 
-# %% ../nbs/api/52_corpora.ipynb 24
+# %% ../nbs/api/52_corpora.ipynb 29
 def get_large_dataset(source_path: str #path to location of sources for building corpora
 					):
 	""" Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -202,7 +232,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
 		os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 27
+# %% ../nbs/api/52_corpora.ipynb 32
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
@@ -225,7 +255,7 @@ def create_large_dataset_sizes(source_path: str, #path to location of sources fo
 			os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 30
+# %% ../nbs/api/52_corpora.ipynb 35
 @call_parse
 def build_sample_corpora(
 		source_path:str, # path to folder with corpora
