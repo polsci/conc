@@ -22,14 +22,22 @@ from .corpus import Corpus
 # %% ../nbs/api/52_corpora.ipynb 8
 def list_corpora(
 		path: str # path to load corpus
-		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
+		) -> pl.DataFrame: # Dataframe with path, corpus, format (Corpus or List Corpus), corpus name, document count, token count
 	""" Scan a directory for available corpora """
 	
-	available_corpora = {'corpus': [], 'name': [], 'date_created': [], 'document_count': [], 'token_count': []}
+	available_corpora = {'corpus': [], 'name': [], 'format': [], 'date_created': [], 'document_count': [], 'token_count': []}
 	for dir in os.listdir(path):
-		if os.path.isdir(os.path.join(path, dir)) and os.path.isfile( os.path.join(path, dir, 'corpus.json')):
-			with open(os.path.join(path, dir, 'corpus.json'), 'rb') as f:
-				data = msgspec.json.decode(f.read(), type=CorpusMetadata)
+		if os.path.isdir(os.path.join(path, dir)):
+			if os.path.isfile( os.path.join(path, dir, 'corpus.json')):
+				with open(os.path.join(path, dir, 'corpus.json'), 'rb') as f:
+					data = msgspec.json.decode(f.read(), type=CorpusMetadata)
+				available_corpora['format'].append('Corpus')
+			elif os.path.isfile( os.path.join(path, dir, 'listcorpus.json')):
+				with open(os.path.join(path, dir, 'listcorpus.json'), 'rb') as f:
+					data = msgspec.json.decode(f.read(), type=CorpusMetadata)
+				available_corpora['format'].append('List Corpus')
+			else:
+				continue
 
 			available_corpora['corpus'].append(dir)
 			for k in ['name', 'document_count', 'token_count', 'date_created']:

@@ -13,6 +13,7 @@ __all__ = ['Frequency']
 
 # %% ../nbs/api/70_frequency.ipynb 4
 from .corpus import Corpus
+from .listcorpus import ListCorpus
 from .result import Result
 from .core import logger, PAGE_SIZE
 
@@ -20,7 +21,7 @@ from .core import logger, PAGE_SIZE
 class Frequency:
 	""" Class for frequency analysis reporting """
 	def __init__(self,
-			  corpus:Corpus # Corpus instance
+			  corpus:Corpus|ListCorpus # Corpus instance
 			  ): 
 		self.corpus = corpus
 

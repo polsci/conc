@@ -92,42 +92,19 @@ class Corpus:
 
 		# token data
 		self.tokens = None
-		# self.orth_index = None
-		# self.lower_index = None
-
-		# lookup mapping doc_id to every token in doc
-		# self.token2doc_index = None
-
-		# lookups to get token string or frequency 
 		self.vocab = None
-		# self.frequency_lookup = None
 
-		# offsets for each document in token data
-		# self.offsets = None
-
-		# punct and space positions in token data
-		# self.punct_positions = None
-		# self.space_positions = None
 		self.puncts = None
 		self.spaces = None
 
 		# metadata for each document
 		self.metadata = None
 
-		# lookups to get spacy tokenizer or internal ids
-		# self.original_to_new = None
-		# self.new_to_original = None
-		
-		# temporary data used when processing text, not 
-		# 
-		# 
-		# 
-		# d to disk permanently on save
-		
-		# self.frequency_table = None
 		self.ngram_index = {}
 		self.results_cache = {}
 
+		self.expected_files_ = ['corpus.json', 'vocab.parquet', 'tokens.parquet', 'puncts.parquet', 'spaces.parquet']
+		self.required_tables_ = ['vocab', 'tokens', 'puncts', 'spaces']
 
 # %% ../nbs/api/45_corpus.ipynb 17
 @patch
@@ -363,11 +340,15 @@ def _create_indices(self: Corpus,
 def _init_corpus_dataframes(self: Corpus):
 	""" Initialize dataframes after build or load """
 	
-	self.vocab = pl.scan_parquet(f'{self.corpus_path}/vocab.parquet')
-	self.tokens = pl.scan_parquet(f'{self.corpus_path}/tokens.parquet')
-	self.puncts = pl.scan_parquet(f'{self.corpus_path}/puncts.parquet')
-	self.spaces = pl.scan_parquet(f'{self.corpus_path}/spaces.parquet')
-	self.metadata = pl.scan_parquet(f'{self.corpus_path}/metadata.parquet')
+	for file in self.expected_files_:
+		if not os.path.isfile(os.path.join(self.corpus_path, file)):
+			raise FileNotFoundError(f"Expected file '{file}' not found in corpus path '{self.corpus_path}'")
+
+	for file in self.required_tables_:
+		self.__setattr__(file, pl.scan_parquet(f'{self.corpus_path}/{file}.parquet'))
+
+	if os.path.isfile(f'{self.corpus_path}/metadata.parquet'):
+		self.metadata = pl.scan_parquet(f'{self.corpus_path}/metadata.parquet')
 
 # %% ../nbs/api/45_corpus.ipynb 30
 README_TEMPLATE = """# {name}
@@ -404,6 +385,7 @@ data directly.
 # %% ../nbs/api/45_corpus.ipynb 31
 @patch
 def save_corpus_metadata(self: Corpus, 
+						 template: str = README_TEMPLATE, # template for the README file
 		 ):
 	""" Save corpus metadata. """
 	
@@ -436,7 +418,7 @@ def save_corpus_metadata(self: Corpus,
 
 # %% ../nbs/api/45_corpus.ipynb 32
 @patch
-def build(self: Corpus, 
+def _build(self: Corpus, 
 		  save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
 		  iterator: iter, # iterator of texts
 		  model: str='en_core_web_sm', # spacy model to use for tokenisation
@@ -615,7 +597,7 @@ def _prepare_files(self: Corpus,
 @patch
 def build_from_files(self: Corpus,
 					source_path: str, # path to folder with text files 
-					save_path: str, # path to save corpus
+					save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
 					file_mask:str='*.txt', # mask to select files 
 					metadata_file: str|None=None, # path to a CSV with metadata
 					metadata_file_column:str = 'file', # column in metadata file with file names to align texts with metadata
@@ -631,7 +613,7 @@ def build_from_files(self: Corpus,
 	start_time = time.time()
 	self._init_build_process(save_path)
 	iterator = self._prepare_files(source_path, file_mask, metadata_file, metadata_file_column, metadata_columns, encoding) #, build_process_path=build_process_path
-	self.build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup) #build_process_path = build_process_path, 
+	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup) #build_process_path = build_process_path, 
 	logger.info(f'Build from files time: {(time.time() - start_time):.3f} seconds')
 
 	return self
@@ -668,7 +650,7 @@ def _prepare_csv(self: Corpus,
 @patch
 def build_from_csv(self: Corpus, 
 				   source_path:str, # path to csv file
-				   save_path: str, # path to save corpus
+				   save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
 				   text_column:str='text', # column in csv with text
 				   metadata_columns:list[str]=[], # list of column names to import from csv
 				   encoding:str='utf8', # encoding of csv passed to Polars read_csv, see their documentation
@@ -683,7 +665,7 @@ def build_from_csv(self: Corpus,
 	start_time = time.time()
 	self._init_build_process(save_path)
 	iterator = self._prepare_csv(source_path = source_path, text_column = text_column, metadata_columns = metadata_columns, encoding = encoding, build_process_batch_size = build_process_batch_size)
-	self.build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup)
+	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup)
 	logger.info(f'Build from csv time: {(time.time() - start_time):.3f} seconds')
 
 	return self
@@ -702,9 +684,8 @@ def load(self: Corpus,
 	if not os.path.isdir(corpus_path):
 		raise FileNotFoundError(f"Path '{corpus_path}' is not a directory")
 	
-	expected_files = ['corpus.json', 'vocab.parquet', 'tokens.parquet', 'puncts.parquet', 'spaces.parquet']
-	if not all(os.path.isfile(os.path.join(corpus_path, f)) for f in expected_files):
-		raise FileNotFoundError(f"Path '{corpus_path}' does not contain all expected files: {expected_files}")
+	if not all(os.path.isfile(os.path.join(corpus_path, f)) for f in self.expected_files_):
+		raise FileNotFoundError(f"Path '{corpus_path}' does not contain all expected files: {self.expected_files_}")
 
 	self.corpus_path = corpus_path
 

@@ -15,6 +15,7 @@ __all__ = ['Keyness']
 
 # %% ../nbs/api/73_keyness.ipynb 4
 from .corpus import Corpus
+from .listcorpus import ListCorpus
 from .result import Result
 from .frequency import Frequency
 from .core import logger, PAGE_SIZE
