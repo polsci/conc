@@ -24,6 +24,10 @@ class Collocates:
 	def __init__(self,
 			  corpus:Corpus # Corpus instance
 			  ): 
+		
+		if type(corpus) != Corpus:
+			raise ValueError('Conc collocates functionality is only available for instances of the Corpus class.')
+
 		self.corpus = corpus
 
 

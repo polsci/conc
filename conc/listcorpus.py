@@ -162,7 +162,15 @@ def build_from_corpus(self: ListCorpus,
 			SPACY_MODEL=self.SPACY_MODEL,
 			SPACY_MODEL_VERSION=self.SPACY_MODEL_VERSION
 		))
+
+	# adding document counts for each token
+	document_counts_lower = pl.scan_parquet(os.path.join(source_corpus_path, 'tokens.parquet')).select(pl.col('lower_index').alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency_lower'))
+	self.vocab = self.vocab.join(document_counts_lower, on='token_id', how='left', maintain_order='left')
+	document_counts_orth = pl.scan_parquet(os.path.join(source_corpus_path, 'tokens.parquet')).select(pl.col('orth_index').alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency_orth'))
+	self.vocab = self.vocab.join(document_counts_orth, on='token_id', how='left', maintain_order='left')
 	
+	# rewriting the vocab file with doc frequencies
+	self.vocab.collect().write_parquet(os.path.join(self.corpus_path, 'vocab.parquet'))
 	return self
 
 
@@ -258,7 +266,7 @@ def __str__(self: ListCorpus):
 
 
 
-# %% ../nbs/api/51_listcorpus.ipynb 21
+# %% ../nbs/api/51_listcorpus.ipynb 30
 @patch
 def get_token_count_text(self: ListCorpus, 
 					exclude_punctuation:bool = False # exclude punctuation tokens from the count

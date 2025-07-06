@@ -51,9 +51,11 @@ def frequencies(self: Frequency,
 	if case_sensitive:
 		frequency_column = 'frequency_orth'
 		document_count_column = 'orth_index'
+		listcorpus_document_count_column = 'document_frequency_orth'
 	else:
 		frequency_column = 'frequency_lower'
 		document_count_column = 'lower_index'
+		listcorpus_document_count_column = 'document_frequency_lower'
 
 	if page_size == 0:
 		page_current = 1 # if returning all, then only interested in first page
@@ -91,15 +93,20 @@ def frequencies(self: Frequency,
 	unique_tokens = df.select(pl.len()).collect(engine='streaming').item()
 
 	if page_size == 0:
-		df = df.rename({frequency_column: "frequency"}).select(*columns)
 		rank_offset = 1 # not really needed, but just in case future changes
 	else:
-		df = df.slice((page_current-1)*page_size, page_size).rename({frequency_column: "frequency"}).select(*columns)
+		df = df.slice((page_current-1)*page_size, page_size)
 		rank_offset = (page_current-1) * page_size+1
 
 	if show_document_frequency:
-		document_counts = self.corpus.tokens.select(pl.col(document_count_column).alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency'))
-		df = df.join(document_counts, on='token_id', how='left', maintain_order='left')
+		columns.append('document_frequency')
+		if type(self.corpus) == ListCorpus:
+			df = df.with_columns(pl.col(listcorpus_document_count_column).alias('document_frequency'))
+		else:
+			document_counts = self.corpus.tokens.select(pl.col(document_count_column).alias('token_id'), pl.col('token2doc_index')).group_by('token_id').agg(pl.col('token2doc_index').n_unique().alias('document_frequency'))
+			df = df.join(document_counts, on='token_id', how='left', maintain_order='left')
+
+	df = df.rename({frequency_column: "frequency"}).select(*columns)
 
 	df = df.with_columns(((pl.col("frequency") / count_tokens) * normalize_by).alias('normalized_frequency'))
 	columns.append('normalized_frequency')

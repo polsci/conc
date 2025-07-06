@@ -15,6 +15,7 @@ from .result import Result
 from .plot import Plot
 from .core import PAGE_SIZE, logger
 from .corpus import Corpus
+from .listcorpus import ListCorpus
 from .frequency import Frequency
 from .ngrams import Ngrams
 from .concordance import Concordance
@@ -29,6 +30,9 @@ class Conc:
 				corpus # Corpus instance
 				):
 		# information about corpus
+		if type(corpus) != Corpus:
+			raise ValueError('Conc functionality is only available for instances of the Corpus class.')
+
 		self.corpus = corpus
 		self.frequency_ = Frequency(corpus)
 		self.ngrams_ = Ngrams(corpus)
@@ -148,7 +152,7 @@ def concordance_plot(self: Conc,
 # %% ../nbs/api/50_conc.ipynb 28
 @patch
 def set_reference_corpus(self: Conc, 
-                    corpus: Corpus  # Reference corpus
+                    corpus: Corpus | ListCorpus # Reference corpus
                     ) -> None:
     """ Set a reference corpus for keyness analysis. """
     self.keyness_ = Keyness(self.corpus, corpus)

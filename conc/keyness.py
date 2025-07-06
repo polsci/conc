@@ -24,8 +24,8 @@ from .core import logger, PAGE_SIZE
 class Keyness:
 	""" Class for keyness analysis reporting. """
 	def __init__(self,
-			  corpus:Corpus, # Corpus instance
-			  reference_corpus:Corpus # Corpus for comparison
+			  corpus:Corpus | ListCorpus, # Corpus instance
+			  reference_corpus:Corpus | ListCorpus # Corpus for comparison
 			  ): 
 		self.corpus = corpus
 		self.reference_corpus = reference_corpus	
