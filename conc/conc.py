@@ -73,7 +73,7 @@ def frequencies(self: Conc,
 def ngrams(self: Conc, 
 		   token_str: str, # token string to get ngrams for 
 		   ngram_length:int = 2, # length of ngram
-		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
+		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT or MIDDLE (support for other positions is in-development)
 		   normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 		   page_size:int = PAGE_SIZE, # number of results to display per results page 
 		   page_current:int = 1, # current page of results
@@ -101,6 +101,7 @@ def ngram_frequencies(self: Conc,
 				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 				page_size:int=PAGE_SIZE, # number of rows to return
 				page_current:int=1, # current page
+                show_document_frequency:bool=False, #show document frequency in output (slow to compute for large corpora)
 				exclude_punctuation:bool=True # exclude ngrams containing punctuation tokens
 				) -> Result: # return a Result object with the frequency table
     """ Report frequent ngrams. """
@@ -109,6 +110,7 @@ def ngram_frequencies(self: Conc,
                                     normalize_by=normalize_by,
                                     page_size=page_size,
                                     page_current=page_current,
+                                    show_document_frequency=show_document_frequency,
                                     exclude_punctuation=exclude_punctuation)
 
 # %% ../nbs/api/50_conc.ipynb 23

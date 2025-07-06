@@ -189,7 +189,7 @@ def parse_bnc_to_csv(source_path:str, # path to location of sources for building
 			writer.writerow([fileid, text])
 
 
-# %% ../nbs/api/52_corpora.ipynb 25
+# %% ../nbs/api/52_corpora.ipynb 26
 def get_garden_party(source_path: str, #path to location of sources for building corpora
 					 create_archive_variations: bool = False # create .tar and .tar.gz files for dev/testing (leave False if you just want the zip)
 					):
@@ -220,7 +220,7 @@ def get_garden_party(source_path: str, #path to location of sources for building
 		shutil.rmtree(f'{source_path}/garden-party-corpus')
 	
 
-# %% ../nbs/api/52_corpora.ipynb 29
+# %% ../nbs/api/52_corpora.ipynb 30
 def get_large_dataset(source_path: str #path to location of sources for building corpora
 					):
 	""" Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -240,7 +240,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
 		os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 32
+# %% ../nbs/api/52_corpora.ipynb 33
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
@@ -263,7 +263,7 @@ def create_large_dataset_sizes(source_path: str, #path to location of sources fo
 			os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 35
+# %% ../nbs/api/52_corpora.ipynb 36
 @call_parse
 def build_sample_corpora(
 		source_path:str, # path to folder with corpora

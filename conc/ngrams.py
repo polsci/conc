@@ -41,7 +41,7 @@ def _get_ngrams(self:Ngrams,
 			   ngram_length: int = 2, # length of ngram
 			   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
 			   exclude_punctuation:bool=False # exclude ngrams with tokens
-			   ) -> np.ndarray: # array of ngrams results
+			   ) -> tuple[np.ndarray, list[np.ndarray]]: # array of ngrams results, revised token positions
 
 	""" Get ngram data for a token sequence. """
 	
@@ -93,24 +93,28 @@ def _get_ngrams(self:Ngrams,
 	# getting positions to search for EOF_TOKEN and filter out ngrams crossing doc boundaries
 	#positions = (np.array(ngram_range)[:, None] != np.arange(sequence_len)).all(axis=1)
 	# ngrams = np.delete(ngrams, np.where(ngrams[positions] == self.corpus.EOF_TOKEN)[1], axis=1)
-	logger.debug(f'Ngrams shape prior to EOF removal {ngrams.shape}')
-	ngrams = np.delete(ngrams, np.where(ngrams == self.corpus.EOF_TOKEN)[1], axis=1)
-	logger.debug(f'Ngrams shape after EOF removal {ngrams.shape}')
+	filter = [self.corpus.EOF_TOKEN]
 
 	if exclude_punctuation: # see above - ngrams returned with punctuation tokens - and then cleaned if exclude_punctuation is True
-		punctuation_tokens = self.corpus.punct_tokens
-		ngrams = np.delete(ngrams, np.where(np.isin(ngrams, punctuation_tokens))[1], axis=1)
+		filter.extend(self.corpus.punct_tokens)
+	
+	mask = np.isin(ngrams, filter)
+	ngrams = np.delete(ngrams, np.where(mask)[1], axis=1)
+	logger.debug(f'Ngrams shape after filter {ngrams.shape}')
+
+	token_positions[0] = np.delete(token_positions[0], np.where(mask)[1], axis=0)
+	logger.debug(f'Token positions after filter {token_positions[0].shape}')
 
 	logger.info(f'Ngrams ({ngrams.shape[1]}) retrieval time: {(time.time() - start_time):.5f} seconds')
-	return ngrams
+	return ngrams, token_positions
 
 
-# %% ../nbs/api/71_ngrams.ipynb 16
+# %% ../nbs/api/71_ngrams.ipynb 17
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
 		   ngram_length:int|None = 2, # length of ngram, if set to None it will use the number of tokens in the token_str + 1
-		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT (support for ngrams with token in middle of sequence is in-development))
+		   ngram_token_position: str = 'LEFT', # specify if token sequence is on LEFT or RIGHT or MIDDLE (support for other positions is in-development)
 		   normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 		   page_size:int = PAGE_SIZE, # number of results to display per results page 
 		   page_current:int = 1, # current page of results
@@ -147,8 +151,8 @@ def ngrams(self: Ngrams,
 			logger.info('No tokens found')
 			return Result(type = 'ngrams', df=pl.DataFrame(), title=f'Ngrams for "{token_str}"', description=f'No matches', summary_data={}, formatted_data=[])
 
-		logger.info('Generating ngrams results')
-		ngrams = self._get_ngrams(token_sequence, index_id, token_positions, ngram_length = ngram_length, ngram_token_position = ngram_token_position, exclude_punctuation=exclude_punctuation)
+		logger.info('Retrieving ngrams results')
+		ngrams, token_positions = self._get_ngrams(token_sequence, index_id, token_positions, ngram_length = ngram_length, ngram_token_position = ngram_token_position, exclude_punctuation=exclude_punctuation)
 		total_count = ngrams.shape[1]
 		if ngram_token_position == 'MIDDLE':
 			expected_ngram_length = len(token_sequence[0]) +  (2 * (math.ceil((ngram_length - len(token_sequence[0])) / 2)))
@@ -157,9 +161,14 @@ def ngrams(self: Ngrams,
 				ngram_length = expected_ngram_length
 		schema = [f'token_{i+1}' for i in range(ngram_length)]
 		ngrams_report = pl.DataFrame(ngrams.T, schema=schema).to_struct(name = 'ngram_token_ids').value_counts(sort=True).rename({"count": "frequency"})
+
+		# if show_document_frequency:
+			# to be added in with # show_document_frequency:bool = False, # return document frequency in output
+		# 	ngrams_report = ngrams_report.with_columns(pl.Series(name='doc_id', values=self.corpus.get_tokens_by_index('token2doc_index')[token_positions[0]]))
+
 		ngrams_report = ngrams_report.with_row_index(name='rank', offset=1)
 		total_unique = len(ngrams_report)
-		
+
 		if use_cache == True:
 			self.corpus.results_cache[cache_id] = (ngrams_report, total_unique, total_count)
 	
@@ -177,7 +186,7 @@ def ngrams(self: Ngrams,
 	token_strs = np.array(token_strs)
 	ngram_text = [' '.join(column) for column in token_strs.T]
 	ngrams_report_page = ngrams_report_page.with_columns(pl.Series(name="ngram", values=ngram_text))
-	#ngrams_report_page = ngrams_report_page.to_pandas().set_index('rank')
+
 	total_pages = math.ceil(total_unique/page_size)
 	summary_data = {'ngram_length': ngram_length, 'ngram_token_position': ngram_token_position, 'total_unique': total_unique, 'total_count': total_count, 'page_current': page_current, 'total_pages': total_pages}
 	formatted_data = [f'Report based on {tokens_descriptor}', f'Ngram length: {ngram_length}, Token position: {ngram_token_position.lower()}']
@@ -201,7 +210,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/71_ngrams.ipynb 23
+# %% ../nbs/api/71_ngrams.ipynb 24
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
@@ -209,6 +218,7 @@ def ngram_frequencies(self: Ngrams,
 				normalize_by:int=10000, # normalize frequencies by a number (e.g. 10000)
 				page_size:int=PAGE_SIZE, # number of rows to return
 				page_current:int=1, # current page
+				show_document_frequency:bool=False, #show document frequency in output
 				exclude_punctuation:bool=True # exclude ngrams containing punctuation tokens
 				) -> Result: # return a Result object with the frequency table
 	""" Report frequent ngrams. """
@@ -236,16 +246,18 @@ def ngram_frequencies(self: Ngrams,
 	if exclude_punctuation:
 		formatted_data.append(f'Ngrams containing punctuation tokens excluded')
 
-	# ngrams = self.corpus.get_ngrams_by_index(ngram_length = ngram_length, index = index).T
+	ngrams = self.corpus.tokens.select(pl.col('token2doc_index'), pl.col(index).alias('token_1')).with_row_index('position')
 
-	ngrams_report = self.corpus.tokens.select(pl.col(index).alias('token_1')).with_row_index('position')
-
-	ngrams_report = ngrams_report.with_columns([pl.col('token_1').shift(-i).alias(f'token_{i+1}') for i in range(1, ngram_length)])
+	ngrams = ngrams.with_columns([pl.col('token_1').shift(-i).alias(f'token_{i+1}') for i in range(1, ngram_length)])
 
 	schema = [f'token_{i+1}' for i in range(ngram_length)]
 
-	# ngrams_report = pl.LazyFrame(ngrams.T, schema=schema)
-	ngrams_report = ngrams_report.group_by(schema).agg(pl.len().alias("frequency")).sort(by="frequency", descending=True)
+	ngrams_report = ngrams.group_by(schema).agg(pl.len().alias("frequency")).sort(by="frequency", descending=True)
+
+	if show_document_frequency:
+		ngrams_report = ngrams_report.join(
+			ngrams.group_by(schema).agg(pl.col('token2doc_index').n_unique().alias('document_frequency')), on = schema, how='left', maintain_order='left'
+		)
 
 	for i in range(ngram_length):
 		ngrams_report = ngrams_report.filter(~pl.col(f'token_{i+1}').is_in(filter))
@@ -270,6 +282,10 @@ def ngram_frequencies(self: Ngrams,
 	if page_size != 0 and total_count > page_size:
 		formatted_data.extend([f'Showing {min(page_size, total_count)} rows', f'Page {page_current} of {total_pages}']) 
 
-	ngrams_report_page = ngrams_report_page[['rank', 'ngram', 'frequency', 'normalized_frequency']]
+	columns = ['rank', 'ngram', 'frequency', 'normalized_frequency']
+	if show_document_frequency:
+		columns.append('document_frequency')
+		
+	ngrams_report_page = ngrams_report_page[columns]
 
 	return Result(type = 'ngram_frequencies', df=ngrams_report_page, title=f'Ngram Frequencies', description=f'{self.corpus.name}', summary_data = {}, formatted_data = formatted_data)
