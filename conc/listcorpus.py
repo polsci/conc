@@ -128,6 +128,8 @@ def build_from_corpus(self: ListCorpus,
 	if not os.path.isdir(source_corpus_path):
 		raise FileNotFoundError(f"Source corpus path '{source_corpus_path}' does not exist or is not a directory.")
 	
+	start_time = time.time()
+
 	self.slug = os.path.basename(source_corpus_path)
 	if self.slug.endswith('.corpus'):
 		self.slug = self.slug[:-7]
@@ -171,6 +173,9 @@ def build_from_corpus(self: ListCorpus,
 	
 	# rewriting the vocab file with doc frequencies
 	self.vocab.collect().write_parquet(os.path.join(self.corpus_path, 'vocab.parquet'))
+
+	logger.info(f"Built ListCorpus {os.path.basename(self.corpus_path)} {time.time() - start_time:.2f} seconds.")
+
 	return self
 
 

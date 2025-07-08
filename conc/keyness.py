@@ -9,6 +9,7 @@ import time
 import polars as pl
 from fastcore.basics import patch
 from scipy.stats import chi2
+import re
 
 # %% auto 0
 __all__ = ['Keyness']
@@ -53,7 +54,8 @@ def keywords(self: Keyness,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True # exclude punctuation tokens
+				exclude_punctuation:bool=True, # exclude punctuation tokens
+				handle_common_typographic_differences:bool=True # whether to detect and normalize common differences in word tokens due to typographic differences (i.e. currently focused on apostrophes in common English contractions), ignored when exclude_punctuation is False
 				) -> Result: # return a Result object with the frequency table
 	""" Get keywords for the corpus. """
 
@@ -76,6 +78,9 @@ def keywords(self: Keyness,
 		raise ValueError('normalize_by must be an integer, e.g. 1000000 or 10000')
 
 	start_time = time.time()
+
+	if page_size == 0:
+		page_current = 1 # if returning all, then only interested in first page
 
 	debug = False
 
@@ -104,7 +109,7 @@ def keywords(self: Keyness,
 										restrict_tokens=restrict_tokens,
 										restrict_tokens_text=restrict_tokens_text,
 										exclude_punctuation=exclude_punctuation).to_frame()
-
+	
 	reference_df = freq_reference.frequencies(case_sensitive=case_sensitive,
 										normalize_by=normalize_by,
 										page_size=0,
@@ -117,7 +122,44 @@ def keywords(self: Keyness,
 										restrict_tokens_text=restrict_tokens_text,
 										exclude_punctuation=exclude_punctuation).to_frame()
 
-	keyness_df = target_df.join(reference_df, on='token', how='left', suffix = '_reference').drop('rank', 'rank_reference')
+	if handle_common_typographic_differences is True:
+		if exclude_punctuation == False:
+			logger.warning(f'handle_common_typographic_differences is ignored when exclude_punctuation is False')
+		else:
+			valid_apostrophe_characters = ["’", "'"] # "‘", "’", "‘", "`"
+			target_top_tokens_with_apostrophe = target_df.filter(pl.col('token').str.contains_any(valid_apostrophe_characters)).filter(pl.col('rank') < 1000).select(pl.col('token')).rows()
+			target_top_tokens_with_apostrophe = [token[0] for token in target_top_tokens_with_apostrophe]
+			apostrophe_characters = re.sub(r'[A-Za-z]', '', ''.join(target_top_tokens_with_apostrophe))
+			apostrophe_characters = ''.join(set(apostrophe_characters))
+			if len(apostrophe_characters) > 1:
+				logger.warning(f'handle_common_typographic_differences, Target corpus uses multiple apostrophe characters, no further action taken')
+			elif len(apostrophe_characters) == 0:
+				logger.info(f'handle_common_typographic_differences, No frequent tokens with apostrophe characters, no further action taken')
+			else:
+				logger.info(f'handle_common_typographic_differences, Target corpus using apostrophe character: {apostrophe_characters}')
+				reference_top_tokens_with_apostrophe = reference_df.filter(pl.col('token').str.contains_any(valid_apostrophe_characters)).filter(pl.col('rank') < 1000).select(pl.col('token')).rows()
+				reference_top_tokens_with_apostrophe = ''.join([token[0] for token in reference_top_tokens_with_apostrophe])
+				reference_apostrophe_characters = re.sub(r'[A-Za-z]', '', reference_top_tokens_with_apostrophe)
+				reference_apostrophe_characters = ''.join(set(reference_apostrophe_characters))
+				if len(reference_apostrophe_characters) != 1:
+					logger.info(f'handle_common_typographic_differences, Reference corpus has multiple (or no) apostrophe characters in frequent word tokens, no further action taken, consider building corpus with standardize_word_token_punctuation_characters=True')
+				elif reference_apostrophe_characters == apostrophe_characters:
+					logger.info(f'handle_common_typographic_differences, Reference corpus has the same apostrophe character as target corpus ({apostrophe_characters}), no further action taken')
+				else:
+					replacements = {}
+					for token in target_top_tokens_with_apostrophe:
+						for valid_apostrophe_character in valid_apostrophe_characters:
+							if valid_apostrophe_character != apostrophe_characters:
+								replacements[token.replace(apostrophe_characters, valid_apostrophe_character)] = token
+					logger.info(f'handle_common_typographic_differences, Replacing apostrophe characters in reference corpus tokens: {replacements}')
+					reference_df = reference_df.with_columns(
+						pl.col('token').replace(
+							pl.Series(replacements.keys()), 
+							pl.Series(replacements.values())).alias('token')
+					)
+					formatted_data.append(f'Frequent tokens with apostrophes have been normalized in reference corpus to match target usage')
+
+	keyness_df = target_df.join(reference_df, on='token', how='left', suffix = '_reference', maintain_order='left').drop('rank', 'rank_reference')
 
 	if exclude_tokens:
 		excluded_tokens_count = keyness_df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
@@ -226,14 +268,17 @@ def keywords(self: Keyness,
 	if order is None:
 		order = effect_size_measure
 	keyness_df = keyness_df.sort(order, descending=order_descending)
-	keyness_df = keyness_df.slice((page_current-1)*page_size, page_size)
+	if page_size == 0:
+		rank_offset = 1
+	else:
+		keyness_df = keyness_df.slice((page_current-1)*page_size, page_size)
+		rank_offset = (page_current-1) * page_size + 1
 
 	if not show_document_frequency:
 		keyness_df = keyness_df.drop('document_frequency', 'document_frequency_reference')
 		columns.remove('document_frequency')
 		columns.remove('document_frequency_reference')
 
-	rank_offset = (page_current-1) * page_size + 1
 	keyness_df = keyness_df.with_row_index(name='rank', offset=rank_offset)
 
 	if normalize_by is not None:

@@ -18,6 +18,7 @@ __all__ = ['list_corpora', 'create_toy_corpus_sources', 'show_toy_corpus', 'get_
 # %% ../nbs/api/52_corpora.ipynb 4
 from .core import CorpusMetadata, logger
 from .corpus import Corpus
+from .listcorpus import ListCorpus
 
 # %% ../nbs/api/52_corpora.ipynb 8
 def list_corpora(
@@ -162,34 +163,74 @@ def parse_bnc_to_csv(source_path:str, # path to location of sources for building
 					 save_path:str, # path to save the csv
 					 output_filename:str = 'bnc.csv.gz' # name of the output file e.g. bnc.csv.gz or bnc-baby.csv.gz
 					):
-	""" Converts BNC XML files, available via the British National Corpus, XML edition and the British National Corpus, Baby edition to a compressed CSV. """
+	""" Converts BNC XML files, available via the British National Corpus, XML edition and the British National Corpus, Baby edition to a compressed CSV with title information retained. """
 
-	try:
-		import nltk
-	except ImportError as e:
-		raise ImportError('This function requires NLTK. To minimise requirements this is not installed by default. You can install NLTK with "pip install nltk"')
-
-	from nltk.corpus.reader.bnc import BNCCorpusReader
+	import os
 	import gzip
 	import csv
+	from lxml import etree
+	from glob import glob
 
-	if not os.path.exists(source_path):
-		os.makedirs(source_path, exist_ok=True)
+	def extract_text_and_title_from_bnc_xml(xml_path: str # path to the XML file
+										 ) -> tuple[str, str]: # title, text, bibliographic data, keywords, classcode, catref_targets
+		""" Extract title (from sourceDesc) and text via sentences from a BNC XML file. """
+
+		tree = etree.parse(xml_path)
+
+		# print(etree.tostring(tree.find('.//teiHeader'), pretty_print=True, encoding='unicode'))
+		title_el = tree.find('.//title')
+		title = title_el.text.strip() if title_el is not None and title_el.text else ''
+
+		bibl_el = tree.find('.//bibl')
+		if bibl_el is None:
+			logger.debug(f'No bibl element found in {xml_path}. This may not be a valid BNC XML file.')
+			bibliographic_data = ''
+		else:
+			bibliographic_data = ''.join(bibl_el.itertext()) if bibl_el is not None else ''
+		profiledesc_el = tree.find('.//profileDesc')
+		if profiledesc_el is None:
+			logger.debug(f'No profileDesc found in {xml_path}. This may not be a valid BNC XML file.')
+			keywords, classcode, catref_targets = '', '', ''
+		else:
+			keywords_el = profiledesc_el.find('.//keywords')
+			keywords = ''.join(keywords_el.itertext()) if keywords_el is not None else ''
+			if keywords.strip() == '(none)':
+				keywords = ''
+			classcode_el = profiledesc_el.find('.//classCode')
+			classcode = ''.join(classcode_el.itertext()) if classcode_el is not None else ''
+			catref_el = profiledesc_el.find('.//catRef')
+			catref_targets = ''
+			if catref_el is not None:
+				catref_targets = catref_el.attrib.get('targets', '') 
+
+		sentences = []
+		for s in tree.xpath('.//s'):
+			tokens = [t.text for t in s.iter() if t.text and t.text.strip()]
+			if tokens:
+				sentences.append(''.join(tokens))
+		if len(sentences) == 0:
+			logger.warning(f'No sentences found in {xml_path}. This may not be a valid BNC XML file.')
+
+		return title, '\n'.join(sentences), bibliographic_data, keywords, classcode, catref_targets
+
 	output_path = os.path.join(save_path, output_filename)
-	corpus = BNCCorpusReader(root=source_path, fileids=r'.*\.xml')
+	xml_files = glob(os.path.join(source_path, '**', '*.xml'), recursive=True)
+	os.makedirs(save_path, exist_ok=True)
 
-	with gzip.open(output_path, 'wt', encoding='utf-8') as csvfile:
+	with gzip.open(output_path, 'wt', encoding='utf-8', newline='') as csvfile:
 		writer = csv.writer(csvfile)
-		writer.writerow(['source', 'text'])
+		writer.writerow(['source', 'title', 'bibliographic_data', 'keywords', 'classcode', 'catref_targets', 'text'])
 
-		for fileid in corpus.fileids():
-			text = ''
-			for sent in corpus.sents(fileids=fileid, strip_space=False, stem=False):
-				text += ''.join(sent) + '\n'
-			writer.writerow([fileid, text])
+		for xml_file in xml_files:
+			try:
+				title, text, bibliographic_data, keywords, classcode, catref_targets = extract_text_and_title_from_bnc_xml(xml_file)
+				writer.writerow([os.path.relpath(xml_file, source_path), title, bibliographic_data, keywords, classcode, catref_targets, text])
+			except Exception as e:
+				logger.warning(f"Error processing {xml_file}: {e}")
 
+	
 
-# %% ../nbs/api/52_corpora.ipynb 26
+# %% ../nbs/api/52_corpora.ipynb 28
 def get_garden_party(source_path: str, #path to location of sources for building corpora
 					 create_archive_variations: bool = False # create .tar and .tar.gz files for dev/testing (leave False if you just want the zip)
 					):
@@ -220,7 +261,7 @@ def get_garden_party(source_path: str, #path to location of sources for building
 		shutil.rmtree(f'{source_path}/garden-party-corpus')
 	
 
-# %% ../nbs/api/52_corpora.ipynb 30
+# %% ../nbs/api/52_corpora.ipynb 32
 def get_large_dataset(source_path: str #path to location of sources for building corpora
 					):
 	""" Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -240,7 +281,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
 		os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 33
+# %% ../nbs/api/52_corpora.ipynb 35
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):
@@ -263,7 +304,7 @@ def create_large_dataset_sizes(source_path: str, #path to location of sources fo
 			os.remove(path)
 
 
-# %% ../nbs/api/52_corpora.ipynb 36
+# %% ../nbs/api/52_corpora.ipynb 38
 @call_parse
 def build_sample_corpora(
 		source_path:str, # path to folder with corpora
@@ -271,6 +312,9 @@ def build_sample_corpora(
 		force_rebuild:bool = False # force rebuild of corpora, useful for development and testing
 		):
 	"""Build all test corpora from source files."""
+
+	if force_rebuild:
+		import shutil
 
 	corpora = {}
 	corpora['toy'] = {'name': 'Toy Corpus', 'slug': 'toy', 'description': 'Toy corpus is a very small dataset for testing and library development. ', 'extension': '.csv.gz', 'metadata_columns': ['source', 'category', 'species']}
@@ -295,7 +339,6 @@ def build_sample_corpora(
 
 	for corpus_name, corpus_details in corpora.items():
 		if force_rebuild and os.path.isdir(f'{save_path}{corpus_details["slug"]}.corpus'):
-			import shutil
 			shutil.rmtree(f'{save_path}{corpus_details["slug"]}.corpus', ignore_errors=True)
 
 		try:
@@ -309,3 +352,11 @@ def build_sample_corpora(
 		except Exception as e:
 			raise e
 		del corpus
+	
+	if force_rebuild and os.path.isdir(f'{save_path}brown.listcorpus'):
+		shutil.rmtree(f'{save_path}brown.listcorpus', ignore_errors=True)
+	try:
+		listcorpus = ListCorpus().load(f"{save_path}brown.listcorpus")
+	except FileNotFoundError:
+		listcorpus = ListCorpus().build_from_corpus(source_corpus_path = f'{save_path}brown.corpus', save_path = save_path)
+	del listcorpus

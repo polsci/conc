@@ -129,7 +129,7 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 
 	if os.path.exists(save_to):
 		with open(save_to, 'r', encoding='utf-8') as f:
-			stop_words = set(f.read().splitlines())
+			stop_words = sorted(set(f.read().splitlines()))
 
 	if stop_words is None:
 		nlp = spacy.load(spacy_model)
@@ -138,6 +138,8 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 
 		if not os.path.exists(save_path):
 			os.makedirs(save_path)
+
+		stop_words = sorted(stop_words)
 
 		with open(save_to, 'w', encoding='utf-8') as f:
 			for word in stop_words:

@@ -110,19 +110,36 @@ class Corpus:
 @patch
 def _init_spacy_model(self: Corpus,
                 model: str = 'en_core_web_sm', # spacy model to use for tokenization
-				version: str|None = None # version of spacy model expected, if mismatch will raise a warning
+				version: str|None = None, # version of spacy model expected, if mismatch will raise a warning
+				standardize_word_token_punctuation_characters: bool = False # whether to standardize apostrophes in word tokens
 				):
 	try:
 		self._nlp = spacy.load(model)
 		self._nlp.disable_pipes(['parser', 'ner', 'lemmatizer', 'tagger', 'senter', 'tok2vec', 'attribute_ruler'])
 		self._nlp.max_length = 10_000_000 # set max length to a large number to avoid issues with long documents
 	except OSError as e:
-		logger.error(f'Error loading model {model}. You need to run python -m spacy download YOURMODEL to download the model. See https://spacy.io/models for available models.')
+		logger.error(f'Error loading model {model}. If you are working with texts in English, you need to run python -m spacy download en_core_web_sm to download the model. See https://spacy.io/models for available models for other languages.')
 		raise e
 	
 	if version is not None:
 		if self._nlp.meta['version'] != version:
 			logger.warning(f'Spacy model version mismatch: expecting {version}, got {self._nlp.meta["version"]}. This may cause issues with tokenization.')
+
+	if standardize_word_token_punctuation_characters:
+		rules = self._nlp.tokenizer.rules.copy()
+		self._standardize_replacements = {}
+		for key in list(rules.keys()):
+			if key.strip(PUNCTUATION_STRINGS) != '' and "’" in key and key.replace("’", "'") in rules: # only standardize word tokens
+				for token in rules[key]:
+					for k, v in token.items():
+						if "’" in v:
+							self._standardize_replacements[v] = v.replace("’", "'")
+				self._nlp.tokenizer.rules[key] = [{k: v.replace("’", "'") for k, v in token.items()} for token in rules[key]]
+				logger.debug(f"Updating rule to standardize word token punctuation for key: {key}, value: {rules[key]}, replaced with: {self._nlp.tokenizer.rules[key]}")
+		logger.debug(f"Standardized word token rules: {self._standardize_replacements}")
+		self._standardize_replacements_ids = {self._nlp.vocab.strings[k]: self._nlp.vocab.strings[v] for k, v in self._standardize_replacements.items()}
+		logger.debug(f"Standardized word token rules as ids: {self._standardize_replacements_ids}")
+
 
 # %% ../nbs/api/45_corpus.ipynb 18
 @patch
@@ -174,13 +191,18 @@ def _update_build_process(self: Corpus,
 # %% ../nbs/api/45_corpus.ipynb 27
 @patch
 def _complete_build_process(self: Corpus, 
-							build_process_cleanup: bool = True # Remove the build files after build is complete, retained for development and testing purposes
+							build_process_cleanup: bool = True,  # Remove the build files after build is complete, retained for development and testing purposes
+							standardize_word_token_punctuation_characters: bool = False # whether to standardize apostrophes in word tokens
 							):
 	""" Complete the disk-based build to create representation of the corpus. """
 
 	logger.memory_usage('init', init=True)
 	tokens_df = pl.scan_parquet(f'{self.corpus_path}/build_*.parquet')
 
+	if standardize_word_token_punctuation_characters:
+		# tokenizsation still seems to let some word tokens through, even with revised rules, so this is a final check to standardize word tokens
+		tokens_df = tokens_df.with_columns(pl.col('orth_index').replace(self._standardize_replacements_ids), pl.col('lower_index').replace(self._standardize_replacements_ids)) # replace orth and lower with standardized versions
+		
 	# get unique vocab ids (combining orth and lower) and create new index
 	vocab_df = pl.concat([tokens_df.select(pl.col('orth_index').unique().alias('index')), tokens_df.select(pl.col('lower_index').unique().alias('index'))])
 	#vocab_df  = combined_df.select(pl.col('index').unique().sort().alias('source_id')).with_row_index('token_id', offset=1) #.collect(engine='streaming')
@@ -424,11 +446,12 @@ def _build(self: Corpus,
 		  model: str='en_core_web_sm', # spacy model to use for tokenisation
 		  spacy_batch_size:int=500, # batch size for spacy tokenizer
 		  build_process_batch_size:int=5000, # save in-progress build to disk every n docs
-		  build_process_cleanup:bool = True # Remove the build files after build is complete, retained for development and testing purposes
+		  build_process_cleanup:bool = True, # Remove the build files after build is complete, retained for development and testing purposes
+		  standardize_word_token_punctuation_characters: bool = False # whether to standardize apostrophes in word tokens
 		  ):
 	"""Build a corpus from an iterator of texts."""
 
-	self._init_spacy_model(model)
+	self._init_spacy_model(model, standardize_word_token_punctuation_characters=standardize_word_token_punctuation_characters)
 	
 	self.SPACY_MODEL = model
 	self.SPACY_MODEL_VERSION = self._nlp.meta['version']
@@ -490,7 +513,7 @@ def _build(self: Corpus,
 	if save_path is not None:
 		store_pos = self._update_build_process(orth_index, lower_index, token2doc_index, has_spaces, store_pos)
 		lower_index, orth_index, token2doc_index, has_spaces = [], [], [], []
-		self._complete_build_process(build_process_cleanup = build_process_cleanup)
+		self._complete_build_process(build_process_cleanup = build_process_cleanup, standardize_word_token_punctuation_characters = standardize_word_token_punctuation_characters)
 	else:
 		# deprecated - leaving for now
 		self._create_indices(orth_index, lower_index, token2doc_index)
@@ -606,14 +629,15 @@ def build_from_files(self: Corpus,
 					model:str='en_core_web_sm', # spacy model to use for tokenisation
 					spacy_batch_size:int=1000, # batch size for spacy tokenizer
 					build_process_batch_size:int=5000, # save in-progress build to disk every n docs
-					build_process_cleanup:bool = True # Remove the build files after build is complete, retained for development and testing purposes
+					build_process_cleanup:bool = True, # Remove the build files after build is complete, retained for development and testing purposes
+					standardize_word_token_punctuation_characters: bool = False # whether to standardize apostrophes in word tokens
 					):
 	"""Build a corpus from text files in a folder."""
 	
 	start_time = time.time()
 	self._init_build_process(save_path)
 	iterator = self._prepare_files(source_path, file_mask, metadata_file, metadata_file_column, metadata_columns, encoding) #, build_process_path=build_process_path
-	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup) #build_process_path = build_process_path, 
+	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup, standardize_word_token_punctuation_characters = standardize_word_token_punctuation_characters) #build_process_path = build_process_path, 
 	logger.info(f'Build from files time: {(time.time() - start_time):.3f} seconds')
 
 	return self
@@ -658,14 +682,15 @@ def build_from_csv(self: Corpus,
 				   spacy_batch_size:int=1000, # batch size for Spacy tokenizer
 				   #build_process_path:str=None, # path to save an in-progress build to disk to reduce memory usage
 				   build_process_batch_size:int=5000, # save in-progress build to disk every n docs
-				   build_process_cleanup:bool = True # Remove the build files after build is complete, retained for development and testing purposes
+				   build_process_cleanup:bool = True, # Remove the build files after build is complete, retained for development and testing purposes
+				   standardize_word_token_punctuation_characters: bool = False # whether to standardize apostrophes in word tokens
 				   ):
 	"""Build a corpus from a csv file."""
 	
 	start_time = time.time()
 	self._init_build_process(save_path)
 	iterator = self._prepare_csv(source_path = source_path, text_column = text_column, metadata_columns = metadata_columns, encoding = encoding, build_process_batch_size = build_process_batch_size)
-	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup)
+	self._build(save_path = save_path, iterator = iterator, model = model, spacy_batch_size = spacy_batch_size, build_process_batch_size = build_process_batch_size, build_process_cleanup = build_process_cleanup, standardize_word_token_punctuation_characters = standardize_word_token_punctuation_characters)
 	logger.info(f'Build from csv time: {(time.time() - start_time):.3f} seconds')
 
 	return self
@@ -898,6 +923,7 @@ def tokenize(self: Corpus,
 	token_sequences = []
 	for doc in self._nlp.pipe(strings_to_tokenize): # was tokenizer.pipe(strings_to_tokenize) - retaining for reference
 		# token_sequences.append(tuple(doc.to_array(index_id))) # not using spacy indexes once corpus created
+		logger.debug(f'Tokens {list(doc)}')
 		token_sequences.append(list(doc))
 	# if is_wildcard_search == True:
 	# 	tmp_token_sequence = []
