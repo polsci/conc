@@ -181,7 +181,8 @@ def keywords(self: Conc,
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
 				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
-				exclude_punctuation:bool=True # exclude punctuation tokens
+				exclude_punctuation:bool=True, # exclude punctuation tokens
+				handle_common_typographic_differences:bool=True # whether to detect and normalize common differences in word tokens due to typographic differences (i.e. currently focused on apostrophes in common English contractions), ignored when exclude_punctuation is False
 				) -> Result: # return a Result object with the frequency table
 	""" Get keywords for the corpus. """
 	if self.keyness_ is None:
@@ -205,7 +206,9 @@ def keywords(self: Conc,
 									exclude_tokens_text=exclude_tokens_text,
 									restrict_tokens=restrict_tokens,
 									restrict_tokens_text=restrict_tokens_text,
-									exclude_punctuation=exclude_punctuation)
+									exclude_punctuation=exclude_punctuation,
+									handle_common_typographic_differences = handle_common_typographic_differences
+									)
 
 # %% ../nbs/api/50_conc.ipynb 33
 @patch
