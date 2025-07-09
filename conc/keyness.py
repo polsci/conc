@@ -37,7 +37,7 @@ class Keyness:
 def keywords(self: Keyness,
 				effect_size_measure:str = 'log_ratio', # effect size measure to use, currently only 'log_ratio' is supported
 				statistical_significance_measure:str = 'log_likelihood', # statistical significance measure to use, currently only 'log_likelihood' is supported
-				order:str|None = None, # default of None orders by effect size measure, results can also be ordered by: frequency, frequency_reference, document_frequency, document_frequency_reference, log_likelihood
+				order:str|None = None, # default of None orders by statistical significance measure, results can also be ordered by: frequency, frequency_reference, document_frequency, document_frequency_reference, log_likelihood
 				order_descending:bool = True, # order is descending or ascending
 				statistical_significance_cut: float|None = None, # statistical significance p-value to filter results, e.g. 0.05 or 0.01 or 0.001 - ignored if None or 0
 				apply_bonferroni:bool = False, # apply Bonferroni correction to the statistical significance cut-off
@@ -55,7 +55,8 @@ def keywords(self: Keyness,
 				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
 				exclude_punctuation:bool=True, # exclude punctuation tokens
-				handle_common_typographic_differences:bool=True # whether to detect and normalize common differences in word tokens due to typographic differences (i.e. currently focused on apostrophes in common English contractions), ignored when exclude_punctuation is False
+				handle_common_typographic_differences:bool=True, # whether to detect and normalize common differences in word tokens due to typographic differences (i.e. currently focused on apostrophes in common English contractions), ignored when exclude_punctuation is False
+				exclude_negative_keywords:bool=True # whether to exclude negative keywords from the report
 				) -> Result: # return a Result object with the frequency table
 	""" Get keywords for the corpus. """
 
@@ -95,8 +96,8 @@ def keywords(self: Keyness,
 	formatted_data = []
 	formatted_data.append(f'Report based on {tokens_descriptor}')
 
-	target_min_freq = (0.05 * normalize_by) / target_count_tokens
-	reference_min_freq = (0.05 * normalize_by) / reference_count_tokens
+	target_min_freq = (0.5 * normalize_by) / target_count_tokens
+	reference_min_freq = (0.5 * normalize_by) / reference_count_tokens
 	
 	target_df = freq_target.frequencies(case_sensitive=case_sensitive,
 										normalize_by=normalize_by,
@@ -187,8 +188,8 @@ def keywords(self: Keyness,
 		keyness_df = keyness_df.with_columns(pl.col('normalized_frequency').alias('calc_normalized_frequency'))
 		keyness_df = keyness_df.with_columns(pl.col('normalized_frequency_reference').alias('calc_normalized_frequency_reference'))
 
-		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency').fill_null(target_min_freq))
-		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency_reference').fill_null(reference_min_freq))
+		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency').replace(0, target_min_freq))
+		keyness_df = keyness_df.with_columns(pl.col('calc_normalized_frequency_reference').replace(0, reference_min_freq))
 
 		keyness_df = keyness_df.with_columns((pl.col('calc_normalized_frequency')/pl.col('calc_normalized_frequency_reference')).alias('relative_risk'))
 		keyness_df = keyness_df.with_columns((pl.col('calc_normalized_frequency').log(2) - pl.col('calc_normalized_frequency_reference').log(2)).alias('log_ratio'))
@@ -264,9 +265,12 @@ def keywords(self: Keyness,
 		keyness_df = keyness_df.filter(pl.col(statistical_significance_measure) > cut)
 		formatted_data.append(p_value_descriptor)
 		unique_tokens = keyness_df.select(pl.len()).item()
-	
+
+	if exclude_negative_keywords:
+		keyness_df = keyness_df.filter(pl.col('relative_risk') >= 1)
+
 	if order is None:
-		order = effect_size_measure
+		order = statistical_significance_measure
 	keyness_df = keyness_df.sort(order, descending=order_descending)
 	if page_size == 0:
 		rank_offset = 1

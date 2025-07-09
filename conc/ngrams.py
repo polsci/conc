@@ -160,7 +160,7 @@ def ngrams(self: Ngrams,
 				logger.warning(f'Adjusting ngram length from {ngram_length} to {expected_ngram_length}')
 				ngram_length = expected_ngram_length
 		schema = [f'token_{i+1}' for i in range(ngram_length)]
-		ngrams_report = pl.DataFrame(ngrams.T, schema=schema).to_struct(name = 'ngram_token_ids').value_counts(sort=True).rename({"count": "frequency"})
+		ngrams_report = pl.DataFrame(ngrams.T, schema=schema).to_struct(name = 'ngram_token_ids').value_counts(sort=True).rename({"count": "frequency"}) # TODO - potentially improve by adding second sort so frequency lists are stable
 
 		# if show_document_frequency:
 			# to be added in with # show_document_frequency:bool = False, # return document frequency in output
@@ -252,7 +252,7 @@ def ngram_frequencies(self: Ngrams,
 
 	schema = [f'token_{i+1}' for i in range(ngram_length)]
 
-	ngrams_report = ngrams.group_by(schema).agg(pl.len().alias("frequency")).sort(by="frequency", descending=True)
+	ngrams_report = ngrams.group_by(schema).agg(pl.len().alias("frequency")).sort(by="frequency", descending=True) # TODO - potentially improve by adding second sort so frequency lists are stable
 
 	if show_document_frequency:
 		ngrams_report = ngrams_report.join(
