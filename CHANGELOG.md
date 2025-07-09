@@ -5,6 +5,31 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.7] - 2025-07-09 - keywords report improvements, BNC XML parsing, lightweight ListCorpus format for reference corpora
+
+### Added
+
+- added BNC xml parsing to conc.corpora
+- ListCorpus format - lightweight format with frequency information for use as a reference corpus
+- support for ListCorpus added to keywords, raising errors in non-supported report classes
+- documented ListCorpus in recipes
+- added document frequency reporting to ngram_frequencies
+- added optional standardisation of apostrophes when building corpora
+- added support to exclude/include negative keywords in keywords report
+
+### Changed
+
+- changed Corpus.build to _build, added flexibility to expected/required files, and improved docs
+- stop words via Conc.core are now sorted
+- requiring lxml dependency for BNC XML parsing
+- keywords report defaults to trying to resolve apostrophe character differences in word tokens
+- changed default keywords order to log likelihood
+
+### Fixed
+
+- ensure page size 0 (all data) works in keywords method
+- fix issue with 0 frequencies not using observed frequency correction in keywords report
+
 ## [0.1.6] - 2025-07-02 - concordance filtering based on context words, improved display of texts
 
 ### Added
