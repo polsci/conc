@@ -619,7 +619,7 @@ def _prepare_files(self: Corpus,
 # %% ../nbs/api/45_corpus.ipynb 34
 @patch
 def build_from_files(self: Corpus,
-					source_path: str, # path to folder with text files 
+					source_path: str, # path to folder with text files, path can be a directory, zip or tar/tar.gz file
 					save_path:str, # directory where corpus will be created, a subdirectory will be automatically created with the corpus content
 					file_mask:str='*.txt', # mask to select files 
 					metadata_file: str|None=None, # path to a CSV with metadata
@@ -641,7 +641,6 @@ def build_from_files(self: Corpus,
 	logger.info(f'Build from files time: {(time.time() - start_time):.3f} seconds')
 
 	return self
-
 
 # %% ../nbs/api/45_corpus.ipynb 35
 @patch
