@@ -174,6 +174,8 @@ def build_from_corpus(self: ListCorpus,
 	# rewriting the vocab file with doc frequencies
 	self.vocab.collect().write_parquet(os.path.join(self.corpus_path, 'vocab.parquet'))
 
+	self._init_corpus_dataframes()
+
 	logger.info(f"Built ListCorpus {os.path.basename(self.corpus_path)} {time.time() - start_time:.2f} seconds.")
 
 	return self
