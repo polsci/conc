@@ -5,6 +5,12 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.9] - 2025-07-15 - compatibility with setup on Google Colab
+
+### Changed
+
+- requiring numpy>=2.0.0 and polars>=1.30.0
+
 ## [0.1.8] - 2025-07-10 - bug fix so list corpora ready for use after build
 
 ### Fixed
