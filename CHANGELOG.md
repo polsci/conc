@@ -9,7 +9,7 @@ This information is mirrored on the documentation site [Releases page](https://g
 
 ### Changed
 
-- requiring numpy>=2.0.0 and polars>=1.30.0
+- requiring numpy>=2.0.0 and polars>=1.30.0, thanks @karinstahel for the feedback about Colab compatibility
 
 ## [0.1.8] - 2025-07-10 - bug fix so list corpora ready for use after build
 
