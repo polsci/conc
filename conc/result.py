@@ -11,7 +11,7 @@ from great_tables import GT
 # %% auto 0
 __all__ = ['Result']
 
-# %% ../nbs/api/76_result.ipynb 4
+# %% ../nbs/api/76_result.ipynb 6
 class Result:
 	def __init__(self,
 			  type: str, # report type
@@ -32,7 +32,7 @@ class Result:
 		
 
 
-# %% ../nbs/api/76_result.ipynb 5
+# %% ../nbs/api/76_result.ipynb 7
 @patch
 def to_frame(self: Result,
 			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning
@@ -42,7 +42,7 @@ def to_frame(self: Result,
 		self.df = self.df.collect()
 	return self.df
 
-# %% ../nbs/api/76_result.ipynb 6
+# %% ../nbs/api/76_result.ipynb 8
 @patch
 def _prepare(self:Result
 			 ):
@@ -86,7 +86,7 @@ def _prepare(self:Result
 				self._gt = self._gt.cols_align(align='center', columns=['Node'])
 
 
-# %% ../nbs/api/76_result.ipynb 7
+# %% ../nbs/api/76_result.ipynb 9
 @patch
 def display(self: Result
 			   ):
@@ -97,7 +97,7 @@ def display(self: Result
 
 
 
-# %% ../nbs/api/76_result.ipynb 8
+# %% ../nbs/api/76_result.ipynb 10
 @patch
 def to_html(self: Result,
 			 collect_if_lazy: bool = True # if the df is a lazyframe, collect before returning

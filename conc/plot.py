@@ -10,7 +10,7 @@ from IPython.display import display, HTML
 # %% auto 0
 __all__ = ['Plot']
 
-# %% ../nbs/api/77_plot.ipynb 4
+# %% ../nbs/api/77_plot.ipynb 6
 class Plot:
 	def __init__(self,
 			  type: str, # report type
@@ -23,7 +23,7 @@ class Plot:
 		
 
 
-# %% ../nbs/api/77_plot.ipynb 5
+# %% ../nbs/api/77_plot.ipynb 7
 @patch
 def to_html(self: Plot
 			 ):
@@ -31,7 +31,7 @@ def to_html(self: Plot
 	
 	return self.html
 
-# %% ../nbs/api/77_plot.ipynb 6
+# %% ../nbs/api/77_plot.ipynb 8
 @patch
 def to_file(self: Plot,
 			filename:str, # filename to write HTML to
@@ -42,7 +42,7 @@ def to_file(self: Plot,
 	with open(filename, 'w', encoding=encoding) as f:
 		f.write(self.html)
 
-# %% ../nbs/api/77_plot.ipynb 7
+# %% ../nbs/api/77_plot.ipynb 9
 @patch
 def display(self: Plot
 			   ):

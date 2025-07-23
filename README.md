@@ -28,7 +28,7 @@ Conc uses [spaCy](https://spacy.io/) for tokenising texts. SpaCy
 functionality to annotate texts will be supported soon.
 
 Conc uses well-supported Python libraries for processing data and
-prioritises the fastest code libraries and data structures. The library
+prioritises fast code libraries and data structures. The library
 produces clear reports with important information to interpret result by
 default. Conc makes it easy to extend analysis using other libraries or
 software. [Conc’s corpus format is
@@ -85,6 +85,8 @@ Faculty of Arts who make work like this possible.
 
 Thanks to Dr Chris Thomson and Karin Stahel for their feedback on early
 versions of Conc.
+
+Above all, thanks to my family for their love, patience and kindness.
 
 ## Development Status
 
