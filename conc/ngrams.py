@@ -56,7 +56,7 @@ def _get_ngrams(self:Ngrams,
 		index = 'lower_index'
 
 	if ngram_token_position == 'RIGHT':
-		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = -1, exclude_punctuation = False, convert_eof = False)
+		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = (sequence_len-1), position_offset_step = -1, exclude_punctuation = False, convert_eof = False)
 		ngrams = ngrams[::-1, :] # reversing order as retrieved right to left
 	elif ngram_token_position == 'LEFT':
 		ngrams = self.corpus.get_tokens_in_context(token_positions = token_positions, index = index, context_length = ngram_length, position_offset = 0, position_offset_step = 1, exclude_punctuation = False, convert_eof = False)
@@ -109,7 +109,7 @@ def _get_ngrams(self:Ngrams,
 	return ngrams, token_positions
 
 
-# %% ../nbs/api/71_ngrams.ipynb 20
+# %% ../nbs/api/71_ngrams.ipynb 21
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
@@ -210,7 +210,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/71_ngrams.ipynb 28
+# %% ../nbs/api/71_ngrams.ipynb 30
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
