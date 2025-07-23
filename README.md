@@ -70,17 +70,19 @@ Conc is developed by [Dr Geoff Ford](https://geoffford.nz/).
 Work to create this Python library has been made possible by
 funding/support from:
 
-- “Mapping LAWS: Issue Mapping and Analyzing the Lethal Autonomous
-  Weapons Debate” (Royal Society of New Zealand’s Marsden Fund Grant
-  19-UOC-068)  
+- “[Mapping LAWS](https://mappinglaws.net/): Issue Mapping and Analyzing
+  the Lethal Autonomous Weapons Debate” (Royal Society of New Zealand’s
+  Marsden Fund Grant 19-UOC-068)  
 - “Into the Deep: Analysing the Actors and Controversies Driving the
   Adoption of the World’s First Deep Sea Mining Governance” (Royal
   Society of New Zealand’s Marsden Fund Grant 22-UOC-059)
 - Sabbatical, University of Canterbury, Semester 1 2025.
 
-Thanks to the Mapping LAWS project team for their support and feedback
-as first users of ConText (a web-based application built on an earlier
-version of Conc).
+Thanks to Jeremy Moses and Sian Troath from the [Mapping
+LAWS](https://mappinglaws.net/) project team for their support and
+feedback as first users of ConText (a web-based application built on an
+earlier version of Conc that I’ve [also recently
+released](https://github.com/polsci/ConText)).
 
 Dr Ford is a researcher with [Te Pokapū Aronui ā-Matihiko \| UC Arts
 Digital Lab (ADL)](https://artsdigitallab.canterbury.ac.nz/). Thanks to
