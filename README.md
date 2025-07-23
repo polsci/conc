@@ -5,7 +5,7 @@
 
 ![GitHub
 Release](https://img.shields.io/github/v/release/polsci/conc.png)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16358752.svg)](https://zenodo.org/badge/DOI/10.5281/zenodo.16358752)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16358752.svg)](https://zenodo.org/doi/10.5281/zenodo.16358752)
 
 ## Introduction to Conc
 
