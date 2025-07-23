@@ -273,7 +273,7 @@ def __str__(self: ListCorpus):
 
 
 
-# %% ../nbs/api/51_listcorpus.ipynb 30
+# %% ../nbs/api/51_listcorpus.ipynb 31
 @patch
 def get_token_count_text(self: ListCorpus, 
 					exclude_punctuation:bool = False # exclude punctuation tokens from the count

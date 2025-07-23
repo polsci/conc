@@ -21,7 +21,7 @@ from .result import Result
 from .plot import Plot
 from .core import logger, PAGE_SIZE, EOF_TOKEN_STR, ERR_TOKEN_STR
 
-# %% ../nbs/api/72_concordance.ipynb 8
+# %% ../nbs/api/72_concordance.ipynb 10
 class Concordance:
 	""" Class for concordancing. """
 	def __init__(self,
@@ -34,7 +34,7 @@ class Concordance:
 		self.corpus = corpus
 
 
-# %% ../nbs/api/72_concordance.ipynb 9
+# %% ../nbs/api/72_concordance.ipynb 11
 @patch
 def _get_concordance_sort(self:Concordance, 
 						 token_positions: list[np.ndarray], # token index to get sort columns for
@@ -67,7 +67,7 @@ def _get_concordance_sort(self:Concordance,
 	return sort_column_ids, sort_column_order
 
 
-# %% ../nbs/api/72_concordance.ipynb 16
+# %% ../nbs/api/72_concordance.ipynb 18
 @patch
 def _build_concordance_result_with_sort(self:Concordance,
 						sequence_length: int, # length of the sequence to concordance
@@ -125,7 +125,7 @@ def _build_concordance_result_with_sort(self:Concordance,
 	return concordance_result_df
 
 
-# %% ../nbs/api/72_concordance.ipynb 17
+# %% ../nbs/api/72_concordance.ipynb 19
 @patch
 def _col_contains_sequence(self:Concordance,
 						  haystack: np.ndarray,  # 2d array of token ids in order of token positions 
@@ -143,7 +143,7 @@ def _col_contains_sequence(self:Concordance,
 
 
 
-# %% ../nbs/api/72_concordance.ipynb 18
+# %% ../nbs/api/72_concordance.ipynb 20
 @patch
 def _concordance_filter_context(self:Concordance,
 						filter_context_str:str|None, # if a string is provided, the concordance lines will be filtered to show lines containing this string
@@ -196,7 +196,7 @@ def _concordance_filter_context(self:Concordance,
 
 	return token_positions, formatted_data
 
-# %% ../nbs/api/72_concordance.ipynb 19
+# %% ../nbs/api/72_concordance.ipynb 21
 @patch
 def concordance(self: Concordance, 
 				token_str: str, # token string to get concordance for 
@@ -350,7 +350,7 @@ def concordance(self: Concordance,
 	return Result(type = 'concordance', df=concordance_view_df, title=f'Concordance for "{token_str}"', description=f'{self.corpus.name}, Context tokens: {context_length}, Order: {order}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/72_concordance.ipynb 35
+# %% ../nbs/api/72_concordance.ipynb 39
 @patch
 def _get_concordance_plot_style(
 	self: Concordance,
@@ -448,7 +448,7 @@ def _get_concordance_plot_style(
 	return html_styles
 
 
-# %% ../nbs/api/72_concordance.ipynb 36
+# %% ../nbs/api/72_concordance.ipynb 40
 @patch
 def _get_concordance_plot_script(
 	self: Concordance,
@@ -618,7 +618,7 @@ def _get_concordance_plot_script(
 	'''
 	return html_script
 
-# %% ../nbs/api/72_concordance.ipynb 37
+# %% ../nbs/api/72_concordance.ipynb 41
 @patch
 def concordance_plot(self: Concordance,
 				token_str: str, # token string for concordance plot
