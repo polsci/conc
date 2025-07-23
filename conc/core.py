@@ -20,17 +20,20 @@ __all__ = ['PAGE_SIZE', 'EOF_TOKEN_STR', 'ERR_TOKEN_STR', 'DOCUMENTATION_URL', '
            'get_large_dataset', 'create_large_dataset_sizes']
 
 # %% ../nbs/api/80_core.ipynb 4
+from . import __version__
+
+# %% ../nbs/api/80_core.ipynb 5
 PAGE_SIZE = 20
 EOF_TOKEN_STR = ' conc-end-of-file-token'
 ERR_TOKEN_STR = 'ERROR: not a token'
 
-# %% ../nbs/api/80_core.ipynb 5
+# %% ../nbs/api/80_core.ipynb 6
 DOCUMENTATION_URL = 'https://geoffford.nz/conc'
 REPOSITORY_URL = 'https://github.com/polsci/conc'
 PYPI_URL = 'https://pypi.org/project/conc/'
-CITATION_STR = '''If you use Conc in your work, please cite it as follows:'''
+CITATION_STR = f'If you use Conc in your work, please cite it as follows: Ford, G. (2025). Conc: a Python library for efficient corpus analysis (Version {__version__}) [Computer software]. https://doi.org/10.5281/zenodo.16358752'
 
-# %% ../nbs/api/80_core.ipynb 9
+# %% ../nbs/api/80_core.ipynb 10
 class ConcLogger(logging.Logger):
 	""" Custom logger for conc module. """
 	def __init__(self, name, level=logging.WARNING, log_file=None):
@@ -74,25 +77,25 @@ class ConcLogger(logging.Logger):
 		self.last_memory_usage = usage
 
 
-# %% ../nbs/api/80_core.ipynb 10
+# %% ../nbs/api/80_core.ipynb 11
 logging.setLoggerClass(ConcLogger)
 
 logger = logging.getLogger(__name__)
 
 
-# %% ../nbs/api/80_core.ipynb 11
+# %% ../nbs/api/80_core.ipynb 12
 def set_logger_state(state:str # 'quiet' or 'verbose'
 					 ):
 	""" Set the state of the conc logger to either 'quiet' or 'verbose' """
 	logger.set_state(state)
 
-# %% ../nbs/api/80_core.ipynb 14
+# %% ../nbs/api/80_core.ipynb 15
 def spacy_attribute_name(index):
 	"""Get name of index from spacy."""
 
 	return list(spacy.attrs.IDS.keys())[list(spacy.attrs.IDS.values()).index(index)]
 
-# %% ../nbs/api/80_core.ipynb 16
+# %% ../nbs/api/80_core.ipynb 17
 class CorpusMetadata(msgspec.Struct): 
     """ JSON validation schema for corpus metadata """
     name: str
@@ -116,7 +119,7 @@ class CorpusMetadata(msgspec.Struct):
 
 
 
-# %% ../nbs/api/80_core.ipynb 19
+# %% ../nbs/api/80_core.ipynb 20
 def get_stop_words(save_path:str, # directory to save stop words to, file name will be created based on spaCy model name
 				   spacy_model:str = 'en_core_web_sm' # model to get stop words for
 					):
@@ -147,7 +150,7 @@ def get_stop_words(save_path:str, # directory to save stop words to, file name w
 
 	return stop_words
 
-# %% ../nbs/api/80_core.ipynb 22
+# %% ../nbs/api/80_core.ipynb 23
 def list_corpora(
 		path: str # path to load corpus
 		) -> pl.DataFrame: # Dataframe with path, corpus, corpus name, document count, token count
@@ -159,7 +162,7 @@ def list_corpora(
 	return _list_corpora(path=path)
 
 
-# %% ../nbs/api/80_core.ipynb 23
+# %% ../nbs/api/80_core.ipynb 24
 def create_toy_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
 	""" (Deprecated - call via conc.corpora) Create txt files and csv to test build of toy corpus. """
@@ -169,7 +172,7 @@ def create_toy_corpus_sources(source_path:str # path to location of sources for 
 	from conc.corpora import create_toy_corpus_sources as _create_toy_corpus_sources
 	return _create_toy_corpus_sources(source_path=source_path)
 
-# %% ../nbs/api/80_core.ipynb 24
+# %% ../nbs/api/80_core.ipynb 25
 def show_toy_corpus(
         csv_path:str # path to location of csv for building corpora
         ) -> GT: 
@@ -180,7 +183,7 @@ def show_toy_corpus(
     from conc.corpora import show_toy_corpus as _show_toy_corpus
     return _show_toy_corpus(csv_path=csv_path)
 
-# %% ../nbs/api/80_core.ipynb 25
+# %% ../nbs/api/80_core.ipynb 26
 def get_nltk_corpus_sources(source_path:str # path to location of sources for building corpora
 							 ):
 	""" (Deprecated - call via conc.corpora) Get NLTK corpora as sources for development or testing Conc functionality. """
@@ -190,7 +193,7 @@ def get_nltk_corpus_sources(source_path:str # path to location of sources for bu
 	from conc.corpora import get_nltk_corpus_sources as _get_nltk_corpus_sources
 	return _get_nltk_corpus_sources(source_path=source_path)
 
-# %% ../nbs/api/80_core.ipynb 26
+# %% ../nbs/api/80_core.ipynb 27
 def get_garden_party(source_path: str #path to location of sources for building corpora
 					):
 	""" (Deprecated - call via conc.corpora) Get corpus of The Garden Party by Katherine Mansfield for development of Conc and testing Conc functionality. """
@@ -200,7 +203,7 @@ def get_garden_party(source_path: str #path to location of sources for building 
 	from conc.corpora import get_garden_party as _get_garden_party
 	return _get_garden_party(source_path=source_path)
 
-# %% ../nbs/api/80_core.ipynb 27
+# %% ../nbs/api/80_core.ipynb 28
 def get_large_dataset(source_path: str #path to location of sources for building corpora
                     ):
     """ (Deprecated - call via conc.corpora) Get 1m rows of https://huggingface.co/datasets/Eugleo/us-congressional-speeches-subset for testing. """
@@ -210,7 +213,7 @@ def get_large_dataset(source_path: str #path to location of sources for building
     from conc.corpora import get_large_dataset as _get_large_dataset
     return _get_large_dataset(source_path=source_path)
 
-# %% ../nbs/api/80_core.ipynb 28
+# %% ../nbs/api/80_core.ipynb 29
 def create_large_dataset_sizes(source_path: str, #path to location of sources for building corpora
 						sizes: list = [10000, 100000, 200000, 500000] # list of sizes for test data-sets
 						):

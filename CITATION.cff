@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+authors:
+- family-names: "Ford"
+  given-names: "Geoffrey"
+  orcid: "https://orcid.org/0000-0001-7088-4073"
+title: "Conc: a Python library for efficient corpus analysis"
+version: 0.1.10
+doi: 10.5281/zenodo.16358752
+date-released: 2025-07-23
+url: "https://github.com/polsci/conc"
