@@ -109,7 +109,7 @@ def _get_ngrams(self:Ngrams,
 	return ngrams, token_positions
 
 
-# %% ../nbs/api/71_ngrams.ipynb 19
+# %% ../nbs/api/71_ngrams.ipynb 20
 @patch
 def ngrams(self: Ngrams, 
 		   token_str: str, # token string to get ngrams for 
@@ -210,7 +210,7 @@ def ngrams(self: Ngrams,
 	return Result(type = 'ngrams', df=ngrams_report_page, title=f'Ngrams for "{token_str}"', description=f'{self.corpus.name}', summary_data=summary_data, formatted_data=formatted_data)
 
 
-# %% ../nbs/api/71_ngrams.ipynb 27
+# %% ../nbs/api/71_ngrams.ipynb 28
 @patch
 def ngram_frequencies(self: Ngrams, 
                 ngram_length:int=2, # length of ngram
