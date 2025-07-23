@@ -5,7 +5,7 @@ authors:
   given-names: "Geoffrey"
   orcid: "https://orcid.org/0000-0001-7088-4073"
 title: "Conc: a Python library for efficient corpus analysis"
-version: 0.1.11
+version: 0.1.12
 doi: 10.5281/zenodo.16358752
 date-released: 2025-07-23
 url: "https://github.com/polsci/conc"

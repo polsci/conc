@@ -5,6 +5,21 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.12] - 2025-07-24 - documentation updates, bug fix
+
+### Added
+
+- explanation of keyness and collocate statistics implemented in Conc
+
+### Changed
+
+- updated optional dependencies install instructions
+- instructions for installing on older machines now has pinned Polars version to 1.30.0
+
+### Fixed
+
+- fix ngrams not returning correct ngram range when token position RIGHT and ngram_length > 1 (includes new tests)
+
 ## [0.1.11] - 2025-07-23 - Zenodo integrated, citation information added
 
 ### Added
