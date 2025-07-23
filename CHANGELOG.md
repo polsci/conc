@@ -5,6 +5,15 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.10] - 2025-07-23 - documentation improvements, initiating Zenodo integration
+
+This version is the first released via Github releases. Previous releases were via Pypi only. Github 
+releases are tracked automatically by Zenodo. 
+
+### Changed
+
+- improvements to API documentation with headings and direction to use Conc class as main interface to reports
+
 ## [0.1.9] - 2025-07-15 - compatibility with setup on Google Colab
 
 ### Changed
