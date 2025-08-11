@@ -328,13 +328,13 @@ def build_sample_corpora(
 	if not os.path.exists(save_path):
 		os.makedirs(save_path)
 
-	if not os.path.exists(f'{source_path}toy.csv.gz'):
+	if not os.path.exists(f'{source_path}toy.csv.gz') or force_rebuild == True:
 		create_toy_corpus_sources(source_path)
 
-	if not os.path.exists(f'{source_path}garden-party-corpus.zip'):
+	if not os.path.exists(f'{source_path}garden-party-corpus.zip') or force_rebuild == True:
 		get_garden_party(source_path)
 
-	if not os.path.exists(f'{source_path}brown.csv.gz'):
+	if not os.path.exists(f'{source_path}brown.csv.gz') or force_rebuild == True:
 		get_nltk_corpus_sources(source_path)
 
 	for corpus_name, corpus_details in corpora.items():
