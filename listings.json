@@ -1,0 +1,26 @@
+[
+  {
+    "listing": "/development/index.html",
+    "items": [
+      "/development/releases.html",
+      "/development/roadmap.html",
+      "/development/developer_guide.html"
+    ]
+  },
+  {
+    "listing": "/tutorials/index.html",
+    "items": [
+      "/tutorials/start.html",
+      "/tutorials/recipes.html",
+      "/tutorials/install.html"
+    ]
+  },
+  {
+    "listing": "/explanations/index.html",
+    "items": [
+      "/explanations/why.html",
+      "/explanations/anatomy.html",
+      "/explanations/performance.html"
+    ]
+  }
+]

@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Information on Conc corpus format if you want to access the data directly.">
+
+<title>Anatomy of a corpus – conc</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../conc-favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-e16dd29f819a46fcdaa82e3575888691.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var sidebar = document.getElementsByClassName('sidebar-menu-container')[0];
+    var logo = document.createElement('div');
+    logo.className = 'sidebar-info';
+    logo.innerHTML = '<a href="https://geoffford.nz/"><img src="https://geoffford.nz/assets/images/geoff-icon.png" alt="Geoff Ford"></a>';
+    var textLink = document.createElement('a');
+    textLink.className = 'sidebar-info-text';
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "Author: Dr Geoff Ford";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    var textLink = document.createElement('a');
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "↪ Main Website";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    sidebar.prepend(logo);
+  });
+</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Anatomy of a corpus – conc">
+<meta property="og:description" content="Information on Conc corpus format if you want to access the data directly.">
+<meta property="og:site_name" content="conc">
+<meta name="twitter:title" content="Anatomy of a corpus – conc">
+<meta name="twitter:description" content="Information on Conc corpus format if you want to access the data directly.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="https://geoffford.nz/assets/images/conc/conc.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">conc</span>
+    </a>
+  </div>
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/polsci/conc"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          <div class="quarto-navbar-tools">
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../explanations/index.html">Explanations</a></li><li class="breadcrumb-item"><a href="../explanations/anatomy.html">Anatomy of a corpus</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Conc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Get Started with Conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quick Conc Recipes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installing Conc</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../explanations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/why.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why Conc?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/anatomy.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Anatomy of a corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../development/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Development</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/releases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Releases</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/roadmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roadmap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/developer_guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer Guide</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/conc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/listcorpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">listcorpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpora.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpora</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/frequency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">frequency</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/ngrams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ngrams</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/concordance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">concordance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/keyness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">keyness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/collocates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">collocates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/result.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">result</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../explanations/index.html">Explanations</a></li><li class="breadcrumb-item"><a href="../explanations/anatomy.html">Anatomy of a corpus</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Anatomy of a corpus</h1>
+</div>
+
+<div>
+  <div class="description">
+    Information on Conc corpus format if you want to access the data directly.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>A Conc corpus is a directory containing files with specific names and formats to represent the data. This document provides an overview of the various files and what they contain. Here is the directory structure of an example Conc corpus:</p>
+<div id="0ac48f36" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>├── garden-party.corpus
+│   ├── tokens.parquet
+│   ├── spaces.parquet
+│   ├── README.md
+│   ├── puncts.parquet
+│   ├── corpus.json
+│   ├── vocab.parquet
+│   └── metadata.parquet</code></pre>
+</div>
+</div>
+<p>Note: by default the library creates a directory with the <code>.corpus</code> suffix. The directory name is created automatically on build based on a slugified version of the corpus name you assigned.</p>
+<p>For example, if you passed in the name:</p>
+<pre><code>Garden Party Corpus</code></pre>
+<p>The directory will be:</p>
+<pre><code>garden-party.corpus</code></pre>
+<p>The directory can be renamed and still loaded. The <code>.corpus</code> extension is intended to make corpora on your filesystem easier to find or identify.</p>
+<p>To distribute a corpus, send a zip of the directory for others to extract or just share the directory as-is.</p>
+<p>Below is an overview of the files in a Conc corpus directory. The data can be accessed via Conc or accessed directly from the files.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 31%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Access via Conc</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>README.md</td>
+<td>-</td>
+<td>Human readable information about the corpus to aide distribution</td>
+</tr>
+<tr class="even">
+<td>corpus.json</td>
+<td>specific properties e.g.&nbsp;conc.token_count</td>
+<td>Machine readable information about the corpus, including name, description, various summary statistics, and models used to build the corpus</td>
+</tr>
+<tr class="odd">
+<td>vocab.parquet</td>
+<td>corpus.vocab</td>
+<td>A table mapping token strings to token IDs and frequency information</td>
+</tr>
+<tr class="even">
+<td>tokens.parquet</td>
+<td>corpus.tokens</td>
+<td>A table with indices based on token positions used to query the corpus with tokens represented by numeric IDs</td>
+</tr>
+<tr class="odd">
+<td>metadata.parquet</td>
+<td>corpus.metadata</td>
+<td>A table with metadata for each document (if there is any)</td>
+</tr>
+<tr class="even">
+<td>spaces.parquet</td>
+<td>corpus.spaces</td>
+<td>A table to allow recovery of document spacing without the original texts</td>
+</tr>
+<tr class="odd">
+<td>puncts.parquet</td>
+<td>corpus.puncts</td>
+<td>A table with punctuation positions</td>
+</tr>
+</tbody>
+</table>
+<p>Below is more information about each file. You can obviously work with a corpus using Conc, but you can work with the processed corpus <a href="https://parquet.apache.org/docs/file-format/">parquet</a> and JSON files directly. Conc works with parquet files using the <a href="https://pola.rs/">Polars library</a>, but there are other libraries that support the format. Python provides native support for JSON, but there are more efficient libraries. Conc uses the <a href="https://github.com/jcrist/msgspec">msgspec library</a> to read and write JSON.</p>
+</section>
+<section id="notes-on-specific-conc-corpus-files-and-data-formats" class="level2">
+<h2 class="anchored" data-anchor-id="notes-on-specific-conc-corpus-files-and-data-formats">Notes on specific Conc corpus files and data formats</h2>
+<p>The following information will help you if you want to work with the corpus data/files directly.</p>
+<section id="readme.md" class="level3">
+<h3 class="anchored" data-anchor-id="readme.md">README.md</h3>
+<p>Below is an example of the README.md file generated by the Conc.</p>
+</section>
+</section>
+<div id="baf4f1a4" class="cell">
+<div class="cell-output cell-output-display cell-output-markdown">
+<section id="brown-corpus" class="level2 alert alert-block alert-success">
+<h2 class="anchored" data-anchor-id="brown-corpus">Brown Corpus</h2>
+<section id="about" class="level3">
+<h3 class="anchored" data-anchor-id="about">About</h3>
+<p>This directory contains a corpus created using the <a href="https://github.com/polsci/conc">Conc</a> Python library.</p>
+</section>
+<section id="corpus-information" class="level3">
+<h3 class="anchored" data-anchor-id="corpus-information">Corpus Information</h3>
+<p>A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.</p>
+<p>Date created: 2025-07-23 22:27:11<br>
+Document count: 500<br>
+Token count: 1138566<br>
+Word token count: 980144<br>
+Unique tokens: 42930<br>
+Unique word tokens: 42907<br>
+Conc Version Number: 0.1.10<br>
+spaCy model: en_core_web_sm, version 3.8.0</p>
+</section>
+<section id="using-this-corpus" class="level3">
+<h3 class="anchored" data-anchor-id="using-this-corpus">Using this corpus</h3>
+<p>Conc can be installed <a href="https://pypi.org/project/conc/">via pip</a>. The <a href="https://geoffford.nz/conc">Conc documentation site</a> has tutorials and detailed information to get you started with Conc or to work with the corpus data directly.</p>
+</section>
+<section id="cite-conc" class="level3">
+<h3 class="anchored" data-anchor-id="cite-conc">Cite Conc</h3>
+<p>If you use Conc in your work, please cite it as follows: Ford, G. (2025). Conc: a Python library for efficient corpus analysis (Version 0.1.10) [Computer software]. https://doi.org/10.5281/zenodo.16358752</p>
+</section>
+</section>
+</div>
+</div>
+<section id="corpus.json-file" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.json-file">corpus.json file</h3>
+<p>Below is the schema of the <code>corpus.json</code> file showing metadata saved with a corpus. These are loaded by Conc as attributes using <a href="https://geoffford.nz/conc/api/corpus.html#corpus.load"><code>Corpus.load</code></a> or are created when you build a corpus using <a href="https://geoffford.nz/conc/api/corpus.html#corpus.build_from_files"><code>Corpus.build_from_files</code></a> or <a href="https://geoffford.nz/conc/api/corpus.html#corpus.build_from_csv"><code>Corpus.build_from_csv</code></a>. The schema used to validate the JSON data represents the names and types of the attributes.</p>
+<div id="b1bcca47" class="cell">
+<div class="cell-output cell-output-display">
+<pre><code>{'name': {'type': 'string'},
+ 'description': {'type': 'string'},
+ 'slug': {'type': 'string'},
+ 'conc_version': {'type': 'string'},
+ 'document_count': {'type': 'integer'},
+ 'token_count': {'type': 'integer'},
+ 'word_token_count': {'type': 'integer'},
+ 'punct_token_count': {'type': 'integer'},
+ 'space_token_count': {'type': 'integer'},
+ 'unique_tokens': {'type': 'integer'},
+ 'unique_word_tokens': {'type': 'integer'},
+ 'date_created': {'type': 'string'},
+ 'EOF_TOKEN': {'type': 'integer'},
+ 'SPACY_EOF_TOKEN': {'type': 'integer'},
+ 'SPACY_MODEL': {'type': 'string'},
+ 'SPACY_MODEL_VERSION': {'type': 'string'},
+ 'punct_tokens': {'type': 'array', 'items': {'type': 'integer'}},
+ 'space_tokens': {'type': 'array', 'items': {'type': 'integer'}}}</code></pre>
+</div>
+</div>
+<p>Once you have <a href="https://geoffford.nz/conc/tutorials/recipes.html">built or loaded a corpus</a> you can access the attributes. For example …</p>
+<div id="8c8462f0" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> Corpus().load(path_to_brown_corpus) <span class="co"># loading the Brown corpus</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(corpus.name) <span class="co"># accessing the name of the corpus</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Word token count: '</span>, corpus.word_token_count) <span class="co"># access word_token_count</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Brown Corpus
+Word token count:  980144</code></pre>
+</div>
+</div>
+<p>Some of these attributes are exposed by <a href="https://geoffford.nz/conc/api/corpus.html#corpus"><code>Corpus</code></a> methods. For example …</p>
+<div id="91de59ba" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>corpus.info() <span class="co"># Polars dataframe with summary metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Attribute</th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>"Name"</td>
+<td>"Brown Corpus"</td>
+</tr>
+<tr class="even">
+<td>"Description"</td>
+<td>"A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version …</td>
+</tr>
+<tr class="odd">
+<td>"Date Created"</td>
+<td>"2025-07-23 22:27:11"</td>
+</tr>
+<tr class="even">
+<td>"Conc Version"</td>
+<td>"0.1.10"</td>
+</tr>
+<tr class="odd">
+<td>"Corpus Path"</td>
+<td>"/home/geoff/data/conc-test-corpora/brown.corpus"</td>
+</tr>
+<tr class="even">
+<td>"Document Count"</td>
+<td>"500"</td>
+</tr>
+<tr class="odd">
+<td>"Token Count"</td>
+<td>"1,138,566"</td>
+</tr>
+<tr class="even">
+<td>"Word Token Count"</td>
+<td>"980,144"</td>
+</tr>
+<tr class="odd">
+<td>"Unique Tokens"</td>
+<td>"42,930"</td>
+</tr>
+<tr class="even">
+<td>"Unique Word Tokens"</td>
+<td>"42,907"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="vocab.parquet" class="level3">
+<h3 class="anchored" data-anchor-id="vocab.parquet">vocab.parquet</h3>
+<p>The vocab parquet file contains …</p>
+<ol type="1">
+<li>A lookup between token_id, token (string representation), and tokens_sort_order. The sort order allows sorting tokens alphabetically directly from token ids.</li>
+<li>A frequency table, with counts for lower cased tokens and orthographic realisation of tokens as they appeared in the text.</li>
+<li>Information on the type of token (i.e.&nbsp;whether punctuation or space - or if neither of those, a “word” token).</li>
+</ol>
+<p>If you have loaded a corpus in Conc, you can access the vocab parquet data as a Polars dataframe like this …</p>
+<div id="54db0721" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corpus.vocab is a Polars dataframe</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>corpus.vocab.head(<span class="dv">5</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">tokens_sort_order</th>
+<th data-quarto-table-cell-role="th">token_id</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">frequency_lower</th>
+<th data-quarto-table-cell-role="th">frequency_orth</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>50087</td>
+<td>22848</td>
+<td>"the"</td>
+<td>63516</td>
+<td>62473</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>28</td>
+<td>8128</td>
+<td>","</td>
+<td>58331</td>
+<td>58331</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>41</td>
+<td>38309</td>
+<td>"."</td>
+<td>49907</td>
+<td>49907</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>35232</td>
+<td>2739</td>
+<td>"of"</td>
+<td>36321</td>
+<td>36122</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3351</td>
+<td>7126</td>
+<td>"and"</td>
+<td>27787</td>
+<td>27633</td>
+<td>false</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>You can also access the vocab data directly from the parquet file using Polars (or other libraries that support parquet).</p>
+<div id="8fb32cd1" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/vocab.parquet'</span>).head(<span class="dv">5</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">tokens_sort_order</th>
+<th data-quarto-table-cell-role="th">token_id</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">frequency_lower</th>
+<th data-quarto-table-cell-role="th">frequency_orth</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>50087</td>
+<td>22848</td>
+<td>"the"</td>
+<td>63516</td>
+<td>62473</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>28</td>
+<td>8128</td>
+<td>","</td>
+<td>58331</td>
+<td>58331</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>41</td>
+<td>38309</td>
+<td>"."</td>
+<td>49907</td>
+<td>49907</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>35232</td>
+<td>2739</td>
+<td>"of"</td>
+<td>36321</td>
+<td>36122</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3351</td>
+<td>7126</td>
+<td>"and"</td>
+<td>27787</td>
+<td>27633</td>
+<td>false</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>To illustrate how frequencies are stored, see the instances for ‘the’. The counts for the form as it appeared in the text are stored in frequency_orth. ‘The’ appears 1043 times and ‘the’ as lowercase appears 62,473 times. The frequency_lower column provides a count of the total number of mentions of ‘the’ regardless of case.</p>
+<div id="9ea6df9d" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/vocab.parquet'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'token'</span>).<span class="bu">str</span>.to_lowercase() <span class="op">==</span> <span class="st">'the'</span>).head(<span class="dv">5</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">tokens_sort_order</th>
+<th data-quarto-table-cell-role="th">token_id</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">frequency_lower</th>
+<th data-quarto-table-cell-role="th">frequency_orth</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>50087</td>
+<td>22848</td>
+<td>"the"</td>
+<td>63516</td>
+<td>62473</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>99</td>
+<td>50086</td>
+<td>15682</td>
+<td>"The"</td>
+<td>null</td>
+<td>1043</td>
+<td>false</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Punctuation is included in the token table, but these tokens can be filtered in Conc reports. If you are working with the table directly you can use <code>is_punct</code> to access or remove punctuation.</p>
+<div id="82eacaf8" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/vocab.parquet'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'is_punct'</span>) <span class="op">==</span> <span class="va">True</span>).head(<span class="dv">5</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">tokens_sort_order</th>
+<th data-quarto-table-cell-role="th">token_id</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">frequency_lower</th>
+<th data-quarto-table-cell-role="th">frequency_orth</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>28</td>
+<td>8128</td>
+<td>","</td>
+<td>58331</td>
+<td>58331</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>41</td>
+<td>38309</td>
+<td>"."</td>
+<td>49907</td>
+<td>49907</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>1577</td>
+<td>1601</td>
+<td>"`"</td>
+<td>9788</td>
+<td>9788</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>14</td>
+<td>42833</td>
+<td>"''"</td>
+<td>8762</td>
+<td>8762</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>29</td>
+<td>27963</td>
+<td>"-"</td>
+<td>8131</td>
+<td>8131</td>
+<td>true</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Conc also stores space tokens from spaCy’s tokenisation process, which are sequences of whitespace characters. Space tokens are included (without counts). Space tokens are explained in more detail below the table.</p>
+<div id="b3009bdc" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/vocab.parquet'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'is_space'</span>) <span class="op">==</span> <span class="va">True</span>).head(<span class="dv">5</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">tokens_sort_order</th>
+<th data-quarto-table-cell-role="th">token_id</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">frequency_lower</th>
+<th data-quarto-table-cell-role="th">frequency_orth</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>47165</td>
+<td>1</td>
+<td>2956</td>
+<td>" "</td>
+<td>null</td>
+<td>null</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>47166</td>
+<td>2</td>
+<td>2799</td>
+<td>" "</td>
+<td>null</td>
+<td>null</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>47167</td>
+<td>3</td>
+<td>27276</td>
+<td>" "</td>
+<td>null</td>
+<td>null</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>47168</td>
+<td>4</td>
+<td>22812</td>
+<td>" "</td>
+<td>null</td>
+<td>null</td>
+<td>false</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>47169</td>
+<td>5</td>
+<td>4112</td>
+<td>" "</td>
+<td>null</td>
+<td>null</td>
+<td>false</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<section id="a-note-about-space-tokens" class="level4">
+<h4 class="anchored" data-anchor-id="a-note-about-space-tokens">A note about space tokens</h4>
+<p>When SpaCy tokenises text it outputs whether each token is followed by a standard space character or not. Conc stores this information during build in the has_spaces column in the tokens table (see below). SpaCy also creates tokens for other whitespace sequences. Conc documentation refers to these as space tokens. Space tokens may be useful for some sequence classification problems, but more importantly for Conc - it allows re-representation of source document in their original form with newlines, tabs and sequences of whitespace preserved.</p>
+<p>Space tokens are not included in overall token counts stored in the corpus.json file.</p>
+</section>
+</section>
+<section id="tokens.parquet" class="level3">
+<h3 class="anchored" data-anchor-id="tokens.parquet">tokens.parquet</h3>
+<p>The <code>tokens.parquet</code> file contains a table representing tokens in the corpus. Whitespace tokens have been removed (see discussion of space tokens above). The tokens data can be directly accessed in Conc as a Polars dataframe …</p>
+<div id="9d2e53e5" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corpus.tokens is a Polars dataframe</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>corpus.tokens.with_row_index(<span class="st">'position'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'position'</span>).is_between(<span class="dv">99</span>, <span class="dv">104</span>)).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">orth_index</th>
+<th data-quarto-table-cell-role="th">lower_index</th>
+<th data-quarto-table-cell-role="th">token2doc_index</th>
+<th data-quarto-table-cell-role="th">has_spaces</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>99</td>
+<td>46333</td>
+<td>46333</td>
+<td>-1</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>100</td>
+<td>15682</td>
+<td>22848</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>101</td>
+<td>4361</td>
+<td>41672</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>14610</td>
+<td>29725</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>54713</td>
+<td>49998</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>45742</td>
+<td>19078</td>
+<td>1</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>You can also access the tokens data directly from the parquet file using Polars (or other libraries that support parquet).</p>
+<div id="3d2cd68c" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/tokens.parquet'</span>).with_row_index(<span class="st">'position'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'position'</span>).is_between(<span class="dv">99</span>, <span class="dv">112</span>)).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">orth_index</th>
+<th data-quarto-table-cell-role="th">lower_index</th>
+<th data-quarto-table-cell-role="th">token2doc_index</th>
+<th data-quarto-table-cell-role="th">has_spaces</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>99</td>
+<td>46333</td>
+<td>46333</td>
+<td>-1</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>100</td>
+<td>15682</td>
+<td>22848</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>101</td>
+<td>4361</td>
+<td>41672</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>14610</td>
+<td>29725</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>54713</td>
+<td>49998</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>45742</td>
+<td>19078</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>105</td>
+<td>53250</td>
+<td>53250</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>106</td>
+<td>8699</td>
+<td>35796</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>107</td>
+<td>45680</td>
+<td>45680</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>108</td>
+<td>30305</td>
+<td>30305</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="odd">
+<td>109</td>
+<td>2739</td>
+<td>2739</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>110</td>
+<td>38486</td>
+<td>35571</td>
+<td>1</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>111</td>
+<td>49732</td>
+<td>49732</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr class="even">
+<td>112</td>
+<td>42720</td>
+<td>42720</td>
+<td>1</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The columns are as follows:</p>
+<ul>
+<li>the <code>orth_index</code> column stores the token_id of the original form of the token</li>
+<li>the <code>lower_index</code> column stores the token_id of the lowercased form of the token<br>
+</li>
+<li>the <code>token2doc_index</code> column stores the document id assigned by Conc in the order the texts where processed (starting from index position 1) - this is the same order as the metadata in the <code>metadata.parquet</code> file.</li>
+<li>the <code>has_spaces</code> column stores a boolean value indicating if the token is followed by a standard space character or not.</li>
+</ul>
+<p>To demarcate the start and end of documents, Conc uses an end of file token (EOF_TOKEN) in the orth_index and lower_index columns. The EOF_TOKEN is stored in <code>corpus.json</code> and is accessible as an attribute of a <a href="https://geoffford.nz/conc/api/corpus.html#corpus"><code>Corpus</code></a> object.</p>
+<p>The token2doc_index represents token positions outside texts in the corpus as -1.</p>
+<p>The view below shows tokens joined with vocab, so you can see the token string and the attributes of the tokens.</p>
+<div id="ec7d4576" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/tokens.parquet'</span>).with_row_index(<span class="st">'position'</span>).<span class="bu">filter</span>(pl.col(<span class="st">'position'</span>).is_between(<span class="dv">99</span>, <span class="dv">121</span>)).join(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/vocab.parquet'</span>).select(pl.col(<span class="st">'token_id'</span>), pl.col(<span class="st">'token'</span>), pl.col(<span class="st">'is_punct'</span>), pl.col(<span class="st">'is_space'</span>)),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    left_on<span class="op">=</span><span class="st">'orth_index'</span>, right_on<span class="op">=</span><span class="st">'token_id'</span>, how<span class="op">=</span><span class="st">'left'</span>, maintain_order<span class="op">=</span><span class="st">'left'</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">orth_index</th>
+<th data-quarto-table-cell-role="th">lower_index</th>
+<th data-quarto-table-cell-role="th">token2doc_index</th>
+<th data-quarto-table-cell-role="th">has_spaces</th>
+<th data-quarto-table-cell-role="th">token</th>
+<th data-quarto-table-cell-role="th">is_punct</th>
+<th data-quarto-table-cell-role="th">is_space</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>99</td>
+<td>46333</td>
+<td>46333</td>
+<td>-1</td>
+<td>false</td>
+<td>" conc-end-of-file-token"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>100</td>
+<td>15682</td>
+<td>22848</td>
+<td>1</td>
+<td>true</td>
+<td>"The"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>101</td>
+<td>4361</td>
+<td>41672</td>
+<td>1</td>
+<td>true</td>
+<td>"Fulton"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>102</td>
+<td>14610</td>
+<td>29725</td>
+<td>1</td>
+<td>true</td>
+<td>"County"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>103</td>
+<td>54713</td>
+<td>49998</td>
+<td>1</td>
+<td>true</td>
+<td>"Grand"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>104</td>
+<td>45742</td>
+<td>19078</td>
+<td>1</td>
+<td>true</td>
+<td>"Jury"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>105</td>
+<td>53250</td>
+<td>53250</td>
+<td>1</td>
+<td>true</td>
+<td>"said"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>106</td>
+<td>8699</td>
+<td>35796</td>
+<td>1</td>
+<td>true</td>
+<td>"Friday"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>107</td>
+<td>45680</td>
+<td>45680</td>
+<td>1</td>
+<td>true</td>
+<td>"an"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>108</td>
+<td>30305</td>
+<td>30305</td>
+<td>1</td>
+<td>true</td>
+<td>"investigation"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>109</td>
+<td>2739</td>
+<td>2739</td>
+<td>1</td>
+<td>true</td>
+<td>"of"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>110</td>
+<td>38486</td>
+<td>35571</td>
+<td>1</td>
+<td>false</td>
+<td>"Atlanta"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>111</td>
+<td>49732</td>
+<td>49732</td>
+<td>1</td>
+<td>true</td>
+<td>"'s"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>112</td>
+<td>42720</td>
+<td>42720</td>
+<td>1</td>
+<td>true</td>
+<td>"recent"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>113</td>
+<td>12294</td>
+<td>12294</td>
+<td>1</td>
+<td>true</td>
+<td>"primary"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>114</td>
+<td>29461</td>
+<td>29461</td>
+<td>1</td>
+<td>true</td>
+<td>"election"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>115</td>
+<td>42473</td>
+<td>42473</td>
+<td>1</td>
+<td>true</td>
+<td>"produced"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>116</td>
+<td>1601</td>
+<td>1601</td>
+<td>1</td>
+<td>false</td>
+<td>"`"</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>117</td>
+<td>1601</td>
+<td>1601</td>
+<td>1</td>
+<td>true</td>
+<td>"`"</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>118</td>
+<td>39507</td>
+<td>39507</td>
+<td>1</td>
+<td>true</td>
+<td>"no"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>119</td>
+<td>9335</td>
+<td>9335</td>
+<td>1</td>
+<td>true</td>
+<td>"evidence"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>120</td>
+<td>42833</td>
+<td>42833</td>
+<td>1</td>
+<td>true</td>
+<td>"''"</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>121</td>
+<td>13607</td>
+<td>13607</td>
+<td>1</td>
+<td>true</td>
+<td>"that"</td>
+<td>false</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="spaces.parquet" class="level3">
+<h3 class="anchored" data-anchor-id="spaces.parquet">spaces.parquet</h3>
+<p>Space tokens (see note above) are stored in <code>spaces.parquet</code>. Space tokens are stored separate from word and punctuation tokens. This allows consistency with most tools for corpus linguistics. The spaces table follows the format of the tokens table. Spaces are represented using <code>position</code> and the corresponding token_id of the whitespace. The original token sequences can be reconstructed from the <code>tokens.parquet</code> and <code>spaces.parquet</code> files. Conc has functionality to recover specific texts by recombining the data.</p>
+<p>From Conc …</p>
+<div id="9b4fe92a" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corpus.spaces is a Polars dataframe</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>corpus.spaces.head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">orth_index</th>
+<th data-quarto-table-cell-role="th">lower_index</th>
+<th data-quarto-table-cell-role="th">token2doc_index</th>
+<th data-quarto-table-cell-role="th">has_spaces</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>100</td>
+<td>27276</td>
+<td>27276</td>
+<td>1</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>345</td>
+<td>2956</td>
+<td>2956</td>
+<td>1</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>637</td>
+<td>2956</td>
+<td>2956</td>
+<td>1</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Directly accessing the parquet file …</p>
+<div id="e1d22e6d" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/spaces.parquet'</span>).head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">orth_index</th>
+<th data-quarto-table-cell-role="th">lower_index</th>
+<th data-quarto-table-cell-role="th">token2doc_index</th>
+<th data-quarto-table-cell-role="th">has_spaces</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>100</td>
+<td>27276</td>
+<td>27276</td>
+<td>1</td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>345</td>
+<td>2956</td>
+<td>2956</td>
+<td>1</td>
+<td>false</td>
+</tr>
+<tr class="odd">
+<td>637</td>
+<td>2956</td>
+<td>2956</td>
+<td>1</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="puncts.parquet" class="level3">
+<h3 class="anchored" data-anchor-id="puncts.parquet">puncts.parquet</h3>
+<p>The <code>puncts.parquet</code> file stores an index of the position of punctuation tokens in the corpus. Below are the first three rows of a <code>puncts.parquet</code> file. If you look above the positions align with punctuation tokens in the tokens.parquet file. These are intended to be used for filtering tokens to exclude punctuation where necessary.</p>
+<p>From Conc …</p>
+<div id="4732f429" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corpus.puncts is a Polars dataframe</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>corpus.puncts.head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>116</td>
+</tr>
+<tr class="even">
+<td>117</td>
+</tr>
+<tr class="odd">
+<td>120</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Directly from the parquet file …</p>
+<div id="b3c9cfdc" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_brown_corpus<span class="sc">}</span><span class="ss">/puncts.parquet'</span>).head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">position</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>116</td>
+</tr>
+<tr class="even">
+<td>117</td>
+</tr>
+<tr class="odd">
+<td>120</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="metadata.parquet" class="level3">
+<h3 class="anchored" data-anchor-id="metadata.parquet">metadata.parquet</h3>
+<p>The <code>metadata.parquet</code> should not be confused with the metadata of the corpus itself, which is accessible via <code>corpus.json</code>.</p>
+<p>If populated, the <code>metadata.parquet</code> file contains metadata for each document in the corpus.</p>
+<p>From Conc you can access the metadata dataframe …</p>
+<div id="91d92a7e" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> Corpus().load(path_to_congress_corpus) <span class="co"># loading a corpus with some metadata!</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>corpus.metadata.head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">speech_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">speaker</th>
+<th data-quarto-table-cell-role="th">chamber</th>
+<th data-quarto-table-cell-role="th">state</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>530182158</td>
+<td>"1895-01-10T00:00:00.000000"</td>
+<td>"Mr. COCKRELL"</td>
+<td>"S"</td>
+<td>"Unknown"</td>
+</tr>
+<tr class="even">
+<td>890274849</td>
+<td>"1966-08-31T00:00:00.000000"</td>
+<td>"Mr. LONG of Louisiana"</td>
+<td>"S"</td>
+<td>"Louisiana"</td>
+</tr>
+<tr class="odd">
+<td>880088363</td>
+<td>"1963-09-11T00:00:00.000000"</td>
+<td>"Mr. FULBRIGHT"</td>
+<td>"S"</td>
+<td>"Unknown"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Directly from the parquet file …</p>
+<div id="01c7aa94" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>path_to_congress_corpus<span class="sc">}</span><span class="ss">/metadata.parquet'</span>).head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">speech_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">speaker</th>
+<th data-quarto-table-cell-role="th">chamber</th>
+<th data-quarto-table-cell-role="th">state</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>530182158</td>
+<td>"1895-01-10T00:00:00.000000"</td>
+<td>"Mr. COCKRELL"</td>
+<td>"S"</td>
+<td>"Unknown"</td>
+</tr>
+<tr class="even">
+<td>890274849</td>
+<td>"1966-08-31T00:00:00.000000"</td>
+<td>"Mr. LONG of Louisiana"</td>
+<td>"S"</td>
+<td>"Louisiana"</td>
+</tr>
+<tr class="odd">
+<td>880088363</td>
+<td>"1963-09-11T00:00:00.000000"</td>
+<td>"Mr. FULBRIGHT"</td>
+<td>"S"</td>
+<td>"Unknown"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Metadata is represented in the same order as documents are stored in the <code>tokens.parquet</code> file. The tokens with token2doc_index 1 correspond to the first metadata row.</p>
+<p>For corpora created from files using the <a href="https://geoffford.nz/conc/api/corpus.html#corpus.build_from_files"><code>Corpus.build_from_files</code></a> method, there will always be a field for the source file at the time of creation.</p>
+<div id="1b0fb134" class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> Corpus().load(path_to_gardenparty_corpus)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>display(pl.scan_parquet(<span class="ss">f'</span><span class="sc">{</span>corpus<span class="sc">.</span>corpus_path<span class="sc">}</span><span class="ss">/metadata.parquet'</span>).head(<span class="dv">3</span>).collect(engine<span class="op">=</span><span class="st">'streaming'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">file</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>"an-ideal-family.txt"</td>
+</tr>
+<tr class="even">
+<td>"at-the-bay.txt"</td>
+</tr>
+<tr class="odd">
+<td>"bank-holiday.txt"</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/geoffford\.nz\/conc");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/polsci/conc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

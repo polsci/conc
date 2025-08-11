@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Functionality for concordance analysis.">
+
+<title>concordance – conc</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../conc-favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-e16dd29f819a46fcdaa82e3575888691.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var sidebar = document.getElementsByClassName('sidebar-menu-container')[0];
+    var logo = document.createElement('div');
+    logo.className = 'sidebar-info';
+    logo.innerHTML = '<a href="https://geoffford.nz/"><img src="https://geoffford.nz/assets/images/geoff-icon.png" alt="Geoff Ford"></a>';
+    var textLink = document.createElement('a');
+    textLink.className = 'sidebar-info-text';
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "Author: Dr Geoff Ford";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    var textLink = document.createElement('a');
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "↪ Main Website";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    sidebar.prepend(logo);
+  });
+</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="concordance – conc">
+<meta property="og:description" content="Functionality for concordance analysis.">
+<meta property="og:site_name" content="conc">
+<meta name="twitter:title" content="concordance – conc">
+<meta name="twitter:description" content="Functionality for concordance analysis.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="https://geoffford.nz/assets/images/conc/conc.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">conc</span>
+    </a>
+  </div>
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/polsci/conc"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          <div class="quarto-navbar-tools">
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/index.html">API</a></li><li class="breadcrumb-item"><a href="../api/concordance.html">concordance</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Conc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Get Started with Conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quick Conc Recipes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installing Conc</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../explanations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/why.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why Conc?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/anatomy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Anatomy of a corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../development/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Development</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/releases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Releases</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/roadmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roadmap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/developer_guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer Guide</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/conc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/listcorpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">listcorpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpora.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpora</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/frequency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">frequency</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/ngrams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ngrams</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/concordance.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">concordance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/keyness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">keyness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/collocates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">collocates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/result.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">result</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/index.html">API</a></li><li class="breadcrumb-item"><a href="../api/concordance.html">concordance</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">concordance</h1>
+</div>
+
+<div>
+  <div class="description">
+    Functionality for concordance analysis.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="using-the-concordance-class" class="level2">
+<h2 class="anchored" data-anchor-id="using-the-concordance-class">Using the Concordance class</h2>
+<p>There are examples below showing how to use the Concordance class directly to output concordances or concordance plots. The recommended way to use this functionality is through the <a href="https://geoffford.nz/conc/api/conc.html">Conc</a> class. This provides an interface to create frequency lists, concordances, collocation tables, keyword tables and more.</p>
+</section>
+<section id="concordance-class-api-reference" class="level2">
+<h2 class="anchored" data-anchor-id="concordance-class-api-reference">Concordance class API reference</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/concordance.py#L25" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="concordance" class="level3">
+<h3 class="anchored" data-anchor-id="concordance">Concordance</h3>
+<blockquote class="blockquote">
+<pre><code> Concordance (corpus:conc.corpus.Corpus)</code></pre>
+</blockquote>
+<p><em>Class for concordancing.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>corpus</td>
+<td>Corpus</td>
+<td>Corpus instance</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-6" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the corpus</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>brown <span class="op">=</span> Corpus(<span class="st">'brown'</span>).load(path_to_brown_corpus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-7" class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instantiate the Concordance class</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>report_brown <span class="op">=</span> Concordance(brown)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/concordance.py#L201" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="concordance.concordance" class="level3">
+<h3 class="anchored" data-anchor-id="concordance.concordance">Concordance.concordance</h3>
+<blockquote class="blockquote">
+<pre><code> Concordance.concordance (token_str:str, context_length:int=5,
+                          order:str='1R2R3R', page_size:int=20,
+                          page_current:int=1, show_all_columns:bool=False,
+                          use_cache:bool=True,
+                          ignore_punctuation:bool=True,
+                          filter_context_str:str|None=None,
+                          filter_context_length:int|tuple[int,int]=5)</code></pre>
+</blockquote>
+<p><em>Report concordance for a token string.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_str</td>
+<td>str</td>
+<td></td>
+<td>token string to get concordance for</td>
+</tr>
+<tr class="even">
+<td>context_length</td>
+<td>int</td>
+<td>5</td>
+<td>number of words to show on left and right of token string</td>
+</tr>
+<tr class="odd">
+<td>order</td>
+<td>str</td>
+<td>1R2R3R</td>
+<td>order of sort columns - one of 1L2L3L, 3L2L1L, 2L1L1R, 1L1R2R, 1R2R3R, LEFT, RIGHT</td>
+</tr>
+<tr class="even">
+<td>page_size</td>
+<td>int</td>
+<td>20</td>
+<td>number of results to display per results page</td>
+</tr>
+<tr class="odd">
+<td>page_current</td>
+<td>int</td>
+<td>1</td>
+<td>current page of results</td>
+</tr>
+<tr class="even">
+<td>show_all_columns</td>
+<td>bool</td>
+<td>False</td>
+<td>df with all columns or just essentials</td>
+</tr>
+<tr class="odd">
+<td>use_cache</td>
+<td>bool</td>
+<td>True</td>
+<td>retrieve the results from cache if available (currently ignored)</td>
+</tr>
+<tr class="even">
+<td>ignore_punctuation</td>
+<td>bool</td>
+<td>True</td>
+<td>whether to ignore punctuation in the concordance sort</td>
+</tr>
+<tr class="odd">
+<td>filter_context_str</td>
+<td>str | None</td>
+<td>None</td>
+<td>if a string is provided, the concordance lines will be filtered to show lines with contexts containing this string</td>
+</tr>
+<tr class="even">
+<td>filter_context_length</td>
+<td>int | tuple[int, int]</td>
+<td>5</td>
+<td>ignored if filter_context_str is None, otherwise this is the context window size per side in tokens - if an int (e.g.&nbsp;5) context lengths on left and right will be the same, for independent control of left and right context length pass a tuple (context_length_left, context_left_right)</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>Result</strong></td>
+<td></td>
+<td><strong>concordance report results</strong></td>
+</tr>
+</tbody>
+</table>
+<p>When configuring <code>order</code>, you can use <code>LEFT</code> as a shortcut for <code>1L2L3L</code> and <code>RIGHT</code> as a shortcut for <code>1R2R3R</code>.</p>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<p>See the note above about accessing this functionality through the <a href="https://geoffford.nz/conc/api/conc.html">Conc</a> class.</p>
+<div id="cell-11" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>report_brown.concordance(<span class="st">'good at'</span>, context_length <span class="op">=</span> <span class="dv">10</span>, order<span class="op">=</span><span class="st">'1R2R3R'</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="worhtjjqih" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#worhtjjqih table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#worhtjjqih thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#worhtjjqih p { margin: 0; padding: 0; }
+ #worhtjjqih .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: 0; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #worhtjjqih .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #worhtjjqih .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #worhtjjqih .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #worhtjjqih .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #worhtjjqih .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #worhtjjqih .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #worhtjjqih .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #worhtjjqih .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #worhtjjqih .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #worhtjjqih .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #worhtjjqih .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #worhtjjqih .gt_spanner_row { border-bottom-style: hidden; }
+ #worhtjjqih .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #worhtjjqih .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #worhtjjqih .gt_from_md> :first-child { margin-top: 0; }
+ #worhtjjqih .gt_from_md> :last-child { margin-bottom: 0; }
+ #worhtjjqih .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #worhtjjqih .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #worhtjjqih .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #worhtjjqih .gt_row_group_first td { border-top-width: 2px; }
+ #worhtjjqih .gt_row_group_first th { border-top-width: 2px; }
+ #worhtjjqih .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #worhtjjqih .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #worhtjjqih .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #worhtjjqih .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #worhtjjqih .gt_left { text-align: left; }
+ #worhtjjqih .gt_center { text-align: center; }
+ #worhtjjqih .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #worhtjjqih .gt_font_normal { font-weight: normal; }
+ #worhtjjqih .gt_font_bold { font-weight: bold; }
+ #worhtjjqih .gt_font_italic { font-style: italic; }
+ #worhtjjqih .gt_super { font-size: 65%; }
+ #worhtjjqih .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #worhtjjqih .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="4" class="gt_heading gt_title gt_font_normal">Concordance for "good at"</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Brown Corpus, Context tokens: 10, Order: 1R2R3R</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Doc-Id" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Doc Id</th>
+<th id="Left" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Left</th>
+<th id="Node" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Node</th>
+<th id="Right" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Right</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">484</td>
+<td class="gt_row gt_right">about twenty miles away , and he was also pretty</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">anything in the carpentry line . was a vivid ,</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">263</td>
+<td class="gt_row gt_right">he says , ' as a storyteller and was precociously</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">description , dialogue , and most of the other staples</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">479</td>
+<td class="gt_row gt_right">and not a method of passing the day . was</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">his job . probably was n't hard for him to</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">474</td>
+<td class="gt_row gt_right">trying to flatter her vanity . You must have been</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">history at school . did you go to school ''</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">82</td>
+<td class="gt_row gt_right">enough of unequal merit , but all of them pretty</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">that . consisted of a new arrangement of ` `</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">474</td>
+<td class="gt_row gt_right">Why not '' ? ? said . I 'm not</td>
+<td class="gt_row gt_center">good at</td>
+<td class="gt_row gt_left">that kind of thing '' . This afternoon let 's</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Total Concordance Lines: 6</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Total Documents: 5</td>
+</tr>
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote">Showing 6 lines</td>
+</tr>
+<tr class="even">
+<td colspan="4" class="gt_sourcenote">Page 1 of 1</td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/concordance.py#L623" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+</section>
+<section id="concordance.concordance_plot" class="level3">
+<h3 class="anchored">Concordance.concordance_plot</h3>
+<blockquote class="blockquote">
+<pre><code> Concordance.concordance_plot (token_str:str, page_size:int=10,
+                               append_info:bool=True)</code></pre>
+</blockquote>
+<p><em>Create a concordance plot.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_str</td>
+<td>str</td>
+<td></td>
+<td>token string for concordance plot</td>
+</tr>
+<tr class="even">
+<td>page_size</td>
+<td>int</td>
+<td>10</td>
+<td>number of plots per page</td>
+</tr>
+<tr class="odd">
+<td>append_info</td>
+<td>bool</td>
+<td>True</td>
+<td>append token position info to the concordance line preview screens visible when hover over the plot lines</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Plot</strong></td>
+<td></td>
+<td><strong>concordance plot object, add .display() to view in notebook</strong></td>
+</tr>
+</tbody>
+</table>
+<section id="examples-1" class="level4">
+<h4 class="anchored">Examples</h4>
+<p>See the note above about accessing this functionality through the <a href="https://geoffford.nz/conc/api/conc.html">Conc</a> class.</p>
+<div id="cell-14" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>conc_reuters.concordance_plot(token_str<span class="op">=</span><span class="st">'cause'</span>, page_size<span class="op">=</span><span class="dv">10</span>, append_info<span class="op">=</span><span class="va">True</span>).display()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script>
+var concplot_711e1a5b90095a450aa6431365004778 = {
+eof_token: 63132,
+page_size: 10,
+append_info: true,
+row_height: 60,
+start_first_row_at: 30,
+row_adjustment: 30,
+default_font_size: 12,
+subplot_height: 40,
+plot_height: 610,
+plot_x: 160,
+label_x_right: 150,
+docs: [{"doc_id":19,"positions":[444],"count":496},{"doc_id":112,"positions":[94],"count":700},{"doc_id":204,"positions":[77],"count":215},{"doc_id":220,"positions":[356],"count":601},{"doc_id":280,"positions":[151],"count":668},{"doc_id":291,"positions":[238],"count":331},{"doc_id":388,"positions":[619],"count":679},{"doc_id":432,"positions":[349],"count":501},{"doc_id":445,"positions":[662],"count":672},{"doc_id":618,"positions":[61],"count":216},{"doc_id":651,"positions":[37],"count":118},{"doc_id":690,"positions":[663],"count":960},{"doc_id":1158,"positions":[46],"count":308},{"doc_id":1222,"positions":[290],"count":447},{"doc_id":1491,"positions":[4,23,88],"count":264},{"doc_id":1669,"positions":[151],"count":202},{"doc_id":1740,"positions":[371],"count":533},{"doc_id":1776,"positions":[101],"count":109},{"doc_id":1785,"positions":[99],"count":107},{"doc_id":1802,"positions":[148,334],"count":426},{"doc_id":1864,"positions":[239],"count":305},{"doc_id":2136,"positions":[127],"count":208},{"doc_id":2195,"positions":[365],"count":509},{"doc_id":2235,"positions":[77],"count":128},{"doc_id":2238,"positions":[9,21],"count":23},{"doc_id":2242,"positions":[5,18,58],"count":533},{"doc_id":2244,"positions":[218],"count":306},{"doc_id":2260,"positions":[73],"count":123},{"doc_id":2336,"positions":[353],"count":703},{"doc_id":2466,"positions":[486],"count":708},{"doc_id":2614,"positions":[54],"count":207},{"doc_id":3177,"positions":[205],"count":684},{"doc_id":3180,"positions":[210],"count":572},{"doc_id":3238,"positions":[299],"count":922},{"doc_id":3274,"positions":[348],"count":657},{"doc_id":3460,"positions":[391],"count":845},{"doc_id":3484,"positions":[177],"count":190},{"doc_id":3515,"positions":[113],"count":125},{"doc_id":3517,"positions":[391],"count":845},{"doc_id":3623,"positions":[142],"count":174},{"doc_id":3733,"positions":[180],"count":245},{"doc_id":3839,"positions":[286],"count":375},{"doc_id":3988,"positions":[266],"count":532},{"doc_id":4127,"positions":[78],"count":111},{"doc_id":4150,"positions":[631],"count":644},{"doc_id":4297,"positions":[169],"count":339},{"doc_id":4328,"positions":[472],"count":705},{"doc_id":4381,"positions":[11],"count":127},{"doc_id":4403,"positions":[71],"count":164},{"doc_id":4409,"positions":[271],"count":463},{"doc_id":4595,"positions":[203],"count":229},{"doc_id":4611,"positions":[169],"count":264},{"doc_id":4643,"positions":[91],"count":98},{"doc_id":4853,"positions":[139],"count":166},{"doc_id":4916,"positions":[57],"count":73},{"doc_id":5091,"positions":[163],"count":277},{"doc_id":5160,"positions":[153],"count":326},{"doc_id":5168,"positions":[360],"count":756},{"doc_id":5380,"positions":[11,24],"count":25},{"doc_id":5393,"positions":[29,102],"count":129},{"doc_id":5539,"positions":[103],"count":552},{"doc_id":5578,"positions":[26,143],"count":570},{"doc_id":5614,"positions":[642],"count":738},{"doc_id":5655,"positions":[259],"count":518},{"doc_id":5717,"positions":[192,356],"count":547},{"doc_id":5815,"positions":[161],"count":206},{"doc_id":5864,"positions":[642],"count":740},{"doc_id":6094,"positions":[102],"count":148},{"doc_id":6163,"positions":[2],"count":456},{"doc_id":6215,"positions":[480],"count":509},{"doc_id":6223,"positions":[190],"count":353},{"doc_id":6227,"positions":[92],"count":187},{"doc_id":6283,"positions":[260],"count":426},{"doc_id":6357,"positions":[398],"count":815},{"doc_id":6437,"positions":[227],"count":296},{"doc_id":6451,"positions":[350],"count":562},{"doc_id":6565,"positions":[110],"count":342},{"doc_id":6566,"positions":[269],"count":429},{"doc_id":7037,"positions":[92],"count":378},{"doc_id":7134,"positions":[125],"count":252},{"doc_id":7246,"positions":[221],"count":749},{"doc_id":7328,"positions":[417],"count":714},{"doc_id":7344,"positions":[472],"count":850},{"doc_id":7550,"positions":[374],"count":490},{"doc_id":7664,"positions":[129],"count":476},{"doc_id":7671,"positions":[202],"count":321},{"doc_id":7884,"positions":[140],"count":554},{"doc_id":8288,"positions":[371],"count":628},{"doc_id":8315,"positions":[377],"count":784},{"doc_id":8338,"positions":[33,515],"count":786},{"doc_id":8582,"positions":[277],"count":313},{"doc_id":8630,"positions":[1072],"count":1172},{"doc_id":8911,"positions":[436],"count":746},{"doc_id":8978,"positions":[64,116],"count":260},{"doc_id":9053,"positions":[249],"count":465},{"doc_id":9166,"positions":[576],"count":841},{"doc_id":9200,"positions":[94],"count":176},{"doc_id":9209,"positions":[467],"count":841},{"doc_id":9240,"positions":[94],"count":176},{"doc_id":9365,"positions":[306],"count":409},{"doc_id":9463,"positions":[87],"count":134},{"doc_id":9561,"positions":[55],"count":94},{"doc_id":9574,"positions":[209,230],"count":372},{"doc_id":9591,"positions":[356],"count":840},{"doc_id":9608,"positions":[26],"count":318},{"doc_id":9622,"positions":[214],"count":290},{"doc_id":9628,"positions":[209,230],"count":372},{"doc_id":9647,"positions":[55],"count":125},{"doc_id":9772,"positions":[520],"count":623},{"doc_id":9876,"positions":[332],"count":410},{"doc_id":9906,"positions":[193],"count":260},{"doc_id":9975,"positions":[249],"count":272},{"doc_id":10003,"positions":[225],"count":292},{"doc_id":10051,"positions":[27],"count":213},{"doc_id":10112,"positions":[14],"count":231},{"doc_id":10180,"positions":[190],"count":371},{"doc_id":10182,"positions":[161],"count":739},{"doc_id":10443,"positions":[191],"count":651},{"doc_id":10458,"positions":[820],"count":827},{"doc_id":10485,"positions":[249],"count":272},{"doc_id":10525,"positions":[113],"count":397}],
+tokens: {"24":"number","27":"root","111":"designed","400":"loss","405":"lead","546":"Netherlands","631":"fire","638":"present","791":"salmonella","1050":"acreages","1940":"not","2016":"gap","2200":"drop","2568":"less","2997":"reevaluate","3021":"SALMONELLA","3280":"CAUSE","3445":"delay","3805":"of","4821":"delegate","5240":"increase","5358":"war","5553":"rise","5863":"plummet","5999":"explosion","6230":"Center","6858":"panic","6931":"he","7482":"inflows","7553":"disruption","7971":"policy","8083":"establish","8137":"output","8284":"this","8459":"longer","8478":"investments","8558":"housing","8591":"production","8969":"more","9410":"RISES","9421":"personnel","9490":"and","9586":"cause","9622":"hardship","9788":"forfeitures","10014":"depressions","10530":"El","10696":"provisiion","10743":",","10962":"private","10982":"retaliation","11365":"basic","11383":"INFLATION","11395":"large","11525":"depressed","11535":"embarrassment","11589":"March","12053":"until","12378":"threaten","12439":"in","12781":"extinguished","12918":"deterioration","13258":"issuers","13321":"falls","13596":"MAJOR","13638":"combination","14086":"is","14843":"extraordinary","15155":"nor","15460":"or","15684":"to","16352":"primary","16437":"change","16944":"ATPC","16949":"February","17121":"disinflation","17469":"rising","17555":"their","17920":"foreign","17923":"act","18130":"that","18133":"investors","18472":"continues","18485":"problem","18690":"term","19222":"bonds","19475":"without","19499":"base","19728":"gave","19769":"saturated","20173":"nation","20407":"rises","20488":"us","20751":"are","20939":"The","21390":"3.2","21619":"those","22529":"imports","22581":"reserves","22691":"warship","23006":"idea","23108":"next","23321":"on","23827":"slack","23951":"disease","24425":"Noranda","24482":"alarm","24707":"dollar","24940":"firm","25223":"There","25308":"recession","25728":"directors","25906":"rain","26387":"RATE","26685":"these","26770":"dislocation","26788":"start","26827":"damage","27038":"collateral","27108":"voting","27293":"full","27315":"plan","27419":"can","27875":"likely","27966":"falloff","28024":"toxicity","28317":"STRIKES","28569":"company","28939":"would","28975":"some","29130":"slight","29181":"electric","29213":"which","29230":"fats","29392":"oil","30071":"another","30163":"must","30259":"MAIN","30321":"extreme","30480":"daily","30617":"normally","30719":"the","30765":"as","30791":"conflicts","30815":"sufficient","30992":"could","31130":"dilution","31502":"poisoning","32085":"gain","32112":"decisions","32472":"It","32993":"them","33118":"go","33431":"surplus","33543":"case","33961":"oats","34021":"monetary","34259":"Chinese","34406":"major","34778":"competitive","35509":"often","35547":"widespread","35575":"92","35890":"pollution","35982":"lifting","36037":"July","36488":"stem","36692":"great","36735":"Argentina","36800":"tension","36860":"BRAZIL","36886":"loan","36892":"business","37486":"might","37542":"decline","37837":"-","38955":"substantial","39228":"significant","39269":"principal","39276":"years","39483":"plantations","39498":"very","39616":"were","39715":"court","39764":"fiscal","39909":"single","39940":"attack","40062":"nervousness","40448":"little","40698":"needed","41022":"was","41136":"rates","41225":"OFFICIAL","41830":"entries","42018":"Ecuador","42277":"it","42278":"chief","42498":"should","42612":"last","42852":"be","43050":"unknown","43305":"Nino","43346":"--","43478":"intense","43616":"trust","43718":"NOT","43960":"supported","44217":"GOVERNMENT","45369":"Antilles","45598":"Rises","45728":"resulting","45814":"under","46099":"flows","46114":"stance","46664":"further","47373":"collapse","48066":"precise","48136":"main","48243":"at","48352":"DOM","48435":"two","48936":"tire","49230":"a","49645":"common","49870":"dissatisfaction","49955":"also","50762":"revision","50889":"SAYS","50977":"Poehl","51184":"problems","51260":"heart","51390":"if","51652":"with","51674":"been","51984":"feed","51995":"starts","52093":"prices","52211":".","52552":"utilities","52907":"FOR","53514":"had","53706":"overproduction","53835":"factors","53889":"no","54219":"order","54253":"any","54385":"extent","54831":"devalued","54864":"fighting","55155":"helped","55354":"DOLLAR","55412":"domestic","55565":"situation","56054":"exchange","56084":"did","56117":"acreage","56377":"oxide","56435":"frequently","56700":"lenders","57117":"PROBLEMS","58137":"low","58443":"COULD","59343":"may","59383":"inflation","59861":"marked","60690":"trade","60761":"pinpoint","61086":"worker","61316":"economy","61340":"trend","61421":"year","61564":"month","61627":"rot","61701":"profits","61738":"demand","62273":"an","62730":"Bank","62878":"equity","63030":"expected","63132":" conc-end-of-file-token","63518":"growth","63866":"capital","64002":"stock","64163":"deliberately","64696":"targets","65605":"\"","65779":"Edinburgh","66024":"DROP","66250":"for","66274":"reach","66522":"factor","66667":"dilutive","66792":"during","66920":"ARE","67394":"local","67597":"concern","67756":"industry","67842":"'s","67871":"shifts","67926":"aggressive","68036":"Speculative","68579":"U.S.","68955":"devaluation","68973":"TREASURY","69101":"serious","69259":"economic","69807":"remove","69876":"cases","69954":"exact","70277":"breakdown","70596":"markets","70882":"now","71218":"halt","71654":"even","71889":"threatened","72632":"aggregates","72663":"said","73229":"steel","73467":"rate","73525":"losses","73595":"program","73694":"death","74110":"CONCERN","74529":"pod","74921":"bond","75084":"Fed","75351":"size","75654":"will","75776":"EC","76095":"disorders","76219":"observers"},
+examples: [{"doc_id":19,"orth_indices":[[30719,33431,28939,9586,59383,9490,405]]},{"doc_id":112,"orth_indices":[[43478,25906,30992,9586,8969,26827,15684]]},{"doc_id":204,"orth_indices":[[6230,9490,75654,9586,49230,400,66250]]},{"doc_id":220,"orth_indices":[[30321,69876,27419,9586,73694,10743,14086]]},{"doc_id":280,"orth_indices":[[68036,7482,30992,9586,34021,72632,15684]]},{"doc_id":291,"orth_indices":[[63866,7482,59343,9586,34021,63518,10743]]},{"doc_id":388,"orth_indices":[[36037,29213,59343,9586,28975,40062,12439]]},{"doc_id":432,"orth_indices":[[30992,42852,49230,9586,3805,59383,10743]]},{"doc_id":445,"orth_indices":[[10743,29213,42498,9586,73229,22529,15684]]},{"doc_id":618,"orth_indices":[[24425,72663,30719,9586,9490,27293,54385]]},{"doc_id":651,"orth_indices":[[24425,72663,30719,9586,9490,27293,54385]]},{"doc_id":690,"orth_indices":[[12053,30719,27,9586,3805,30719,60690]]},{"doc_id":1158,"orth_indices":[[6931,72663,30992,9586,49230,25308,23108]]},{"doc_id":1222,"orth_indices":[[67871,39616,30719,9586,3805,30719,5240]]},{"doc_id":1491,"orth_indices":[[43718,30259,3021,3280,10743,41225,50889],[2568,56435,30719,9586,3805,791,31502],[31502,15155,30719,9586,3805,62273,5240]]},{"doc_id":1669,"orth_indices":[[8284,75351,30992,9586,49230,2016,12439]]},{"doc_id":1740,"orth_indices":[[42277,28939,1940,9586,54253,37542,12439]]},{"doc_id":1776,"orth_indices":[[30719,71218,28939,9586,30480,73525,3805]]},{"doc_id":1785,"orth_indices":[[30719,71218,28939,9586,30480,73525,3805]]},{"doc_id":1802,"orth_indices":[[12439,59383,75654,9586,49230,27966,12439],[14086,27875,15684,9586,8558,51995,15684]]},{"doc_id":1864,"orth_indices":[[8284,61421,30992,9586,30719,16944,15684]]},{"doc_id":2136,"orth_indices":[[546,45369,59343,9586,74921,13258,15684]]},{"doc_id":2195,"orth_indices":[[48936,28939,1940,9586,20488,15684,2997]]},{"doc_id":2235,"orth_indices":[[66522,18130,59343,9586,20407,12439,52093]]},{"doc_id":2238,"orth_indices":[[73467,20407,20751,9586,66250,67597,50977],[73467,20407,20751,9586,66250,67597,63132]]},{"doc_id":2242,"orth_indices":[[26387,9410,66920,3280,52907,74110,45598],[41136,20751,49230,9586,66250,67597,9490],[49230,18485,9490,9586,66250,67597,10743]]},{"doc_id":2244,"orth_indices":[[18130,19769,29230,9586,51260,23951,9490]]},{"doc_id":2260,"orth_indices":[[39940,9490,30992,9586,35547,35890,12439]]},{"doc_id":2336,"orth_indices":[[6931,72663,30163,9586,28975,67597,48243]]},{"doc_id":2466,"orth_indices":[[5240,41022,49230,9586,66250,67597,52211]]},{"doc_id":2614,"orth_indices":[[29213,18472,15684,9586,51184,3805,53706]]},{"doc_id":3177,"orth_indices":[[30719,24707,75654,9586,30719,75084,15684]]},{"doc_id":3180,"orth_indices":[[65605,20939,11365,9586,43346,28975,13638]]},{"doc_id":3238,"orth_indices":[[56054,41136,30992,9586,38955,46099,3805]]},{"doc_id":3274,"orth_indices":[[22691,14086,49230,9586,66250,5358,52211]]},{"doc_id":3460,"orth_indices":[[42852,3805,36692,9586,66250,24482,66792]]},{"doc_id":3484,"orth_indices":[[72663,42277,30992,9586,30719,47373,3805]]},{"doc_id":3515,"orth_indices":[[23006,3805,30719,9586,3805,30719,54864]]},{"doc_id":3517,"orth_indices":[[42852,3805,36692,9586,66250,24482,66792]]},{"doc_id":3623,"orth_indices":[[23108,61564,30992,9586,26827,45814,26685]]},{"doc_id":3733,"orth_indices":[[72663,52211,20939,9586,66250,30719,5553]]},{"doc_id":3839,"orth_indices":[[1940,63030,15684,9586,54253,59861,34778]]},{"doc_id":3988,"orth_indices":[[15684,19222,30992,9586,34406,13321,23321]]},{"doc_id":4127,"orth_indices":[[66667,9490,75654,9586,49230,29130,5240]]},{"doc_id":4150,"orth_indices":[[27038,19499,30992,9586,62273,5240,12439]]},{"doc_id":4297,"orth_indices":[[9490,42277,28939,9586,8969,10982,10743]]},{"doc_id":4328,"orth_indices":[[70882,43960,17555,9586,52211,20939,4821]]},{"doc_id":4381,"orth_indices":[[51984,52093,75654,9586,30719,34259,15684]]},{"doc_id":4403,"orth_indices":[[25223,14086,40448,9586,66250,67597,51652]]},{"doc_id":4409,"orth_indices":[[69807,25728,19475,9586,10743,30719,28569]]},{"doc_id":4595,"orth_indices":[[8478,12378,15684,9586,59383,52211,62730]]},{"doc_id":4611,"orth_indices":[[15684,8083,30719,9586,3805,61086,49870]]},{"doc_id":4643,"orth_indices":[[12781,52211,20939,9586,3805,30719,631]]},{"doc_id":4853,"orth_indices":[[70596,56084,1940,9586,42277,54253,69101]]},{"doc_id":4916,"orth_indices":[[72663,52211,20939,9586,3805,30719,5999]]},{"doc_id":5091,"orth_indices":[[36886,41830,15460,9586,8969,36886,9788]]},{"doc_id":5160,"orth_indices":[[20751,63030,15684,9586,71654,30719,67926]]},{"doc_id":5168,"orth_indices":[[10743,14086,30719,9586,3805,17469,34021]]},{"doc_id":5380,"orth_indices":[[55354,66024,58443,3280,11383,68579,68973],[55354,66024,58443,3280,11383,63132,48352]]},{"doc_id":5393,"orth_indices":[[30719,24707,30992,9586,52093,15684,33118],[54831,24707,59343,9586,69259,10014,12439]]},{"doc_id":5539,"orth_indices":[[26685,19728,53889,9586,66250,67597,52211]]},{"doc_id":5578,"orth_indices":[[27315,18130,28939,9586,49230,31130,3805],[49645,62878,75654,9586,49230,65605,45728]]},{"doc_id":5614,"orth_indices":[[9490,29213,75654,9586,51184,52211,65605]]},{"doc_id":5655,"orth_indices":[[10743,29213,28939,9586,11589,15684,32085]]},{"doc_id":5717,"orth_indices":[[32112,29213,37486,9586,70596,15684,6858],[53514,51674,30719,9586,66250,30719,70277]]},{"doc_id":5815,"orth_indices":[[28024,76095,18130,9586,30719,35509,37837]]},{"doc_id":5864,"orth_indices":[[9490,29213,75654,9586,51184,52211,65605]]},{"doc_id":6094,"orth_indices":[[20751,1940,30719,9586,3805,54253,18485]]},{"doc_id":6163,"orth_indices":[[63132,36860,28317,3280,44217,13596,57117]]},{"doc_id":6215,"orth_indices":[[42018,55565,30992,9586,49230,3445,10743]]},{"doc_id":6223,"orth_indices":[[9490,56377,37486,9586,17920,29181,52552]]},{"doc_id":6227,"orth_indices":[[9490,56377,37486,9586,17920,29181,52552]]},{"doc_id":6283,"orth_indices":[[24,40698,15684,9586,30719,27108,43616]]},{"doc_id":6357,"orth_indices":[[8284,28939,1940,9586,30719,67394,67756]]},{"doc_id":6437,"orth_indices":[[51674,49230,39269,9586,3805,30719,68955]]},{"doc_id":6451,"orth_indices":[[1940,30719,27,9586,3805,30719,60690]]},{"doc_id":6565,"orth_indices":[[39483,9490,59343,9586,8137,15684,2200]]},{"doc_id":6566,"orth_indices":[[60761,30719,69954,9586,3805,30719,400]]},{"doc_id":7037,"orth_indices":[[72663,30719,34406,9586,66250,30719,50762]]},{"doc_id":7134,"orth_indices":[[42852,63030,15684,9586,54253,39228,5553]]},{"doc_id":7246,"orth_indices":[[74529,61627,27419,9586,30719,400,3805]]},{"doc_id":7328,"orth_indices":[[72663,30719,48136,9586,41022,49230,21390]]},{"doc_id":7344,"orth_indices":[[1940,30719,27,9586,3805,30719,14843]]},{"doc_id":7550,"orth_indices":[[36735,75654,27875,9586,21619,52093,15684]]},{"doc_id":7664,"orth_indices":[[30765,30719,27,9586,3805,30719,75776]]},{"doc_id":7671,"orth_indices":[[42612,61421,55155,9586,49230,37542,12439]]},{"doc_id":7884,"orth_indices":[[35575,10696,75654,9586,39498,11395,1050]]},{"doc_id":8288,"orth_indices":[[64696,71889,15684,9586,7971,30791,10743]]},{"doc_id":8315,"orth_indices":[[39764,46114,30992,9586,8459,18690,67597]]},{"doc_id":8338,"orth_indices":[[20751,1940,30815,9586,15684,26788,35982],[16949,10743,59343,9586,28975,76219,15684]]},{"doc_id":8582,"orth_indices":[[48435,39276,15684,9586,49230,16437,12439]]},{"doc_id":8630,"orth_indices":[[14086,30719,48136,9586,3805,58137,52093]]},{"doc_id":8911,"orth_indices":[[20751,49230,34406,9586,3805,30719,638]]},{"doc_id":8978,"orth_indices":[[8591,10743,1940,9586,35547,69259,9622],[26770,42277,28939,9586,43346,30719,400]]},{"doc_id":9053,"orth_indices":[[52211,20939,16352,9586,3805,30719,27315]]},{"doc_id":9166,"orth_indices":[[24940,10743,30071,9586,66250,67597,15684]]},{"doc_id":9200,"orth_indices":[[41022,111,15684,9586,42277,11535,66792]]},{"doc_id":9209,"orth_indices":[[15684,54253,39909,9586,10743,10530,43305]]},{"doc_id":9240,"orth_indices":[[41022,111,15684,9586,42277,11535,66792]]},{"doc_id":9365,"orth_indices":[[53835,75654,30617,9586,52093,15684,5240]]},{"doc_id":9463,"orth_indices":[[39715,54219,30992,9586,39228,9421,51184]]},{"doc_id":9561,"orth_indices":[[65779,52211,20939,9586,9490,54385,3805]]},{"doc_id":9574,"orth_indices":[[41022,30719,48136,9586,3805,36800,12439],[15684,36488,30719,9586,3805,36800,52211]]},{"doc_id":9591,"orth_indices":[[30719,61340,59343,9586,55412,18133,15684]]},{"doc_id":9608,"orth_indices":[[36892,61421,42498,9586,61701,15684,66274]]},{"doc_id":9622,"orth_indices":[[33961,14086,49230,9586,66250,67597,51390]]},{"doc_id":9628,"orth_indices":[[41022,30719,48136,9586,3805,36800,12439],[15684,36488,30719,9586,3805,36800,52211]]},{"doc_id":9647,"orth_indices":[[14086,27875,15684,9586,46664,7553,10743]]},{"doc_id":9772,"orth_indices":[[30765,30719,42278,9586,3805,17121,52211]]},{"doc_id":9876,"orth_indices":[[67394,24707,75654,9586,32993,56054,73525]]},{"doc_id":9906,"orth_indices":[[72663,30719,48066,9586,14086,43050,52211]]},{"doc_id":9975,"orth_indices":[[64002,64163,15684,9586,23827,61738,12439]]},{"doc_id":10003,"orth_indices":[[29392,22529,28939,9586,30719,20173,67842]]},{"doc_id":10051,"orth_indices":[[17923,29213,28939,9586,30719,12918,3805]]},{"doc_id":10112,"orth_indices":[[61316,75654,27875,9586,17920,22581,15684]]},{"doc_id":10180,"orth_indices":[[32472,37486,49955,9586,10962,56700,15684]]},{"doc_id":10182,"orth_indices":[[73595,10743,75654,9586,56117,15684,5863]]},{"doc_id":10443,"orth_indices":[[8591,10743,1940,9586,69259,26770,10743]]},{"doc_id":10458,"orth_indices":[[20751,30719,34406,9586,3805,30719,11525]]},{"doc_id":10485,"orth_indices":[[64002,64163,15684,9586,23827,61738,12439]]},{"doc_id":10525,"orth_indices":[[8284,33543,30992,9586,42277,65605,15684]]}]
+}
+
+
+    function filter_token_ids(token_ids, plot_id) {
+        const data = window[plot_id];
+        var centre_index = Math.floor(token_ids.length / 2);
+        var left_tokens = token_ids.slice(0, centre_index);
+        var right_tokens = token_ids.slice(centre_index);
+        if (left_tokens.includes(data['eof_token'])) {
+            var eof_index_pos = left_tokens.lastIndexOf(data['eof_token']);
+            if (eof_index_pos !== -1) {
+                left_tokens = left_tokens.slice(eof_index_pos + 1);
+            }
+        }
+        if (right_tokens.includes(data['eof_token'])) {
+            var eof_index_pos = right_tokens.indexOf(data['eof_token']);
+            if (eof_index_pos !== -1) {
+                right_tokens = right_tokens.slice(0, eof_index_pos);
+            }
+        }
+        token_ids = left_tokens.concat(right_tokens);
+        return token_ids;
+    }
+    function token_ids_to_str(token_ids, plot_id) {
+        const data = window[plot_id];
+        if (token_ids.includes(data['eof_token'])) {
+            token_ids = filter_token_ids(token_ids, plot_id);
+        }
+        const token_strs = [];
+        for (let i = 0; i < token_ids.length; i++) {
+            const token_id = token_ids[i];
+            if (data['tokens'][token_id]) { 
+                token_strs.push(data['tokens'][token_id]); 
+            } else {
+                token_strs.push(`Unknown Token ID: ${token_id}`);
+            }
+        }
+        return token_strs.join(' ');
+    }
+    function populatePlot(page, page_size, plot_id) {
+        const data = window[plot_id];
+        start = (page - 1) * page_size;
+        end = start + page_size;
+        const plot = document.getElementById(plot_id).querySelector('.conc-concordance-plot');
+        const lines = plot.getElementsByClassName('conc-concordance-plot-line');
+        while (lines.length > 0) {
+            lines[0].remove();
+        }
+        const labels = plot.getElementsByClassName('label');
+        while (labels.length > 0) {
+            labels[0].remove();
+        }
+        const rects = plot.getElementsByTagName('rect');
+        for (let i = 0; i < rects.length; i++) {
+            rects[i].setAttribute('style', 'opacity:1;');
+        }
+        for (let i = start; i < end; i++) {
+            page_i = (i - start + 1)
+            if (i >= data['docs'].length) { 
+                const rect = plot.querySelector(`.rect-${page_i}`);
+                if (rect) {
+                    rect.setAttribute('style', 'opacity:0;');
+                }
+                continue;
+            }
+            const doc = data['docs'][i]; 
+            const plot_y = (page_i * data['row_height']) - data['row_adjustment'];
+            const label_y = plot_y + (data['default_font_size'] * 1.4);
+            const label_y2 = plot_y + (data['default_font_size'] * 1.4 * 2);
+            const doc_positions_count = doc.positions.length;
+            const line_text = doc_positions_count === 1 ? '1 line' : `${doc_positions_count} lines`;
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('class', 'label');
+            label.setAttribute('x', data['label_x_right']);
+            label.setAttribute('y', label_y);
+            label.setAttribute('font-size', data['default_font_size']);
+            label.setAttribute('text-anchor', 'end');
+            label.textContent = `Doc ${doc.doc_id}`;
+            plot.appendChild(label);
+            const label2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label2.setAttribute('class', 'label');
+            label2.setAttribute('x', data['label_x_right']);
+            label2.setAttribute('y', label_y2);
+            label2.setAttribute('font-size', data['default_font_size']);
+            label2.setAttribute('text-anchor', 'end');
+            label2.textContent = line_text;
+            plot.appendChild(label2);
+            const positions = doc.positions;
+            const x_values = positions.map(pos => (pos / doc.count) * 100 * 8);
+            for (let j = 0; j < x_values.length; j++) {
+                const x_value = x_values[j];
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                line.setAttribute('class', 'conc-concordance-plot-line');
+                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line1.setAttribute('x1', data['plot_x'] + x_value);
+                line1.setAttribute('y1', plot_y);
+                line1.setAttribute('x2', data['plot_x'] + x_value);
+                line1.setAttribute('y2', plot_y + data['subplot_height']);
+                line1.setAttribute('style', 'stroke-width:10;opacity:0;');
+                line.appendChild(line1);
+                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line2.setAttribute('x1', data['plot_x'] + x_value);
+                line2.setAttribute('y1', plot_y);
+                line2.setAttribute('x2', data['plot_x'] + x_value);
+                line2.setAttribute('y2', plot_y + data['subplot_height']);
+                line2.setAttribute('style', 'stroke-width:2;');
+                line.appendChild(line2);
+                let anchor = 'middle';
+                let x_adjustment = 0;
+                if (x_value < 150) {
+                    anchor = 'start';
+                    x_adjustment = -30;
+                }
+                if (x_value > 650) {
+                    anchor = 'end';
+                    x_adjustment = 30;
+                }
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', data['plot_x'] + x_value + x_adjustment);
+                text.setAttribute('y', plot_y - 5);
+                text.setAttribute('text-anchor', anchor);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', 'black');
+                append = ''
+                if (data['append_info']) {
+                    position_offset_0 = doc.positions[j];
+                    position_offset_1 = doc.positions[j] + 1;
+                    append = ` (token ${position_offset_1} of ${doc.count})`;
+                    line.setAttribute('data-offset', `${position_offset_0}`);
+                }
+                text.textContent = token_ids_to_str(data['examples'][i].orth_indices[j], plot_id) + append;
+                line.setAttribute('data-doc', `${doc.doc_id}`);
+                line.appendChild(text);
+                plot.appendChild(line);
+            }
+
+        }
+    }
+
+    function tryInit(plot_id) {
+    const targetNode = document.getElementById(plot_id);
+    if (targetNode && targetNode.querySelector('.conc-plot-footer')) {
+        vizInit(plot_id);
+        return true;
+    }
+    return false;
+    }
+    function vizInit(plot_id) {
+        const data = window[plot_id];
+        current_page = 1;
+        const plot = document.getElementById(plot_id);
+        const slider = plot.querySelector('.conc-concordance-plot-slider');
+        populatePlot(current_page, data['page_size'], plot_id);
+        slider.addEventListener('input', function() {
+            const page = parseInt(this.value, 10);
+            populatePlot(page, data['page_size'], plot_id);
+            const page_number = plot.querySelector('.conc-concordance-plot-page-number');
+            page_number.textContent = `${page}`;
+        });
+    }
+
+    
+</script>
+<style>
+    .conc-plot-wrapper {
+    background: #fff;
+    width:1000px;
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    line-height: 1.1;
+    margin: 20px 0 20px 0;
+    }
+    .conc-plot-wrapper h2 {
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    text-align:center;
+    font-weight: 600;
+    line-height: 2;
+    margin:0;
+    padding:0;
+    }
+    .conc-plot-wrapper h3 {
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    text-align:center;
+    font-weight: 300;
+    line-height: 1;
+    margin:0;
+    padding:0;
+    }
+    .conc-concordance-plot {
+    }
+    .conc-concordance-plot-summary {
+    margin: 20px 40px 10px 160px;
+    color: #000;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    }
+    .conc-concordance-plot-controls {
+    height: 60px;
+    margin: 0 40px 20px 40px;
+    }
+    .conc-concordance-plot-controls input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    background: #ccc;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+    }
+    .conc-concordance-plot-controls label {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    color: #000;
+    display: block;
+    margin-bottom: 5px;
+    }
+    .conc-concordance-plot rect {
+    fill: #ccc;
+    width: 800px;
+    height: 40px;
+    }
+    .conc-concordance-plot .label {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    }
+    g.conc-concordance-plot-line {
+    cursor: pointer;
+    }
+    g.conc-concordance-plot-line line {
+    stroke:#666;
+    }
+    g.conc-concordance-plot-line:hover line {
+    stroke:#000;
+    }
+    g.conc-concordance-plot-line > text {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+    display:none;
+    }
+    g.conc-concordance-plot-line:hover > text {
+    display:block;
+    }
+    g.conc-concordance-plot-line.highlight line {
+    }
+    .conc-plot-wrapper { font-size: 12px; }.conc-plot-wrapper h2 { font-size: 24px; }.conc-plot-wrapper h3, .conc-concordance-plot-summary { font-size: 15.0px; }.conc-concordance-plot-controls label { font-size: 12px; }</style><div class="conc-plot-wrapper" id="concplot_711e1a5b90095a450aa6431365004778"><h2 class="anchored" data-anchor-id="examples-1">Concordance Plot for "cause"</h2><h3 class="anchored">Reuters Corpus</h3><svg class="conc-concordance-plot" viewbox="0 0 1000 610" width="1000" height="610" xmlns="http://www.w3.org/2000/svg"><rect class="rect-1" x="160" y="30" height="40" width="800"></rect><rect class="rect-2" x="160" y="90" height="40" width="800"></rect><rect class="rect-3" x="160" y="150" height="40" width="800"></rect><rect class="rect-4" x="160" y="210" height="40" width="800"></rect><rect class="rect-5" x="160" y="270" height="40" width="800"></rect><rect class="rect-6" x="160" y="330" height="40" width="800"></rect><rect class="rect-7" x="160" y="390" height="40" width="800"></rect><rect class="rect-8" x="160" y="450" height="40" width="800"></rect><rect class="rect-9" x="160" y="510" height="40" width="800"></rect><rect class="rect-10" x="160" y="570" height="40" width="800"></rect></svg><div class="conc-concordance-plot-summary">Total Documents: 121<br>Total Concordance Lines: 135</div><div class="conc-concordance-plot-controls"><label for="concplot_711e1a5b90095a450aa6431365004778-slider" class="conc-concordance-plot-slider-label">Page <span class="conc-concordance-plot-page-number">1</span> of 13</label>
+    <input type="range" min="1" max="13" value="1" step="1" class="slider conc-concordance-plot-slider" id="concplot_711e1a5b90095a450aa6431365004778-slider" autocomplete="off"></div>
+    <div class="conc-plot-footer"></div>
+    </div><script>
+if (!tryInit("concplot_711e1a5b90095a450aa6431365004778")) {
+
+    // Only set up observer if not ready yet
+    const observer = new MutationObserver(function(mutationsList, observer) {
+    
+        if (tryInit("concplot_711e1a5b90095a450aa6431365004778")) {
+
+        observer.disconnect();
+        }
+
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    }
+    </script>
+    
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/geoffford\.nz\/conc");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/polsci/conc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

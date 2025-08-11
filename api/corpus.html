@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Create a conc corpus.">
+
+<title>corpus – conc</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../conc-favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-e16dd29f819a46fcdaa82e3575888691.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var sidebar = document.getElementsByClassName('sidebar-menu-container')[0];
+    var logo = document.createElement('div');
+    logo.className = 'sidebar-info';
+    logo.innerHTML = '<a href="https://geoffford.nz/"><img src="https://geoffford.nz/assets/images/geoff-icon.png" alt="Geoff Ford"></a>';
+    var textLink = document.createElement('a');
+    textLink.className = 'sidebar-info-text';
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "Author: Dr Geoff Ford";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    var textLink = document.createElement('a');
+    textLink.href = "https://geoffford.nz/";
+    textLink.innerText = "↪ Main Website";
+    textLink.className = 'sidebar-info-text';
+    logo.appendChild(textLink);
+    sidebar.prepend(logo);
+  });
+</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="corpus – conc">
+<meta property="og:description" content="Create a conc corpus.">
+<meta property="og:site_name" content="conc">
+<meta name="twitter:title" content="corpus – conc">
+<meta name="twitter:description" content="Create a conc corpus.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="https://geoffford.nz/assets/images/conc/conc.svg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">conc</span>
+    </a>
+  </div>
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/polsci/conc"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          <div class="quarto-navbar-tools">
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/index.html">API</a></li><li class="breadcrumb-item"><a href="../api/corpus.html">corpus</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Conc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../tutorials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/start.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Get Started with Conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quick Conc Recipes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installing Conc</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../explanations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Explanations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/why.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why Conc?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/anatomy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Anatomy of a corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../explanations/performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../development/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Development</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/releases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Releases</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/roadmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roadmap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../development/developer_guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developer Guide</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpus.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">corpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/conc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">conc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/listcorpus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">listcorpus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/corpora.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">corpora</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/frequency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">frequency</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/ngrams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ngrams</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/concordance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">concordance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/keyness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">keyness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/collocates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">collocates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/result.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">result</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">core</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/index.html">API</a></li><li class="breadcrumb-item"><a href="../api/corpus.html">corpus</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">corpus</h1>
+</div>
+
+<div>
+  <div class="description">
+    Create a conc corpus.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="corpus-class" class="level2">
+<h2 class="anchored" data-anchor-id="corpus-class">Corpus class</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L54" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus" class="level3">
+<h3 class="anchored" data-anchor-id="corpus">Corpus</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus (name:str='', description:str='')</code></pre>
+</blockquote>
+<p><em>Represention of text corpus, with methods to build, load and save a corpus from a variety of formats and to work with the corpus data.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>name</td>
+<td>str</td>
+<td></td>
+<td>name of corpus</td>
+</tr>
+<tr class="even">
+<td>description</td>
+<td>str</td>
+<td></td>
+<td>description of corpus</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="build-and-save-a-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="build-and-save-a-corpus">Build and save a corpus</h2>
+<p>Conc defines a punctuation token as a token consisting only of punctuation characters. Punctuation characters are defined by combining the Python <code>string.punctuation</code> characters with unicode characters categorised as punctuation (i.e.&nbsp;<a href="https://en.wikipedia.org/wiki/Unicode_character_property#General_Category">unicode characters with general category starting with P</a>) or currency symbols (i.e.&nbsp;<a href="https://en.wikipedia.org/wiki/Unicode_character_property#General_Category">general category Sc</a>). This means, for example, that various versions of a dashes or quotation marks can be identified as punctuation. This also means that any emoticons that are based on sequences of punctuation characters, like :), will be defined as a punctuation token. To access reporting on punctuation is still possible in Conc reports using the relevant parameters. There are still many unicode symbol characters that are not defined as punctuation by Conc. This may change in future versions of Conc, including the ability to define punctuation strings or exceptions. Any changes will be documented.</p>
+<div id="cell-6" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(PUNCTUATION_STRINGS))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(PUNCTUATION_STRINGS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>890
+𐩿᭟£﹚”᰿₢𑜾᳁𐫳𑩅᪩﹝𐩓꣺᭝︖‹⁓❵﹏⸰𑅂߸﹣፨꧉‗᠂–︰⸎𐮛⸻‰𑑎⹘𑗆𑩂€՜𑃀𑅵࠻﹨𑓆𑱄⁅𒑱&lt;⟦⸹︶𐮜᳅߿⦗}｛〕𖩮⁖⳻—᨟„𑅁'᭜࠸𐽗𐬼᰼𖺚؋࿒𝪉）𑙥፡𑑍︓⦑〜゠𒑴𖺘𑪞؍𑥄𖬹꧞₣₫𑅴𑗍⸦࠼/᠀࠶❨⸟𑗗။᳂⧽⸢᠈𑙡𐬻⸤⟬*／𑇞⹅､︼꧇𑜽𖭄𑥆•︳꧄＄𑈽⹗᙮᛫𑗋᜵⧙𑈼₲﹋？༈⹊⦎·=]︑﹆၏﹛﹠𑻷࠽𑧢𑿠؛܈᭚﹖𐏐꧂᐀【‿꧃𑗑፠𑱁⸂𑇛₦❮︿𑗇𐺭־⸇𑇅⸲𑗅⦋⸙〉‸׆𐄁[٭᠅︻᳓〰﹙⸽𑪢𖬸❲𑙃࠺𒿱༑⸃﹅༆❪⦊⟨꧈՛₧𐩔﹕¤―𐡗₶࠹⁏₹＂⸶𐤿𑙫･﹪꧌₠᳇𐩖꛷࠱᱾〔・𐄀𑗂𞥟︱𑗏៛܍៘𑗕❬꧁꡴›₤࠴⁃׃꫱׳…⸋؊❴〈؝⁆⁑꤮𐩗𑁇࠰⸺『𒑳𑙠⸒￥〖﷼⁜⟯⸍𖫵៖﹁׀《᚛꧊⹍𖬻⦆⁌܆⸧𑗉︷𐬺᨞⸖⹔⸫⸵𐫶⹃𑇇𝪊𑜼!࿔⁍⦔⹛꙳𑨿⦌″⹏꡷︔༇⁉՝︐⸌𑿿𑿟|᭠⁀𐩑་｢⦉၌᥅❱𐫱︴𑗒𐤟꤯₩₵¡၎‐⦄₴†⸨❯𐩕₨𐬾⸆⌊₪՟𑱂༊﹇𖺙［⹒❫⸓༽𐩒᠇𑪛⁕𑑚᠃⹇౷。₾𐮚᯿⸝⧚᯽᪨𑑌』𒑲᪠·₼꧟％)۔⸿⹌-︒￦❰𛲟⸾᚜⁾𑗌𑪠𖺗༄𑱃﹐𖬷၊᛬﹡⹂‑❩﴾𑱰‟꫰᠄⧛⌈𑻸᳆꛵¿࠷𑇆𐬿‾;֊༉༏՞⧘⸣𑑝𑙩₍࿓៕〟፥⟪༌𑩃᜶〃܃，𑙦‶⸪᭾⦓︸๚𑙪;𑗖𐾆᪭𑇈᳃₮𑗔￡𑊩৻฿។⦐៚﹉⸑꡵𐽙𐬹﹑₯‴⸳꫞⸛⸔\༐﴿𑗓𑩀※𐾈܋⁙⸀𑑛｝𑁉⸞⁊〛〝꛶’〚⁽࠲𑩁꛲܀༅⸭྅؞"᰽᪤⁁﹍﹟༻܅։⸱।#⸊⁈︙૰৲‥︕࿑⸕𐽖⸠𐩘𐽘𐽕꫟𑗁᱿&amp;꩝᪬⹀᳀`⸏⸄꧋፣؉܂】࠵꣎꣸﹞₺₻‘৳⟆𐾉፦⹙٬𑠻𑿝࿐܉「᪣〘᯾⸜〞჻𑁌𖩯﹌༺𑇝§𑗎༒𑙬（.𐾇࠾⸩𖿢′︽﹊།॰¢‡𐬽｟⳾꓾⹉＃$‷⸘‒〽．𑅃｡］᯼⸷₷{꣹𐫵᰾܄⹈꣏＆૱꧆⦃₡‱‧〙｠﹔᪫‣﹜𐫲𑂿𖬺๛⹁꛳⦕𒿲₳⦖᰻𑁍⟧⦇‽?‛⌋₿⸅＊᠉৽᠁𑪜；․⁋⦍⹄߾॥࿙»⹝᭽﹎‖꧅︺՚＿಄‚_๏⁂𑑏⳿꣼༔₰⸸﹗܊᠊𑩆₎᪥𑈸߹⧼⸡〈❭𑁋𑇟״(𑪟٪𐩐꯫⹖꩞‼࿚⳺^﹃⦅⸉꘎༎𞋿⁗𑙧︵꩜𑈺₥꘏߷၍⁐،,⁛︘⟅⸗᪢⳹¶⌉꓿⸮꛴⸈₸：︾𑙁࡞𝪇⁎⟭¥᭛𝪋੶︹𐫴𞥞𐄂𑂼‵❳𑅀﹫𝪈«、𐫰⁞꥟፤𐎟⸁⦏༼𑪚￠𑗊⁔᪡₭᛭᥄𑂻﹈𑁈𑥅܌₽𑗄－𑗃𑗐꧍﹄𑗈𑱅᠆᭞﹂&gt;﹀﹘⁇%⵰𑿞⟮》⹋﹩﹒܇⟫+⦘᳄」⁚᪪᪦⹆＼⸥@꘍︲:࠳𑙤꡶⹜𑃁؟𐮙𑈻௹𑪡𑑋៙~⟩₱⹎〉𑱱꙾𞲰⸬⦈⃀⸴𑚹⸐〗︗＠𑁊𑙨٫𑂾⦒⹚𑙢⹓෴⸼𐕯⁘𑈹“𑙣֏⳼𑇍！𒑰⸚⁝𑩄𑙂⹕።｣＇꠸፧܁꩟</code></pre>
+</div>
+</div>
+<p>Spacy includes space tokens in the vocab for non-destructive tokenisation. Positions of space tokens are stored so they can be filtered out for analysis and reporting.</p>
+<p>Tokens consisting of only punctuation are defined as punctuation tokens. These can be removed or included in analysis and reporting.</p>
+<p>NOTE: currently streaming either with sink_parquet or collect(engine=‘streaming’) can break the order of the dataframe (not just whole rows, but within specific columns leading to misaligned data). Streaming is not being used for the build, this will be reassessed in the future as the new Polars streaming functionality matures.</p>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L409" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.save_corpus_metadata" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.save_corpus_metadata">Corpus.save_corpus_metadata</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.save_corpus_metadata (template:str='# {name}\n\n## About\n\nThis
+                              directory contains a corpus created using
+                              the [Conc]({REPOSITORY_URL}) Python library.
+                              \n\n## Corpus
+                              Information\n\n{description}\n\nDate
+                              created: {date_created}  \nDocument count:
+                              {document_count}  \nToken count:
+                              {token_count}  \nWord token count:
+                              {word_token_count}  \nUnique tokens:
+                              {unique_tokens}  \nUnique word tokens:
+                              {unique_word_tokens}  \nConc Version Number:
+                              {conc_version}  \nspaCy model:
+                              {SPACY_MODEL}, version {SPACY_MODEL_VERSION}
+                              \n\n## Using this corpus\n \nConc can be
+                              installed [via pip]({PYPI_URL}). The [Conc
+                              documentation site]({DOCUMENTATION_URL})
+                              \nhas tutorials and detailed information to
+                              get you started with Conc or to work with
+                              the corpus \ndata directly.  \n\n## Cite
+                              Conc\n\n{CITATION_STR}\n\n')</code></pre>
+</blockquote>
+<p><em>Save corpus metadata.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>template</td>
+<td>str</td>
+<td># {name}<br><br>## About<br><br>This directory contains a corpus created using the <a href="{REPOSITORY_URL}">Conc</a> Python library. <br><br>## Corpus Information<br><br>{description}<br><br>Date created: {date_created} <br>Document count: {document_count} <br>Token count: {token_count} <br>Word token count: {word_token_count} <br>Unique tokens: {unique_tokens} <br>Unique word tokens: {unique_word_tokens} <br>Conc Version Number: {conc_version} <br>spaCy model: {SPACY_MODEL}, version {SPACY_MODEL_VERSION} <br><br>## Using this corpus<br> <br>Conc can be installed <a href="{PYPI_URL}">via pip</a>. The <a href="{DOCUMENTATION_URL}">Conc documentation site</a> <br>has tutorials and detailed information to get you started with Conc or to work with the corpus <br>data directly. <br><br>## Cite Conc<br><br>{CITATION_STR}<br><br></td>
+<td>template for the README file</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L621" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.build_from_files" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.build_from_files">Corpus.build_from_files</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.build_from_files (source_path:str, save_path:str,
+                          file_mask:str='*.txt',
+                          metadata_file:str|None=None,
+                          metadata_file_column:str='file',
+                          metadata_columns:list[str]=[],
+                          encoding:str='utf-8',
+                          model:str='en_core_web_sm',
+                          spacy_batch_size:int=1000,
+                          build_process_batch_size:int=5000,
+                          build_process_cleanup:bool=True, standardize_wor
+                          d_token_punctuation_characters:bool=False)</code></pre>
+</blockquote>
+<p><em>Build a corpus from text files in a folder.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>source_path</td>
+<td>str</td>
+<td></td>
+<td>path to folder with text files, path can be a directory, zip or tar/tar.gz file</td>
+</tr>
+<tr class="even">
+<td>save_path</td>
+<td>str</td>
+<td></td>
+<td>directory where corpus will be created, a subdirectory will be automatically created with the corpus content</td>
+</tr>
+<tr class="odd">
+<td>file_mask</td>
+<td>str</td>
+<td>*.txt</td>
+<td>mask to select files</td>
+</tr>
+<tr class="even">
+<td>metadata_file</td>
+<td>str | None</td>
+<td>None</td>
+<td>path to a CSV with metadata</td>
+</tr>
+<tr class="odd">
+<td>metadata_file_column</td>
+<td>str</td>
+<td>file</td>
+<td>column in metadata file with file names to align texts with metadata</td>
+</tr>
+<tr class="even">
+<td>metadata_columns</td>
+<td>list</td>
+<td>[]</td>
+<td>list of column names to import from metadata</td>
+</tr>
+<tr class="odd">
+<td>encoding</td>
+<td>str</td>
+<td>utf-8</td>
+<td>encoding of text files</td>
+</tr>
+<tr class="even">
+<td>model</td>
+<td>str</td>
+<td>en_core_web_sm</td>
+<td>spacy model to use for tokenisation</td>
+</tr>
+<tr class="odd">
+<td>spacy_batch_size</td>
+<td>int</td>
+<td>1000</td>
+<td>batch size for spacy tokenizer</td>
+</tr>
+<tr class="even">
+<td>build_process_batch_size</td>
+<td>int</td>
+<td>5000</td>
+<td>save in-progress build to disk every n docs</td>
+</tr>
+<tr class="odd">
+<td>build_process_cleanup</td>
+<td>bool</td>
+<td>True</td>
+<td>Remove the build files after build is complete, retained for development and testing purposes</td>
+</tr>
+<tr class="even">
+<td>standardize_word_token_punctuation_characters</td>
+<td>bool</td>
+<td>False</td>
+<td>whether to standardize apostrophes in word tokens</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L674" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.build_from_csv" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.build_from_csv">Corpus.build_from_csv</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.build_from_csv (source_path:str, save_path:str,
+                        text_column:str='text',
+                        metadata_columns:list[str]=[],
+                        encoding:str='utf8', model:str='en_core_web_sm',
+                        spacy_batch_size:int=1000,
+                        build_process_batch_size:int=5000,
+                        build_process_cleanup:bool=True, standardize_word_
+                        token_punctuation_characters:bool=False)</code></pre>
+</blockquote>
+<p><em>Build a corpus from a csv file.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>source_path</td>
+<td>str</td>
+<td></td>
+<td>path to csv file</td>
+</tr>
+<tr class="even">
+<td>save_path</td>
+<td>str</td>
+<td></td>
+<td>directory where corpus will be created, a subdirectory will be automatically created with the corpus content</td>
+</tr>
+<tr class="odd">
+<td>text_column</td>
+<td>str</td>
+<td>text</td>
+<td>column in csv with text</td>
+</tr>
+<tr class="even">
+<td>metadata_columns</td>
+<td>list</td>
+<td>[]</td>
+<td>list of column names to import from csv</td>
+</tr>
+<tr class="odd">
+<td>encoding</td>
+<td>str</td>
+<td>utf8</td>
+<td>encoding of csv passed to Polars read_csv, see their documentation</td>
+</tr>
+<tr class="even">
+<td>model</td>
+<td>str</td>
+<td>en_core_web_sm</td>
+<td>spacy model to use for tokenisation</td>
+</tr>
+<tr class="odd">
+<td>spacy_batch_size</td>
+<td>int</td>
+<td>1000</td>
+<td>batch size for Spacy tokenizer</td>
+</tr>
+<tr class="even">
+<td>build_process_batch_size</td>
+<td>int</td>
+<td>5000</td>
+<td>save in-progress build to disk every n docs</td>
+</tr>
+<tr class="odd">
+<td>build_process_cleanup</td>
+<td>bool</td>
+<td>True</td>
+<td>Remove the build files after build is complete, retained for development and testing purposes</td>
+</tr>
+<tr class="even">
+<td>standardize_word_token_punctuation_characters</td>
+<td>bool</td>
+<td>False</td>
+<td>whether to standardize apostrophes in word tokens</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="load-a-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="load-a-corpus">Load a corpus</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L699" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.load" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.load">Corpus.load</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.load (corpus_path:str)</code></pre>
+</blockquote>
+<p><em>Load corpus from disk and load the corresponding spaCy model.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>corpus_path</td>
+<td>str</td>
+<td>path to load corpus</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="information-about-the-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="information-about-the-corpus">Information about the corpus</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L732" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.info" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.info">Corpus.info</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.info (include_disk_usage:bool=False, formatted:bool=True)</code></pre>
+</blockquote>
+<p><em>Return information about the corpus.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>include_disk_usage</td>
+<td>bool</td>
+<td>False</td>
+<td>include information of size on disk in output</td>
+</tr>
+<tr class="even">
+<td>formatted</td>
+<td>bool</td>
+<td>True</td>
+<td>return formatted output</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>str</strong></td>
+<td></td>
+<td><strong>formatted information about the corpus</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L768" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.report" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.report">Corpus.report</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.report (include_memory_usage:bool=False)</code></pre>
+</blockquote>
+<p><em>Get information about the corpus as a result object.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>include_memory_usage</td>
+<td>bool</td>
+<td>False</td>
+<td>include memory usage in output</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Result</strong></td>
+<td></td>
+<td><strong>returns Result object with corpus summary information</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L776" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.summary" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.summary">Corpus.summary</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.summary (include_memory_usage:bool=False)</code></pre>
+</blockquote>
+<p><em>Print information about the corpus in a formatted table.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>include_memory_usage</td>
+<td>bool</td>
+<td>False</td>
+<td>include memory usage in output</td>
+</tr>
+</tbody>
+</table>
+<p>You can get summary information on your corpus, including the number of documents, the token count and the number of unique tokens as a dataframe using the <code>info</code> method. You can also just print the corpus itself.</p>
+<div id="cell-20" class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(brown) <span class="co"># equivalent to print(brown.info())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>┌────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Attribute          ┆ Value                                                                                                                                                                                                                                              │
+╞════════════════════╪════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡
+│ Name               ┆ Brown Corpus                                                                                                                                                                                                                                       │
+│ Description        ┆ A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 │
+│                    ┆ http://www.hit.uib.no/icame/brown/bcm.html. This version …                                                                                                                                                                                         │
+│ Date Created       ┆ 2025-07-02 15:00:59                                                                                                                                                                                                                                │
+│ Conc Version       ┆ 0.1.5                                                                                                                                                                                                                                              │
+│ Corpus Path        ┆ /home/geoff/data/conc-test-corpora/brown.corpus                                                                                                                                                                                                    │
+│ Document Count     ┆ 500                                                                                                                                                                                                                                                │
+│ Token Count        ┆ 1,138,566                                                                                                                                                                                                                                          │
+│ Word Token Count   ┆ 980,144                                                                                                                                                                                                                                            │
+│ Unique Tokens      ┆ 42,930                                                                                                                                                                                                                                             │
+│ Unique Word Tokens ┆ 42,907                                                                                                                                                                                                                                             │
+└────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+</div>
+</div>
+<p>The <code>info</code> method can also provide information on the disk usage of the corpus setting the <code>include_disk_usage</code> parameter to <code>True</code>.</p>
+<div id="cell-22" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(brown.info(include_disk_usage<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>┌────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Attribute                  ┆ Value                                                                                                                                                                                                                                              │
+╞════════════════════════════╪════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╡
+│ Name                       ┆ Brown Corpus                                                                                                                                                                                                                                       │
+│ Description                ┆ A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 │
+│                            ┆ http://www.hit.uib.no/icame/brown/bcm.html. This version …                                                                                                                                                                                         │
+│ Date Created               ┆ 2025-07-02 15:00:59                                                                                                                                                                                                                                │
+│ Conc Version               ┆ 0.1.5                                                                                                                                                                                                                                              │
+│ Corpus Path                ┆ /home/geoff/data/conc-test-corpora/brown.corpus                                                                                                                                                                                                    │
+│ Document Count             ┆ 500                                                                                                                                                                                                                                                │
+│ Token Count                ┆ 1,138,566                                                                                                                                                                                                                                          │
+│ Word Token Count           ┆ 980,144                                                                                                                                                                                                                                            │
+│ Unique Tokens              ┆ 42,930                                                                                                                                                                                                                                             │
+│ Unique Word Tokens         ┆ 42,907                                                                                                                                                                                                                                             │
+│ Corpus Metadata (Mb)       ┆ 0.001                                                                                                                                                                                                                                              │
+│ Document Metadata (Mb)     ┆ 0.001                                                                                                                                                                                                                                              │
+│ Tokens (Mb)                ┆ 4.468                                                                                                                                                                                                                                              │
+│ Vocab (Mb)                 ┆ 0.678                                                                                                                                                                                                                                              │
+│ Punctuation Positions (Mb) ┆ 0.425                                                                                                                                                                                                                                              │
+│ Space Positions (Mb)       ┆ 0.012                                                                                                                                                                                                                                              │
+└────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+</div>
+</div>
+<p>You can get the same information in a table format by using the <code>summary</code> method.</p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>brown.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="wvgyqfjwqm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#wvgyqfjwqm table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#wvgyqfjwqm thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#wvgyqfjwqm p { margin: 0; padding: 0; }
+ #wvgyqfjwqm .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: 0; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #wvgyqfjwqm .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #wvgyqfjwqm .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #wvgyqfjwqm .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #wvgyqfjwqm .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #wvgyqfjwqm .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #wvgyqfjwqm .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #wvgyqfjwqm .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #wvgyqfjwqm .gt_spanner_row { border-bottom-style: hidden; }
+ #wvgyqfjwqm .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #wvgyqfjwqm .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #wvgyqfjwqm .gt_from_md> :first-child { margin-top: 0; }
+ #wvgyqfjwqm .gt_from_md> :last-child { margin-bottom: 0; }
+ #wvgyqfjwqm .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #wvgyqfjwqm .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #wvgyqfjwqm .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #wvgyqfjwqm .gt_row_group_first td { border-top-width: 2px; }
+ #wvgyqfjwqm .gt_row_group_first th { border-top-width: 2px; }
+ #wvgyqfjwqm .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #wvgyqfjwqm .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #wvgyqfjwqm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #wvgyqfjwqm .gt_left { text-align: left; }
+ #wvgyqfjwqm .gt_center { text-align: center; }
+ #wvgyqfjwqm .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #wvgyqfjwqm .gt_font_normal { font-weight: normal; }
+ #wvgyqfjwqm .gt_font_bold { font-weight: bold; }
+ #wvgyqfjwqm .gt_font_italic { font-style: italic; }
+ #wvgyqfjwqm .gt_super { font-size: 65%; }
+ #wvgyqfjwqm .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #wvgyqfjwqm .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="2" class="gt_heading gt_title gt_font_normal">Corpus Summary</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"></th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Attribute" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Attribute</th>
+<th id="Value" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Name</td>
+<td class="gt_row gt_left">Brown Corpus</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Description</td>
+<td class="gt_row gt_left">A Standard Corpus of Present-Day Edited American English, for use with Digital Computers. by W. N. Francis and H. Kucera (1964) Department of Linguistics, Brown University Providence, Rhode Island, USA Revised 1971, Revised and Amplified 1979 http://www.hit.uib.no/icame/brown/bcm.html. This version downloaded via NLTK https://www.nltk.org/nltk_data/.</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Date Created</td>
+<td class="gt_row gt_left">2025-07-02 15:00:59</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Conc Version</td>
+<td class="gt_row gt_left">0.1.5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Corpus Path</td>
+<td class="gt_row gt_left">/home/geoff/data/conc-test-corpora/brown.corpus</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Document Count</td>
+<td class="gt_row gt_left">500</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Token Count</td>
+<td class="gt_row gt_left">1,138,566</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Word Token Count</td>
+<td class="gt_row gt_left">980,144</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Unique Tokens</td>
+<td class="gt_row gt_left">42,930</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Unique Word Tokens</td>
+<td class="gt_row gt_left">42,907</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="working-with-tokens" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-tokens">Working with tokens</h2>
+<p>Internally, Conc uses Polars and Numpy vector operations where possible to speed up processing.</p>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L821" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.token_ids_to_tokens" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.token_ids_to_tokens">Corpus.token_ids_to_tokens</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.token_ids_to_tokens (token_ids:numpy.ndarray|list)</code></pre>
+</blockquote>
+<p><em>Get token strings for a list of token ids.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_ids</td>
+<td>numpy.ndarray | list</td>
+<td>token ids to return token strings for</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td><strong>return token strings for token ids</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L837" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.tokens_to_token_ids" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.tokens_to_token_ids">Corpus.tokens_to_token_ids</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.tokens_to_token_ids (tokens:list[str]|numpy.ndarray[str])</code></pre>
+</blockquote>
+<p><em>Convert a list or np.array of token string to token ids</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tokens</td>
+<td>list[str] | numpy.ndarray[str]</td>
+<td>list of tokens to get ids for</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td><strong>array of token ids, 0 for unknown tokens</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L851" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.token_to_id" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.token_to_id">Corpus.token_to_id</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.token_to_id (token:str)</code></pre>
+</blockquote>
+<p><em>Get the token id of a token string.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token</td>
+<td>str</td>
+<td>token to get id for</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>int</strong></td>
+<td><strong>return token id (0 if token not found in the corpus)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>A list or numpy array of token strings can be converted to a numpy array of token ids like this using <code>tokens_to_token_ids</code> …</p>
+<div id="cell-31" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> [<span class="st">'The'</span>, <span class="st">'quick'</span>, <span class="st">'brown'</span>, <span class="st">'fox'</span>, <span class="st">'jumps'</span>, <span class="st">'over'</span>, <span class="st">'the'</span>, <span class="st">'lazy'</span>, <span class="st">'dog'</span>]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>token_ids <span class="op">=</span> brown.tokens_to_token_ids(tokens)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(token_ids)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[15682 37698 47121 13458   526 16875 22848 25923 23289]</code></pre>
+</div>
+</div>
+<p>To reverse this use <code>token_ids_to_tokens</code> …</p>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> brown.token_ids_to_tokens(token_ids) <span class="co"># token_ids was set above</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tokens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['The' 'quick' 'brown' 'fox' 'jumps' 'over' 'the' 'lazy' 'dog']</code></pre>
+</div>
+</div>
+<p>The <code>tokens_to_token_ids</code> method will return a 0 for any tokens not in the corpus vocabulary.</p>
+<div id="cell-35" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> [<span class="st">'some'</span>, <span class="st">'random'</span>, <span class="st">'gazupinfava'</span>, <span class="st">'words'</span>]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>brown.tokens_to_token_ids(tokens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([21572, 28602,     0, 31327])</code></pre>
+</div>
+</div>
+<p>If zero is passed to <code>token_ids_to_tokens</code> it will return an error token as shown below. A negative value will raise a ValueError.</p>
+<div id="cell-37" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>brown.token_ids_to_tokens([<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array(['ERROR: not a token'], dtype=object)</code></pre>
+</div>
+</div>
+<p>The <code>token_to_id</code> method wraps <code>tokens_to_token_ids</code>. You can pass a single token string and get the token id back. As with <code>tokens_to_token_ids</code>, if the token is not in the vocabulary it will return 0.</p>
+<div id="cell-39" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(brown.token_to_id(<span class="st">'brown'</span>)) <span class="co"># returns token id</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(brown.token_to_id(<span class="st">'Supercalifragilisticexpialidocious'</span>)) <span class="co"># returns 0 if token not in corpus</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>47121
+0</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L861" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.token_ids_to_sort_order" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.token_ids_to_sort_order">Corpus.token_ids_to_sort_order</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.token_ids_to_sort_order (token_ids:numpy.ndarray|list)</code></pre>
+</blockquote>
+<p><em>Get the sort order of token strings corresponding to token ids</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 38%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_ids</td>
+<td>numpy.ndarray | list</td>
+<td>token ids to return token strings for</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td><strong>rank of token ids</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-41" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> np.array([<span class="st">'The'</span>, <span class="st">'quick'</span>, <span class="st">'brown'</span>, <span class="st">'fox'</span>, <span class="st">'jumps'</span>, <span class="st">'over'</span>, <span class="st">'the'</span>, <span class="st">'lazy'</span>, <span class="st">'dog'</span>])</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>token_ids <span class="op">=</span> brown.tokens_to_token_ids(tokens)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>sort_order <span class="op">=</span> brown.token_ids_to_sort_order(token_ids)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>sorted_tokens <span class="op">=</span> tokens[np.argsort(sort_order)]</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tokens)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(token_ids)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sort_order)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sorted_tokens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['The' 'quick' 'brown' 'fox' 'jumps' 'over' 'the' 'lazy' 'dog']
+[15682 37698 47121 13458   526 16875 22848 25923 23289]
+[50086 40359  7940 20497 27663 35982 50087 29054 15849]
+['brown' 'dog' 'fox' 'jumps' 'lazy' 'over' 'quick' 'The' 'the']</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L877" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.get_token_count_text" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.get_token_count_text">Corpus.get_token_count_text</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.get_token_count_text (exclude_punctuation:bool=False)</code></pre>
+</blockquote>
+<p><em>Get the token count for the corpus with adjustments and text for output</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>exclude_punctuation</td>
+<td>bool</td>
+<td>False</td>
+<td>exclude punctuation tokens from the count</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>tuple</strong></td>
+<td></td>
+<td><strong>token count with adjustments based on exclusions, token descriptor, total descriptor</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="tokenization" class="level2">
+<h2 class="anchored" data-anchor-id="tokenization">Tokenization</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L894" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.tokenize" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.tokenize">Corpus.tokenize</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.tokenize (string:str, simple_indexing=False)</code></pre>
+</blockquote>
+<p><em>Tokenize a string using the Spacy tokenizer.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>string</td>
+<td>str</td>
+<td></td>
+<td>string to tokenize</td>
+</tr>
+<tr class="even">
+<td>simple_indexing</td>
+<td>bool</td>
+<td>False</td>
+<td>use simple indexing</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="work-with-specific-texts-in-the-corpus" class="level2">
+<h2 class="anchored" data-anchor-id="work-with-specific-texts-in-the-corpus">Work with specific texts in the corpus</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1008" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.text" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.text">Corpus.text</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.text (doc_id:int)</code></pre>
+</blockquote>
+<p><em>Get a text document</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>doc_id</td>
+<td>int</td>
+<td>the id of the document</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="find-positions-of-tokens" class="level2">
+<h2 class="anchored" data-anchor-id="find-positions-of-tokens">Find positions of tokens</h2>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1017" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="corpus.get_tokens_by_index" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.get_tokens_by_index">Corpus.get_tokens_by_index</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.get_tokens_by_index (index:str='orth_index',
+                             exclude_punctuation:bool=False)</code></pre>
+</blockquote>
+<p><em>Get tokens for a given index.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>index</td>
+<td>str</td>
+<td>orth_index</td>
+<td>index to get tokens from i.e.&nbsp;‘orth_index’ ‘lower_index’ ‘token2doc_index’</td>
+</tr>
+<tr class="even">
+<td>exclude_punctuation</td>
+<td>bool</td>
+<td>False</td>
+<td>exclude punctuation tokens from the result (unused currently)</td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1052" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.get_ngrams_by_index" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.get_ngrams_by_index">Corpus.get_ngrams_by_index</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.get_ngrams_by_index (ngram_length:int, index:str,
+                             exclude_punctuation:bool=False)</code></pre>
+</blockquote>
+<p><em>Get ngrams for a given index and ngram length.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ngram_length</td>
+<td>int</td>
+<td></td>
+<td>length of ngrams to get</td>
+</tr>
+<tr class="even">
+<td>index</td>
+<td>str</td>
+<td></td>
+<td>index to get tokens from, e.g.&nbsp;‘orth_index’ ‘lower_index’</td>
+</tr>
+<tr class="odd">
+<td>exclude_punctuation</td>
+<td>bool</td>
+<td>False</td>
+<td>exclude punctuation tokens from the result (unused currently)</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-50" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>toy.get_ngrams_by_index(ngram_length<span class="op">=</span><span class="dv">2</span>, index<span class="op">=</span><span class="st">'lower_index'</span>)[<span class="dv">100</span>:<span class="dv">110</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array([[10,  6],
+       [ 6, 12],
+       [12,  8],
+       [ 8, 10],
+       [10, 13],
+       [13, 15],
+       [15, 17],
+       [17, 10],
+       [10, 11],
+       [11, 12]], dtype=uint32)</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1072" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.get_token_positions" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.get_token_positions">Corpus.get_token_positions</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.get_token_positions (token_sequence:list[numpy.ndarray],
+                             index_id:int, exclude_punctuation:bool=False)</code></pre>
+</blockquote>
+<p><em>Get the positions of a token sequence in the corpus.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_sequence</td>
+<td>list</td>
+<td></td>
+<td>token sequence to get index for</td>
+</tr>
+<tr class="even">
+<td>index_id</td>
+<td>int</td>
+<td></td>
+<td>index to search (i.e.&nbsp;ORTH, LOWER)</td>
+</tr>
+<tr class="odd">
+<td>exclude_punctuation</td>
+<td>bool</td>
+<td>False</td>
+<td>exclude punctuation tokens from the result (unused currently)</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>ndarray</strong></td>
+<td></td>
+<td><strong>positions of token sequence</strong></td>
+</tr>
+</tbody>
+</table>
+<div id="cell-52" class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>token_str <span class="op">=</span> <span class="st">'dog'</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>token_sequence, index_id <span class="op">=</span> brown.tokenize(token_str, simple_indexing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>token_positions <span class="op">=</span> brown.get_token_positions(token_sequence, index_id)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(token_positions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[array([  18833,   18870,   18880,   18950,   18957,   37578,   88691,
+        125019,  137037,  137687,  137722,  137731,  137775,  143860,
+        188374,  248842,  248982,  249204,  249217,  249243,  249311,
+        249337,  249397,  249425,  249535,  250476,  250495,  250554,
+        250613,  250645,  250699,  250709,  251033,  252740,  253700,
+        255256,  255360,  255532,  330282,  359785,  437987,  437991,
+        438046,  438051,  463456,  463485,  463507,  521175,  648316,
+        694080,  694129,  694289,  694481,  694760,  695139,  695216,
+        695313,  861865,  861872,  863503,  863521,  875531,  875573,
+        875660,  887598,  994901, 1012130, 1028088, 1050598, 1050607,
+       1052032, 1074911, 1084765, 1086020, 1086052, 1086639, 1104994,
+       1128317, 1137426])]</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1150" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="corpus.get_tokens_in_context" class="level3">
+<h3 class="anchored" data-anchor-id="corpus.get_tokens_in_context">Corpus.get_tokens_in_context</h3>
+<blockquote class="blockquote">
+<pre><code> Corpus.get_tokens_in_context (token_positions:numpy.ndarray, index:str,
+                               context_length:int=5,
+                               position_offset:int=1,
+                               position_offset_step:int=1,
+                               exclude_punctuation:bool=True,
+                               convert_eof:bool=True)</code></pre>
+</blockquote>
+<p><em>Get tokens in context for given token positions, context length and direction, operates one side at a time.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>token_positions</td>
+<td>ndarray</td>
+<td></td>
+<td>Numpy array of token positions in the corpus</td>
+</tr>
+<tr class="even">
+<td>index</td>
+<td>str</td>
+<td></td>
+<td>Index to use - lower_index, orth_index</td>
+</tr>
+<tr class="odd">
+<td>context_length</td>
+<td>int</td>
+<td>5</td>
+<td>Number of context words to consider on each side of the token</td>
+</tr>
+<tr class="even">
+<td>position_offset</td>
+<td>int</td>
+<td>1</td>
+<td>offset to start retrieving context words - negatve is left of node, positive for right - may want to adjust if sequence_len &gt; 1</td>
+</tr>
+<tr class="odd">
+<td>position_offset_step</td>
+<td>int</td>
+<td>1</td>
+<td>step to move position offset by, this sets direct, -1 for left, 1 for right</td>
+</tr>
+<tr class="even">
+<td>exclude_punctuation</td>
+<td>bool</td>
+<td>True</td>
+<td>ignore punctuation from context retrieved</td>
+</tr>
+<tr class="odd">
+<td>convert_eof</td>
+<td>bool</td>
+<td>True</td>
+<td>if True (for collocation functionality), contexts with end of file tokens will have eof token and tokens after set to zero, otherwise EOF retained (e.g.&nbsp;False used for ngrams)</td>
+</tr>
+<tr class="even">
+<td><strong>Returns</strong></td>
+<td><strong>Result</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href="https://github.com/polsci/conc/blob/main/conc/corpus.py#L1202" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="build_test_corpora" class="level3">
+<h3 class="anchored" data-anchor-id="build_test_corpora">build_test_corpora</h3>
+<blockquote class="blockquote">
+<pre><code> build_test_corpora (source_path:str, save_path:str,
+                     force_rebuild:bool=False)</code></pre>
+</blockquote>
+<p><em>(Deprecated - moved to conc.corpora) Build all test corpora from source files.</em></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>source_path</td>
+<td>str</td>
+<td></td>
+<td>path to folder with corpora</td>
+</tr>
+<tr class="even">
+<td>save_path</td>
+<td>str</td>
+<td></td>
+<td>path to save corpora</td>
+</tr>
+<tr class="odd">
+<td>force_rebuild</td>
+<td>bool</td>
+<td>False</td>
+<td>force rebuild of corpora, useful for development and testing</td>
+</tr>
+</tbody>
+</table>
+<p>Note: <a href="https://geoffford.nz/conc/api/corpora.html#build_sample_corpora"><code>build_sample_corpora</code></a> was accessible via conc.corpus as <a href="https://geoffford.nz/conc/api/corpus.html#build_test_corpora"><code>build_test_corpora</code></a> up to version 0.1.1. Calling it this way will raise a deprecation warning. It will be removed for version 1.0.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/geoffford\.nz\/conc");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/polsci/conc/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
