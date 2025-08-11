@@ -110,7 +110,7 @@ def keywords(self: Keyness,
 										restrict_tokens=restrict_tokens,
 										restrict_tokens_text=restrict_tokens_text,
 										exclude_punctuation=exclude_punctuation).to_frame()
-	
+
 	reference_df = freq_reference.frequencies(case_sensitive=case_sensitive,
 										normalize_by=normalize_by,
 										page_size=0,
@@ -163,14 +163,15 @@ def keywords(self: Keyness,
 	keyness_df = target_df.join(reference_df, on='token', how='left', suffix = '_reference', maintain_order='left').drop('rank', 'rank_reference')
 
 	if exclude_tokens:
-		excluded_tokens_count = keyness_df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).collect(engine='streaming').item()
-		keyness_df = keyness_df.filter(~pl.col('token').is_in(exclude_tokens))
+		excluded_tokens_count = keyness_df.filter(pl.col('token').is_in(exclude_tokens)).select(pl.len()).item()
+		#keyness_df = keyness_df.filter(~pl.col('token').is_in(exclude_tokens))
 		if exclude_tokens_text == '':
 			formatted_data.append(f'Tokens excluded from report: {excluded_tokens_count}')
 		else:
 			formatted_data.append(f'{exclude_tokens_text}')
+
 	if restrict_tokens:
-		keyness_df = keyness_df.filter(pl.col('token').is_in(restrict_tokens))
+		#keyness_df = keyness_df.filter(pl.col('token').is_in(restrict_tokens))
 		if restrict_tokens_text == '':
 			formatted_data.append(f'')
 		else:

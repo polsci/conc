@@ -78,6 +78,7 @@ def frequencies(self: Frequency,
 			formatted_data.append(f'Tokens excluded from report: {excluded_tokens_count}')
 		else:
 			formatted_data.append(f'{exclude_tokens_text}')
+			
 	if restrict_tokens:
 		df = df.filter(pl.col('token').is_in(restrict_tokens))
 		if restrict_tokens_text == '':
