@@ -52,7 +52,7 @@ def keywords(self: Keyness,
 				show_document_frequency:bool=False, # show document frequency in output
 				exclude_tokens:list[str]=[], # exclude specific tokens from report results
 				exclude_tokens_text:str = '', # text to explain which tokens have been excluded, will be added to the report notes
-				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens
+				restrict_tokens:list[str]=[], # restrict report to return results for a list of specific tokens (see note below)
 				restrict_tokens_text:str = '', # text to explain which tokens are included, will be added to the report notes
 				exclude_punctuation:bool=True, # exclude punctuation tokens
 				handle_common_typographic_differences:bool=True, # whether to detect and normalize common differences in word tokens due to typographic differences (i.e. currently focused on apostrophes in common English contractions), ignored when exclude_punctuation is False
