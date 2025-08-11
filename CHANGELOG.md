@@ -5,6 +5,21 @@ Added, Changed, Deprecated, Removed, Fixed, or Security
 
 This information is mirrored on the documentation site [Releases page](https://geoffford.nz/conc/development/releases.html).
 
+## [0.1.13] - 2025-08-12 - restrict/exclude tokens improvements for keyness, bug fix
+
+### Changed
+
+- replacing call to deprecated function in frequency tests
+- removing double filtering of restrict/excluded tokens keyness
+- added tests for restrict tokens in keyness
+- add note on restrict_tokens interaction with other arguments
+- pinning polars to 1.31.0 based on is_in bug in 1.32.0
+- ensuring force rebuild of sample corpora forces redownload of source data
+
+### Fixed
+
+- correcting attempt to collect already collected lazyframe in keyness
+
 ## [0.1.12] - 2025-07-24 - documentation updates, bug fix
 
 ### Added
